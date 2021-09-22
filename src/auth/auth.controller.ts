@@ -11,11 +11,13 @@ export class AuthController {
   //   @UseGuards(LocalAuthGuard)
   @Post('/login')
   //   async login(user: userLoginDto, @Res() res: Response) {
-  async login(@Body() user: UserLoginDto) {
+  async login(@Body() body: UserLoginDto) {
+    const user = await this.authService.validateUser(body);
+
     return {
       user,
-      ...{ hi: 123 },
     };
+
     // const { user, access_token } = await this.authService.login(req.user);
 
     // res.cookie('accessToken', access_token, {
