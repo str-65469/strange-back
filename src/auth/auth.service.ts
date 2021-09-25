@@ -1,6 +1,6 @@
 import { JwtAcessService } from './../jwt/jwt-access.service';
-import { UserLoginDto, SafeUserLogin } from './../users/dto/user-login.dto';
-import { User, UsersService } from './../users/users.service';
+import { UserLoginDto, SafeUserLogin } from '../user/dto/user-login.dto';
+import { User, UsersService } from '../user/users.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 export interface ValidateResponse {

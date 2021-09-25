@@ -1,4 +1,4 @@
-import { UserLoginDto } from './../../users/dto/user-login.dto';
+import { UserLoginDto } from '../../user/dto/user-login.dto';
 import { AuthService } from '../auth.service';
 import { Body, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';

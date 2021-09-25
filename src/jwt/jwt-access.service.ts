@@ -1,6 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import { Injectable } from '@nestjs/common';
-import { SafeUserLogin } from 'src/users/dto/user-login.dto';
+import { SafeUserLogin } from 'src/user/dto/user-login.dto';
 
 @Injectable()
 export class JwtAcessService {

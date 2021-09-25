@@ -1,5 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { UserLoginDto } from './../users/dto/user-login.dto';
+import { UserLoginDto } from '../user/dto/user-login.dto';
 import { Controller, Post, Res, Body } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
