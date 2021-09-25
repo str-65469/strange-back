@@ -19,7 +19,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: process.env.POSTGRES_USERNAME,
       password: process.env.POSTGRES_PASSWORD,
       autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV === 'development',
+      synchronize: process.env.APP_DEBUG_MODE === 'development',
     }),
   ],
   controllers: [AppController],
