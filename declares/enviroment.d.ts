@@ -3,7 +3,7 @@ import { AppDebugMode } from './enviroment-types';
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      APP_DEBUG_MODE: AppDebugMode;
+      NODE_ENV: AppDebugMode;
       POSTGRES_HOST: string;
       POSTGRES_DATABASE: string;
       POSTGRES_PORT: string;

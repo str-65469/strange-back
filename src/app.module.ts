@@ -6,11 +6,16 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+const ENV = process.env.NODE_ENV;
+
 @Module({
   imports: [
     UsersModule,
     AuthModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ENV == 'development' || !ENV ? '.env' : `.env.${ENV}`,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,

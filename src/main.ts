@@ -14,6 +14,7 @@ async function bootstrap() {
   });
   await app.listen(3000);
 
-  Logger.log({ DEBUG_MODE: process.env.APP_DEBUG_MODE });
+  Logger.log({ DEBUG_MODE: process.env.NODE_ENV });
+  console.log({ DEBUG_MODE: process.env.NODE_ENV });
 }
 bootstrap();
