@@ -6,7 +6,7 @@ export default class Another {
   id: number;
 
   @Column()
-  username: string;
+  usernamexxx: string;
 
   @Column()
   username1: string;

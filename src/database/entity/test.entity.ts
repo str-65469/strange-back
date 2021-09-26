@@ -6,5 +6,5 @@ export default class Test {
   xxxx: number;
 
   @Column()
-  yyyyyy: string;
+  yyyyyysahdsaohsaohds: string;
 }
