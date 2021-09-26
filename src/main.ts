@@ -1,7 +1,7 @@
 import * as cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,7 +14,6 @@ async function bootstrap() {
   });
   await app.listen(3000);
 
-  Logger.log({ DEBUG_MODE: process.env.NODE_ENV });
   console.log({ DEBUG_MODE: process.env.NODE_ENV });
 }
 bootstrap();
