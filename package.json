@@ -24,7 +24,8 @@
     "migrate:generate": "yarn run typeorm -- migration:generate -n",
     "migrate:run": "yarn run typeorm -- migration:run",
     "migratemain": "yarn run typeorm migration:generate -n Main",
-    "migrate": "yarn run migratemain && yarn run migrate:run"
+    "clean": "rimraf src/database/migrations/*",
+    "migrate": "yarn run clean && yarn run migratemain && yarn run migrate:run"
   },
   "dependencies": {
     "@nestjs/common": "^7.6.15",
