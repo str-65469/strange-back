@@ -7,7 +7,7 @@ export class ContactUs {
   @PrimaryGeneratedColumn() id: number;
   @Column() name: string;
   @Column() email: string;
-  @Column('text') message: string;
+  @Column({ type: 'text', nullable: true }) message?: string;
   @Column({ type: 'enum', enum: ContactUseMessageTypes }) message_type: ContactUseMessageTypes;
 
   @ManyToOne(() => User, (user) => user.id)

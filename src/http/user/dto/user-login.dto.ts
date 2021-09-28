@@ -8,10 +8,3 @@ export class UserLoginDto {
   @IsNotEmpty()
   password: string;
 }
-
-export class SafeUserLogin {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-}

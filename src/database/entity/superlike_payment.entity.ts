@@ -6,7 +6,7 @@ import { PaymentType } from 'src/enum/payment_type.enum';
 @Entity('superlike_payment')
 export class SuperLikePayment {
   @PrimaryGeneratedColumn() id: number;
-  @Column('float') amount: number;
+  @Column({ type: 'float' }) amount: number;
   @Column({ type: 'enum', enum: SuperLikeServiceType }) like_service_type: SuperLikeServiceType;
   @Column({ type: 'enum', enum: PaymentType }) payment_type: PaymentType;
 

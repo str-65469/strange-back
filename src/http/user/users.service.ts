@@ -1,29 +1,22 @@
 import { Injectable } from '@nestjs/common';
-
-export type User = {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-  password: string;
-};
+import User from 'src/database/entity/user.entity';
 
 @Injectable()
 export class UsersService {
   private readonly users: Array<User> = [
     {
       id: 1,
-      name: 'gio',
       username: 'giusha',
       email: 'gio@gio.com',
       password: 'giusha123',
+      created_at: new Date(),
     },
     {
       id: 2,
-      name: 'lela',
       username: 'lelachka',
       email: 'lela@lela.com',
       password: 'lela123',
+      created_at: new Date(),
     },
   ];
 

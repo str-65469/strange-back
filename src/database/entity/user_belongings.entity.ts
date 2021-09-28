@@ -9,6 +9,6 @@ export default class UserBelongings {
   @JoinColumn({ name: 'user_id' })
   user_id: User;
 
-  @Column() super_like: number;
+  @Column({ nullable: true }) super_like?: number;
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) created_at: Date;
 }

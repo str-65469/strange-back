@@ -1,3 +1,7 @@
 export enum LolMainLane {
-  TEST = 'something',
+  TOP = 'top',
+  JUNGLE = 'jungle',
+  MID = 'mid',
+  ADC = 'adc',
+  SUPPORT = 'support',
 }

@@ -1,3 +1,5 @@
 export enum DuoStatus {
-  TEST = 'hello',
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  DECLINE = 'decline',
 }

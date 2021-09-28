@@ -4,7 +4,7 @@ import User from './user.entity';
 @Entity('matched_duos')
 export class MatchedDuos {
   @PrimaryGeneratedColumn() id: number;
-  @Column() is_favorite: boolean;
+  @Column({ nullable: false }) is_favorite: boolean;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
@@ -14,6 +14,6 @@ export class MatchedDuos {
   @JoinColumn({ name: 'matched_user_id' })
   matched_user_id: number;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) updated_at: Date;
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', nullable: false }) updated_at: Date;
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) created_at: Date;
 }
