@@ -1,8 +1,15 @@
+import { UserRegisterCache } from './../../database/entity/user_register_cache';
 import { Injectable } from '@nestjs/common';
 import User from 'src/database/entity/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(UserRegisterCache)
+    private readonly userRegisterRepository: UserRegisterCache,
+  ) {}
+
   private readonly users: Array<User> = [
     {
       id: 1,

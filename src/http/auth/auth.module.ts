@@ -1,3 +1,4 @@
+import { MailModule } from './../../mail/mail.module';
 import { JwtAcessService } from './../jwt/jwt-access.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './auth.controller';
@@ -15,6 +16,7 @@ import { JwtModule } from '@nestjs/jwt';
       secret: 'SECRET',
       signOptions: { expiresIn: 6000 },
     }),
+    MailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAcessService],

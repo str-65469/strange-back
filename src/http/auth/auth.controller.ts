@@ -5,6 +5,7 @@ import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { JwtAcessService } from '../jwt/jwt-access.service';
 import { UsersService } from '../user/users.service';
+import { MailService } from 'src/mail/mail.service';
 
 @Controller('/auth')
 export class AuthController {
@@ -13,6 +14,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly userService: UsersService,
     private readonly jwtAcessService: JwtAcessService,
+    private readonly mailServie: MailService,
   ) {}
 
   @Post('/login')
@@ -32,13 +34,19 @@ export class AuthController {
 
   @Post('/register')
   async register(@Body() body: UserRegisterDto) {
-    const user = this.userService.findOne(body.email);
+    const { username, email, password } = body;
+
+    const user = this.userService.findOne(email);
 
     if (user) {
       throw new HttpException('user already exists', HttpStatus.BAD_REQUEST);
     }
 
+    //! https://notiz.dev/blog/send-emails-with-nestjs
+
     // send to mail
+    this.mailServie.sendUserConfirmation(username, email);
+
     // cache into database
   }
 }

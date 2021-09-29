@@ -28,6 +28,7 @@
     "migrate": "yarn run clean && yarn run migratemain && yarn run migrate:run"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.6.0",
     "@nestjs/common": "^7.6.15",
     "@nestjs/config": "^1.0.1",
     "@nestjs/core": "^7.6.15",
@@ -40,6 +41,8 @@
     "class-validator": "^0.13.1",
     "cookie-parser": "^1.4.5",
     "dotenv": "^10.0.0",
+    "handlebars": "^4.7.7",
+    "nodemailer": "^6.6.5",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
@@ -58,6 +61,7 @@
     "@types/express": "^4.17.11",
     "@types/jest": "^26.0.22",
     "@types/node": "^14.14.36",
+    "@types/nodemailer": "^6.4.4",
     "@types/passport-jwt": "^3.0.6",
     "@types/passport-local": "^1.0.34",
     "@types/supertest": "^2.0.10",
