@@ -11,12 +11,9 @@ export interface ValidateResponse {
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly userService: UsersService,
-    private readonly jwtAcessService: JwtAcessService,
-  ) {}
+  constructor(private readonly userService: UsersService) {}
 
-  async validateUser(userCredentials: UserLoginDto): Promise<ValidateResponse> {
+  async validateUser(userCredentials: UserLoginDto): Promise<User> {
     // find user
     const user = await this.userService.findOne(userCredentials.email);
 
@@ -26,9 +23,6 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
-    // get token with safe user payload
-    const token = this.jwtAcessService.generateAccessToken(user);
-
-    return { access_token: token, user };
+    return user;
   }
 }

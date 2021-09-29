@@ -9,6 +9,7 @@ declare global {
       POSTGRES_PORT: string;
       POSTGRES_USERNAME: string;
       POSTGRES_PASSWORD: string;
+      JWT_SECRET: string;
     }
   }
 }
