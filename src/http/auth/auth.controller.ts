@@ -34,19 +34,28 @@ export class AuthController {
 
   @Post('/register')
   async register(@Body() body: UserRegisterDto) {
-    const { username, email, password } = body;
+    const { email, summoner_name, server } = body;
 
-    const user = this.userService.findOne(email);
+    // first check if user exists
+    await this.authService.userExists(email);
 
-    if (user) {
-      throw new HttpException('user already exists', HttpStatus.BAD_REQUEST);
+    // second check if user lol credentials is valid
+    const check = await this.userService.checkLolCredentialsValid(server, summoner_name);
+
+    console.log(body);
+    console.log(check);
+    return 123;
+
+    if (check) {
+      // third cache into database
+      const userCached = await this.userService.cacheUserRegister(body);
+
+      console.log(userCached);
+
+      // send to mail
+      this.mailServie.sendUserConfirmation(userCached);
     }
-
-    //! https://notiz.dev/blog/send-emails-with-nestjs
-
-    // send to mail
-    this.mailServie.sendUserConfirmation(username, email);
-
-    // cache into database
   }
 }
+
+//! https://notiz.dev/blog/send-emails-with-nestjs

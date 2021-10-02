@@ -1,15 +1,11 @@
+import { LolServer } from './../../enum/lol_server.enum';
 import { UserRegisterCache } from './../../database/entity/user_register_cache';
 import { Injectable } from '@nestjs/common';
 import User from 'src/database/entity/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { UserRegisterDto } from './dto/user-register.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(UserRegisterCache)
-    private readonly userRegisterRepository: UserRegisterCache,
-  ) {}
-
   private readonly users: Array<User> = [
     {
       id: 1,
@@ -29,5 +25,16 @@ export class UsersService {
 
   async findOne(email: string): Promise<User | undefined> {
     return this.users.find((user) => user.email === email);
+  }
+
+  async checkLolCredentialsValid(server: LolServer, summoner_name: string): Promise<boolean> {
+    // use api here
+
+    return true;
+  }
+
+  async cacheUserRegister(body: UserRegisterDto) {
+    const userCache = new UserRegisterCache(body);
+    return await userCache.save();
   }
 }

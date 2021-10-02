@@ -5,10 +5,15 @@
   "username": "giorgi",
   "password": "giorgi",
   "database": "strangeelo",
+  "logging": true,
   "synchronize": false,
-  "entities": ["dist/**/*.entity.js"],
+  "entities": [
+    "dist/**/*.entity.js"
+  ],
   "migrationsTableName": "migration",
-  "migrations": ["src/database/migration/*.ts"],
+  "migrations": [
+    "src/database/migration/*.ts"
+  ],
   "cli": {
     "migrationsDir": "src/database/migration"
   }

@@ -1,7 +1,7 @@
 import { JwtAcessService } from './../jwt/jwt-access.service';
 import { UserLoginDto } from '../user/dto/user-login.dto';
 import { UsersService } from '../user/users.service';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import User from 'src/database/entity/user.entity';
 
 export interface ValidateResponse {
@@ -24,5 +24,13 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async userExists(email: string): Promise<void> {
+    const user = await this.userService.findOne(email);
+
+    if (user) {
+      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    }
   }
 }

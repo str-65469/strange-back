@@ -39,8 +39,8 @@ export class ConfigService {
       password: this.getValue('POSTGRES_PASSWORD'),
       database: this.getValue('POSTGRES_DATABASE'),
 
+      logging: true,
       synchronize: false,
-      //   entities: ['**/*.entity{.ts,.js}'],
       entities: ['dist/**/*.entity.js'],
 
       migrationsTableName: 'migration',
