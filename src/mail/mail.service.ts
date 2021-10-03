@@ -1,27 +1,24 @@
-import { UserRegisterCache } from './../database/entity/user_register_cache';
-import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
+import { RegisterMailCheckService } from './register/register_check.service';
+
+export const SENDER_ADDRESS = `"${process.env.APP_TITLE} 👻" <${process.env.MAIL_USER}>`;
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  constructor(
+    @Inject('RegisterMailCheck')
+    private readonly registerMailService: RegisterMailCheckService,
+  ) {}
 
   async sendUserConfirmation(userCached: UserRegisterCache) {
-    const url = `http://localhost?id=saisjaos1j2io3j12ioj`;
+    const { id, username, secret_token } = userCached;
 
-    await this.mailerService.sendMail({
-      to: 'giorgi.kumelashvili21@gmail.com',
-      from: 'giorgi.kumelashvili21@gmail.com',
+    const properties = {
+      url: process.env.APP_URL + `/auth/register/confirm?id=${id}&secret=${secret_token}`,
+      username,
+    };
 
-      //   to: userCached.emailD,
-      //   from: 'giorgi.kumelashvili21@gmail.com',
-
-      subject: 'Welcome to Nice App! Confirm your Email',
-      template: './confirmation', // `.hbs` extension is appended automatically
-      context: {
-        name: userCached.username,
-        url,
-      },
-    });
+    return await this.registerMailService.sendConfirmationEmail(userCached, properties);
   }
 }

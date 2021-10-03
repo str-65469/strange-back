@@ -9,15 +9,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    UsersModule,
-    PassportModule,
-    JwtModule.register({
-      secret: 'SECRET',
-      signOptions: { expiresIn: 6000 },
-    }),
-    MailModule,
-  ],
+  imports: [UsersModule, PassportModule, JwtModule.register({ secret: process.env.JWT_SECRET }), MailModule],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAcessService],
   exports: [AuthService],

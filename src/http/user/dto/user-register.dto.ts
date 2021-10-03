@@ -1,7 +1,5 @@
-import { LolLeague } from './../../../enum/lol_league.enum';
 import { LolServer } from './../../../enum/lol_server.enum';
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Transform } from 'class-transformer';
 
 export class UserRegisterDto {
   @IsNotEmpty()

@@ -1,11 +1,13 @@
+import { JwtService } from '@nestjs/jwt';
 import { UserRegisterDto } from './../user/dto/user-register.dto';
 import { UserLoginDto } from '../user/dto/user-login.dto';
-import { Controller, Post, Res, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Res, Body, Get, Query, ParseIntPipe } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { JwtAcessService } from '../jwt/jwt-access.service';
 import { UsersService } from '../user/users.service';
 import { MailService } from 'src/mail/mail.service';
+// import * as jwt from 'jsonwebtoken'
 
 @Controller('/auth')
 export class AuthController {
@@ -15,6 +17,7 @@ export class AuthController {
     private readonly userService: UsersService,
     private readonly jwtAcessService: JwtAcessService,
     private readonly mailServie: MailService,
+    private readonly jwtservice: JwtService,
   ) {}
 
   @Post('/login')
@@ -25,7 +28,6 @@ export class AuthController {
     res.cookie('accessToken', token, {
       expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
       sameSite: 'none',
-      //   sameSite: 'strict',
       httpOnly: true,
     });
 
@@ -42,20 +44,55 @@ export class AuthController {
     // second check if user lol credentials is valid
     const check = await this.userService.checkLolCredentialsValid(server, summoner_name);
 
-    console.log(body);
-    console.log(check);
-    return 123;
-
     if (check) {
       // third cache into database
       const userCached = await this.userService.cacheUserRegister(body);
 
+      console.log('==================');
       console.log(userCached);
 
       // send to mail
       this.mailServie.sendUserConfirmation(userCached);
     }
   }
+
+  @Get('/register/confirm')
+  async registerVerify(
+    @Query('id', ParseIntPipe) registerCacheID: number,
+    @Query('secret') secretToken: string,
+  ) {
+    const d = await this.jwtservice.verify(secretToken, { secret: process.env.JWT_REGISTER_CACHE_SECRET });
+    return d;
+    // validate token
+
+    // get data from cache
+
+    // generate access_token and refresh token and new secret
+
+    // save cached data in user
+
+    // additional data to user details
+
+    // delete user cached data
+
+    // return response
+
+    return {
+      msg: 'hello world',
+      id: registerCacheID,
+      token: secretToken,
+    };
+  }
 }
 
-//! https://notiz.dev/blog/send-emails-with-nestjs
+// jwt.verify(token, 'shhhhh', function(err, decoded) {
+// 	if (err) {
+// 	  /*
+// 		err = {
+// 		  name: 'TokenExpiredError',
+// 		  message: 'jwt expired',
+// 		  expiredAt: 1408621000
+// 		}
+// 	  */
+// 	}
+//   });
