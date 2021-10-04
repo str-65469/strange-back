@@ -16,10 +16,12 @@ export class AuthService {
     // find user
     const user = await this.userService.findOne(userCredentials.email);
 
-    // check user and password
-    if (!user || user.password !== userCredentials.password) {
-      // throw unauthorized exception
+    if (!user) {
       throw new UnauthorizedException('User not found');
+    }
+
+    if (user.password !== userCredentials.password) {
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     return user;

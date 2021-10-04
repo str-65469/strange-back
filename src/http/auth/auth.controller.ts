@@ -22,7 +22,6 @@ import { AuthService } from './auth.service';
 import { JwtAcessService } from '../jwt/jwt-access.service';
 import { UsersService } from '../user/users.service';
 import { MailService } from 'src/mail/mail.service';
-import * as jwt from 'jsonwebtoken';
 import { JwtRegisterAuthGuard } from './guards/jwt-register.guard';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -46,6 +45,9 @@ export class AuthController {
   async login(@Body() body: UserLoginDto, @Res() res: Response) {
     const user = await this.authService.validateUser(body);
     const token = this.jwtAcessService.generateAccessToken(user);
+    const refreshTokenResponse = this.jwtAcessService.generateRefreshToken(user);
+
+    await this.userService.saveUser(user, refreshTokenResponse);
 
     res.cookie('accessToken', token, {
       expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
@@ -90,13 +92,13 @@ export class AuthController {
     const refreshTokenResponse = this.jwtAcessService.generateRefreshToken(cachedData);
 
     // save cached data in user
-    const saved = await this.userService.saveUserByCachedData(cachedData, refreshTokenResponse);
+    const savedUser = await this.userService.saveUserByCachedData(cachedData, refreshTokenResponse);
 
     // save additional data to user details
-    const savedAdditional = await this.userDetailsService.saveUserDetailsByCachedData(cachedData);
+    await this.userDetailsService.saveUserDetailsByCachedData(cachedData);
 
     // delete user cached data
-    const deletedUser = await this.userRegisterCacheService.delete(cachedData.id);
+    await this.userRegisterCacheService.delete(cachedData.id);
 
     // send httpOnly access_token cookie
     res.cookie('access_token', accessToken, {
@@ -105,10 +107,6 @@ export class AuthController {
       httpOnly: true,
     });
 
-    return res.send({
-      saved,
-      savedAdditional,
-      deletedUser,
-    });
+    return res.send({ user: savedUser });
   }
 }
