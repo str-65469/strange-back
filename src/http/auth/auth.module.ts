@@ -17,8 +17,11 @@ import { UserRegisterCacheService } from '../user_register_cache/user_register_c
   imports: [
     UsersModule,
     PassportModule,
-    JwtModule.register({ secret: process.env.JWT_SECRET }),
     MailModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '30m' },
+    }),
     TypeOrmModule.forFeature([UserRegisterCache, UserDetails]),
   ],
   controllers: [AuthController],

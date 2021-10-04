@@ -7,6 +7,7 @@ import { UserRegisterDto } from './dto/user-register.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshTokenResponse } from '../jwt/jwt-access.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {

@@ -2,6 +2,7 @@ import { UserLoginDto } from '../user/dto/user-login.dto';
 import { UsersService } from '../user/users.service';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import User from 'src/database/entity/user.entity';
+import * as bcrypt from 'bcrypt';
 
 export interface ValidateResponse {
   access_token: string;
@@ -20,7 +21,9 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
-    if (user.password !== userCredentials.password) {
+    const isPasswordMatch = await bcrypt.compare(userCredentials.password, user.password);
+
+    if (isPasswordMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
