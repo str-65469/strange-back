@@ -1,8 +1,13 @@
+import { RandomGenerator } from './../../helpers/random_generator';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { JwtService } from '@nestjs/jwt';
 import { Injectable } from '@nestjs/common';
 import User from 'src/database/entity/user.entity';
-import crypto from 'crypto';
+
+export interface RefreshTokenResponse {
+  secret: string;
+  refreshToken: string;
+}
 
 @Injectable()
 export class JwtAcessService {
@@ -10,25 +15,22 @@ export class JwtAcessService {
 
   public generateAccessToken(user: User | UserRegisterCache): string {
     const payload = {
+      id: user.id,
       username: user.username,
-      sub: user.id,
     };
 
-    const token = this.jwtService.sign(payload, { expiresIn: '30s' });
-    // const token = this.jwtService.sign(payload, { expiresIn: '15m', secret: process.env.JWT_SECRET });
-
-    return token;
+    return this.jwtService.sign(payload, { expiresIn: '30s' });
+    // return this.jwtService.sign(payload, { expiresIn: '15m', secret: process.env.JWT_SECRET });
   }
 
-  public generateRefreshToken(user: User) {
+  public generateRefreshToken(user: User | UserRegisterCache): RefreshTokenResponse {
     const payload = {
+      id: user.id,
       username: user.username,
-      sub: user.id,
     };
 
-    const secret = crypto.randomBytes(20).toString('hex');
+    const secret = RandomGenerator.randomString();
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '1m', secret });
-    // const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d', secret });
 
     return { secret, refreshToken };
   }

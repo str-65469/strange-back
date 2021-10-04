@@ -6,6 +6,7 @@ import User from 'src/database/entity/user.entity';
 import { UserRegisterDto } from './dto/user-register.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RefreshTokenResponse } from '../jwt/jwt-access.service';
 
 @Injectable()
 export class UsersService {
@@ -32,8 +33,7 @@ export class UsersService {
     d2.setMinutes(d1.getMinutes() + 30);
 
     const expiryDate = d2;
-    const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '5s' });
-    // const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '30m' });
+    const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '30m' });
 
     const userCache = new UserRegisterCache({
       email,
@@ -46,5 +46,18 @@ export class UsersService {
     });
 
     return await userCache.save();
+  }
+
+  async saveUserByCachedData(userCached: UserRegisterCache, opt: RefreshTokenResponse) {
+    const { email, password, username } = userCached;
+
+    const user = new User();
+    user.email = email;
+    user.password = password;
+    user.username = username;
+    user.secret = opt.secret;
+    user.refresh_token = opt.refreshToken;
+
+    return await this.userRepository.save(user);
   }
 }

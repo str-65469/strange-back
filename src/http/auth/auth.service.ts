@@ -32,6 +32,4 @@ export class AuthService {
       throw new BadRequestException('Email already in use');
     }
   }
-
-  //   async validateUserRegister() {}
 }

@@ -18,5 +18,6 @@ import { MailModule } from './mail/mail.module';
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [],
 })
 export class AppModule {}
