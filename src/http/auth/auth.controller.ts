@@ -70,9 +70,6 @@ export class AuthController {
       // third cache into database
       const userCached = await this.userService.cacheUserRegister(body);
 
-      console.log('==================');
-      console.log(userCached);
-
       // send to mail
       this.mailServie.sendUserConfirmation(userCached);
     }
