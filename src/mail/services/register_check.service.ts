@@ -12,7 +12,7 @@ export class RegisterMailCheckService {
       .sendMail({
         from: SENDER_ADDRESS,
         to: userCached.email,
-        subject: 'Welcome to Nice App! Confirm your Email',
+        subject: 'Welcome to Strangeelo! Confirm your Email',
         template: './register_confirmation', // `.hbs` extension is appended automatically
         context: properties,
       })

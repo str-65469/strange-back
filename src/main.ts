@@ -6,7 +6,14 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
 //TODO remove crypto not used anywhere
-//TODO user password is saved as normal not hashed resolve it
+
+/*TODO
+@CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+public created_at: Date;
+
+@UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
+public updated_at: Date;
+*/
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -22,9 +29,10 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
+  const PORT = 3000;
 
-  await app.listen(3000);
+  await app.listen(PORT);
 
-  console.log({ DEBUG_MODE: process.env.NODE_ENV });
+  console.log({ DEBUG_MODE: process.env.NODE_ENV, PORT: PORT });
 }
 bootstrap();

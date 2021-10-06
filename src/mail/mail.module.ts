@@ -1,9 +1,10 @@
-import { RegisterMailCheckService } from './register/register_check.service';
+import { RegisterMailCheckService } from './services/register_check.service';
 import { Module } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { ContactUsMailService } from './services/contact_us.service';
 
 @Module({
   imports: [
@@ -31,6 +32,10 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     {
       provide: 'RegisterMailCheck',
       useClass: RegisterMailCheckService,
+    },
+    {
+      provide: 'ContactUsMail',
+      useClass: ContactUsMailService,
     },
   ],
   exports: [MailService],

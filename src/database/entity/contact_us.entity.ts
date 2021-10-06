@@ -9,10 +9,5 @@ export class ContactUs {
   @Column() email: string;
   @Column({ type: 'text', nullable: true }) message?: string;
   @Column({ type: 'enum', enum: ContactUseMessageTypes }) message_type: ContactUseMessageTypes;
-
-  @ManyToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: 'user_id' })
-  user_id: User;
-
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) created_at: Date;
 }

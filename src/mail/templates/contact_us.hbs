@@ -1,0 +1,28 @@
+<p style='margin: 0;'>From : {{email}},</p>
+<p style='margin: 0;'>Message Type : {{message_type}},</p>
+
+{{#if message}}
+  {{! this is just straight line regular hr tag doesnt work }}
+  {{! <table border='0' width='100%' cellpadding='0' cellspacing='0'>
+    <tr>
+      <td
+        style='background:none; border-bottom: 1px solid #d7dfe3; height:1px; width:100%; margin:0px 0px 0px 0px;'
+      >&nbsp;</td>
+    </tr>
+  </table>
+
+  <table>
+    <tr>
+      <td
+        style='background:none; border:dotted 1px #999999; border-width:1px 0 0 0; height:1px; width:100%; margin:0px 0px 0px 0px; padding-top:10px;padding-bottom:10px;'
+      >&nbsp;</td>
+    </tr>
+  </table> }}
+  <h4 style='margin: 0;'>Message: </h4>
+  <hr
+    height='1'
+    style='height:1px; border:0 none; color: #D7DFE3; background-color: #D7DFE3; margin-top:1.5em; margin-bottom:1.5em;'
+  />
+
+  <p>{{message}}</p>
+{{/if}}
