@@ -1,15 +1,36 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import User from './user.entity';
 
 @Entity('user_belongings')
 export default class UserBelongings {
-  @PrimaryGeneratedColumn() id: number;
-  @Column({ nullable: true }) super_like?: number;
+  @PrimaryGeneratedColumn()
+  public id: number;
+
+  @Column({ nullable: true })
+  public super_like?: number;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  user_id: User;
+  public user_id: User;
 
-  @Column({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP', nullable: true }) updatedAt: Date;
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) created_at: Date;
+  @CreateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
 }

@@ -1,19 +1,40 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import User from './user.entity';
 
 @Entity('matched_duos')
 export class MatchedDuos {
-  @PrimaryGeneratedColumn() id: number;
-  @Column({ nullable: false }) is_favorite: boolean;
+  @PrimaryGeneratedColumn()
+  public id: number;
+
+  @Column({ nullable: false })
+  public is_favorite: boolean;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  user_id: User;
+  public user_id: User;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'matched_user_id' })
-  matched_user_id: number;
+  public matched_user_id: number;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', nullable: false }) updated_at: Date;
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) created_at: Date;
+  @CreateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
 }

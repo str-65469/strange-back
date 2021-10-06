@@ -1,19 +1,44 @@
 import { DuoStatus } from './../../enum/duo_statuses.enum';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import User from './user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('duo_statuses')
 export class UserDetails {
-  @PrimaryGeneratedColumn() id: number;
+  @PrimaryGeneratedColumn()
+  public id: number;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  user_id: User;
+  public user_id: User;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'desired_user_id' })
-  desired_user_id: number;
+  public desired_user_id: number;
 
-  @Column({ type: 'enum', enum: DuoStatus }) status: DuoStatus;
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) created_at: Date;
+  @Column({
+    type: 'enum',
+    enum: DuoStatus,
+  })
+  public status: DuoStatus;
+
+  @CreateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
 }

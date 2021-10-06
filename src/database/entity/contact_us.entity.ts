@@ -1,13 +1,47 @@
 import { ContactUseMessageTypes } from './../../enum/contact_us_message_type.enum';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import User from './user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('contact_us')
 export class ContactUs {
-  @PrimaryGeneratedColumn() id: number;
-  @Column() name: string;
-  @Column() email: string;
-  @Column({ type: 'text', nullable: true }) message?: string;
-  @Column({ type: 'enum', enum: ContactUseMessageTypes }) message_type: ContactUseMessageTypes;
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) created_at: Date;
+  @PrimaryGeneratedColumn()
+  public id: number;
+
+  @Column()
+  public name: string;
+
+  @Column()
+  public email: string;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  public message?: string;
+
+  @Column({
+    type: 'enum',
+    enum: ContactUseMessageTypes,
+  })
+  public message_type: ContactUseMessageTypes;
+
+  @CreateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
 }

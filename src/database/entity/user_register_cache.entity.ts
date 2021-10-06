@@ -1,4 +1,11 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { LolServer } from '../../enum/lol_server.enum';
 
 interface RegisterCacheConstrParams {
@@ -14,18 +21,49 @@ interface RegisterCacheConstrParams {
 
 @Entity('user_register_cache')
 export class UserRegisterCache extends BaseEntity {
-  @PrimaryGeneratedColumn() id: number;
-  @Column() username: string;
-  @Column() email: string;
-  @Column() password: string;
-  @Column({ nullable: true, type: 'enum', enum: LolServer }) server?: LolServer;
-  @Column({ nullable: true }) summoner_name?: string;
+  @PrimaryGeneratedColumn()
+  public id: number;
 
-  // for timer
-  @Column({ nullable: true }) secret_token?: string;
-  @Column({ type: 'timestamptz', nullable: true }) expiry_date?: Date;
+  @Column()
+  public username: string;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) created_at: Date;
+  @Column()
+  public email: string;
+
+  @Column()
+  public password: string;
+
+  @Column({
+    nullable: true,
+    type: 'enum',
+    enum: LolServer,
+  })
+  public server?: LolServer;
+
+  @Column({ nullable: true })
+  public summoner_name?: string;
+
+  @Column({ nullable: true })
+  public secret_token?: string;
+
+  @Column({
+    type: 'timestamptz',
+    nullable: true,
+  })
+  public expiry_date?: Date;
+
+  @CreateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
 
   constructor(params?: RegisterCacheConstrParams) {
     super();
