@@ -3,6 +3,7 @@ import { UsersService } from '../user/users.service';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import User from 'src/database/entity/user.entity';
 import * as bcrypt from 'bcrypt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 
 export interface ValidateResponse {
   access_token: string;
@@ -11,7 +12,7 @@ export interface ValidateResponse {
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly userService: UsersService, private readonly jwtService: JwtService) {}
 
   async validateUser(userCredentials: UserLoginDto): Promise<User> {
     // find user
@@ -23,7 +24,7 @@ export class AuthService {
 
     const isPasswordMatch = await bcrypt.compare(userCredentials.password, user.password);
 
-    if (isPasswordMatch) {
+    if (!isPasswordMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -36,5 +37,31 @@ export class AuthService {
     if (user) {
       throw new BadRequestException('Email already in use');
     }
+  }
+
+  async validateToken(token: string): Promise<any> {
+    try {
+      const verifiedToken = await this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+      return verifiedToken;
+    } catch (error) {
+      if (error.message === 'jwt expired') {
+        const newToken = await this.refreshToken(token);
+        return newToken;
+      } else {
+        throw new UnauthorizedException();
+      }
+    }
+  }
+
+  async refreshToken(token: string | any): Promise<any> {
+    const decodedToken = (await this.jwtService.decode(token)) as any;
+    const { email, id } = decodedToken;
+    const payload = { email, id };
+    const options: JwtSignOptions = {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '2w',
+    };
+    const accessToken = await this.jwtService.sign(payload, options);
+    return { accessToken };
   }
 }

@@ -46,6 +46,13 @@ export default class User {
 
   @BeforeInsert()
   async hashPassword(): Promise<void> {
+    // var bcrypt = require('bcrypt');
+    // const saltRounds = 10;
+    // const myPlaintextPassword = 's0/\/\P4$$w0rD';
+
+    // var salt = bcrypt.genSaltSync(16);
+    // var hash = bcrypt.hashSync(myPlaintextPassword, salt);
+
     const salt = await bcrypt.genSalt(16);
     const hash = await bcrypt.hash(this.password, salt);
     this.password = hash;
