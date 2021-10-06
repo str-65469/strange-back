@@ -7,14 +7,6 @@ import { join } from 'path';
 
 //TODO remove crypto not used anywhere
 
-/*TODO
-@CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
-public created_at: Date;
-
-@UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
-public updated_at: Date;
-*/
-
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
