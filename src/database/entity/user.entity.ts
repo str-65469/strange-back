@@ -22,8 +22,8 @@ export default class User {
   @Column()
   public password: string;
 
-  @Column({ nullable: true })
-  public refresh_token?: string;
+  //   @Column({ nullable: true })
+  //   public refresh_token?: string;
 
   @Column({ nullable: true })
   public secret?: string;

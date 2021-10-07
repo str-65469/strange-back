@@ -45,11 +45,17 @@ export class AuthController {
   async login(@Body() body: UserLoginDto, @Res() res: Response) {
     const user = await this.authService.validateUser(body);
     const token = this.jwtAcessService.generateAccessToken(user);
-    const refreshTokenResponse = this.jwtAcessService.generateRefreshToken(user);
+    const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(user);
 
-    await this.userService.saveUser(user, refreshTokenResponse);
+    await this.userService.saveUser(user, secret);
 
-    res.cookie('accessToken', token, {
+    res.cookie('access_token', token, {
+      expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+      sameSite: 'none',
+      httpOnly: true,
+    });
+
+    res.cookie('refresh_token', refreshToken, {
       expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
       sameSite: 'none',
       httpOnly: true,
@@ -89,10 +95,10 @@ export class AuthController {
 
     // generate access_token and refresh token and new secret
     const accessToken = this.jwtAcessService.generateAccessToken(cachedData);
-    const refreshTokenResponse = this.jwtAcessService.generateRefreshToken(cachedData);
+    const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(cachedData);
 
     // save cached data in user
-    const savedUser = await this.userService.saveUserByCachedData(cachedData, refreshTokenResponse);
+    const savedUser = await this.userService.saveUserByCachedData(cachedData, secret);
 
     // save additional data to user details
     await this.userDetailsService.saveUserDetailsByCachedData(cachedData);
@@ -102,6 +108,12 @@ export class AuthController {
 
     // send httpOnly access_token cookie
     res.cookie('access_token', accessToken, {
+      expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+      sameSite: 'none',
+      httpOnly: true,
+    });
+
+    res.cookie('refresh_token', refreshToken, {
       expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
       sameSite: 'none',
       httpOnly: true,

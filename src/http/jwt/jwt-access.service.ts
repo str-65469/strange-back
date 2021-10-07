@@ -20,7 +20,7 @@ export class JwtAcessService {
     };
 
     return this.jwtService.sign(payload, { expiresIn: '30s' });
-    // return this.jwtService.sign(payload, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    // return this.jwtService.sign(payload, { expiresIn: '15m' });
   }
 
   public generateRefreshToken(user: User | UserRegisterCache): RefreshTokenResponse {

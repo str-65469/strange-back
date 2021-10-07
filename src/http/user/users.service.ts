@@ -49,22 +49,20 @@ export class UsersService {
     return await userCache.save();
   }
 
-  async saveUserByCachedData(userCached: UserRegisterCache, opt: RefreshTokenResponse): Promise<User> {
+  async saveUserByCachedData(userCached: UserRegisterCache, secret: string): Promise<User> {
     const { email, password, username } = userCached;
 
     const user = new User();
     user.email = email;
     user.password = password;
     user.username = username;
-    user.secret = opt.secret;
-    user.refresh_token = opt.refreshToken;
+    user.secret = secret;
 
     return await this.userRepository.save(user);
   }
 
-  async saveUser(user: User, opt: RefreshTokenResponse) {
-    user.secret = opt.secret;
-    user.refresh_token = opt.refreshToken;
+  async saveUser(user: User, secret: string) {
+    user.secret = secret;
 
     return await this.userRepository.save(user);
   }
