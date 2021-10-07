@@ -1,5 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { configs } from 'src/configs';
 import { JwtAcessService } from 'src/http/jwt/jwt-access.service';
 
 @Injectable()
@@ -12,9 +13,13 @@ export class JwtAcessTokenAuthGuard implements CanActivate {
     const accessToken = cookies?.access_token;
 
     if (!accessToken) {
-      throw new UnauthorizedException('access token is missing');
+      throw new UnauthorizedException(configs.messages.exceptions.accessTokenMissing);
     }
 
-    return this.jwtAcessService.validateAcessToken(accessToken);
+    return this.jwtAcessService.validateToken({
+      token: accessToken,
+      secret: process.env.JWT_SECRET,
+      expired_message: configs.messages.exceptions.accessTokenExpired,
+    });
   }
 }

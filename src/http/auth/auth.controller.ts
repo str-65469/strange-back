@@ -16,8 +16,9 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { JwtAcessService } from '../jwt/jwt-access.service';
 import { UsersService } from '../user/users.service';
@@ -25,12 +26,14 @@ import { MailService } from 'src/mail/mail.service';
 import { JwtRegisterAuthGuard } from './guards/jwt-register.guard';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtRefreshTokenAuthGuard } from './guards/jwt-refresh.guard';
 
 @Controller('/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UsersService,
+    private readonly jwtService: JwtService,
     private readonly jwtAcessService: JwtAcessService,
     private readonly mailServie: MailService,
     private readonly userDetailsService: UserDetailsServiceService,
@@ -119,5 +122,37 @@ export class AuthController {
     });
 
     return res.send({ user: savedUser });
+  }
+
+  @UseGuards(JwtRefreshTokenAuthGuard)
+  @Get('/refresh')
+  public async refreshToken(@Req() req: Request, @Res() res: Response) {
+    const cookies = req.cookies;
+    const accessToken = cookies.access_token;
+
+    const accessTokenDecoded = this.jwtService.decode(accessToken) as { id: number; email: string };
+    const id = accessTokenDecoded.id;
+    const user = await this.userService.findOne(id);
+
+    // generate access_token and refresh token and new secret
+    const accessTokenNew = this.jwtAcessService.generateAccessToken(user);
+    const refreshNew = this.jwtAcessService.generateRefreshToken(user);
+
+    // update user secret
+    await this.userService.saveUser(user, refreshNew.secret);
+
+    res.cookie('access_token', accessTokenNew, {
+      expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+      sameSite: 'none',
+      httpOnly: true,
+    });
+
+    res.cookie('refresh_token', refreshNew.refreshToken, {
+      expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+      sameSite: 'none',
+      httpOnly: true,
+    });
+
+    return res.send({ message: 'token refresh successful' });
   }
 }

@@ -13,6 +13,12 @@ export interface RefreshTokenResponse {
   refreshToken: string;
 }
 
+interface ValidateAcessTokenProps {
+  token: string;
+  secret: string;
+  expired_message?: string;
+}
+
 @Injectable()
 export class JwtAcessService {
   constructor(private readonly jwtService: JwtService) {}
@@ -38,12 +44,12 @@ export class JwtAcessService {
     return { secret, refreshToken };
   }
 
-  public validateAcessToken(token): boolean {
-    jwt.verify(token, process.env.JWT_SECRET, (err: jwt.VerifyErrors) => {
+  public validateToken(params: ValidateAcessTokenProps): boolean {
+    jwt.verify(params.token, params.secret, (err: jwt.VerifyErrors) => {
       if (err) {
         if (err.name === MessageCode.TOKEN_EXPIRED) {
           throw new GeneralException(HttpStatus.UNAUTHORIZED, {
-            message: configs.messages.exceptions.accessTokenExpired,
+            message: params?.expired_message ?? configs.messages.exceptions.generalTokenExpired,
             status_code: HttpStatus.UNAUTHORIZED,
             message_code: MessageCode.TOKEN_EXPIRED,
             detailed: err,
@@ -61,4 +67,27 @@ export class JwtAcessService {
 
     return true;
   }
+  //   public validateAcessToken(token): boolean {
+  //     jwt.verify(token, process.env.JWT_SECRET, (err: jwt.VerifyErrors) => {
+  //       if (err) {
+  //         if (err.name === MessageCode.TOKEN_EXPIRED) {
+  //           throw new GeneralException(HttpStatus.UNAUTHORIZED, {
+  //             message: configs.messages.exceptions.accessTokenExpired,
+  //             status_code: HttpStatus.UNAUTHORIZED,
+  //             message_code: MessageCode.TOKEN_EXPIRED,
+  //             detailed: err,
+  //           });
+  //         }
+
+  //         throw new GeneralException(HttpStatus.UNAUTHORIZED, {
+  //           message: err.message,
+  //           status_code: HttpStatus.UNAUTHORIZED,
+  //           message_code: MessageCode.GENERAL,
+  //           detailed: err,
+  //         });
+  //       }
+  //     });
+
+  //     return true;
+  //   }
 }

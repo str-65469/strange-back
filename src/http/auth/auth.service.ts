@@ -16,7 +16,7 @@ export class AuthService {
 
   async validateUser(userCredentials: UserLoginDto): Promise<User> {
     // find user
-    const user = await this.userService.findOne(userCredentials.email);
+    const user = await this.userService.findOneByEmail(userCredentials.email);
 
     if (!user) {
       throw new UnauthorizedException('User not found');
@@ -32,7 +32,7 @@ export class AuthService {
   }
 
   async userExists(email: string): Promise<void> {
-    const user = await this.userService.findOne(email);
+    const user = await this.userService.findOneByEmail(email);
 
     if (user) {
       throw new BadRequestException('Email already in use');
