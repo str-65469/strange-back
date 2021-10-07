@@ -2,16 +2,15 @@ import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ContactUsService } from './app_services/contact_us/contact_us.service';
 import { ContactUsDto } from './app_services/contact_us/dto/ContactUsDto';
-import { JwtAcessTokenAuthGuard } from './http/auth/guards/jwt.guard';
+import { JwtAcessTokenAuthGuard } from './http/auth/guards/jwt-access.guard';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService, private readonly contactUsService: ContactUsService) {}
 
   @UseGuards(JwtAcessTokenAuthGuard)
-  //   @UseGuards(JwtAuthGuard)
   @Get('protected')
-  getHello(@Req() req) {
+  getHello() {
     return this.appService.getHello();
   }
 

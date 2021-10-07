@@ -39,30 +39,17 @@ export class AuthService {
     }
   }
 
-  async validateToken(token: string): Promise<any> {
-    try {
-      return await this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
-    } catch (error) {
-      if (error.message === 'jwt expired') {
-        const newToken = await this.refreshToken(token);
-        return newToken;
-      } else {
-        throw new UnauthorizedException();
-      }
-    }
-  }
+  //   async refreshToken(token: string | any): Promise<any> {
+  //     // const decodedToken = await this.jwtService.decode(token);
+  //     const decodedToken = (await this.jwtService.decode(token)) as any;
+  //     const { email, id } = decodedToken;
+  //     const payload = { email, id };
 
-  async refreshToken(token: string | any): Promise<any> {
-    // const decodedToken = await this.jwtService.decode(token);
-    const decodedToken = (await this.jwtService.decode(token)) as any;
-    const { email, id } = decodedToken;
-    const payload = { email, id };
-
-    const options: JwtSignOptions = {
-      secret: process.env.JWT_SECRET,
-      expiresIn: '2w',
-    };
-    const accessToken = await this.jwtService.sign(payload, options);
-    return { accessToken };
-  }
+  //     const options: JwtSignOptions = {
+  //       secret: process.env.JWT_SECRET,
+  //       expiresIn: '2w',
+  //     };
+  //     const accessToken = await this.jwtService.sign(payload, options);
+  //     return { accessToken };
+  //   }
 }

@@ -9,7 +9,7 @@ interface GeneralExceptonProps {
 }
 
 export class GeneralException extends HttpException {
-  constructor(opts: GeneralExceptonProps, statusCode: HttpStatus) {
+  constructor(statusCode: HttpStatus, opts: GeneralExceptonProps) {
     super(opts, statusCode);
   }
 }
