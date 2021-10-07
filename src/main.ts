@@ -6,6 +6,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
 //TODO remove crypto not used anywhere
+//TODO remove passport stuff completely
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

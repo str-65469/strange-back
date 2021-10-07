@@ -29,6 +29,6 @@ import { UserRegisterCacheService } from '../user_register_cache/user_register_c
     UserDetailsServiceService,
     UserRegisterCacheService,
   ],
-  exports: [AuthService],
+  exports: [AuthService, JwtAcessService],
 })
 export class AuthModule {}
