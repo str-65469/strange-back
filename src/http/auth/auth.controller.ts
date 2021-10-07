@@ -29,7 +29,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Controller('/auth')
 export class AuthController {
   constructor(
-    //   private readonly user
     private readonly authService: AuthService,
     private readonly userService: UsersService,
     private readonly jwtAcessService: JwtAcessService,

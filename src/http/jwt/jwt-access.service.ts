@@ -23,18 +23,17 @@ export class JwtAcessService {
       username: user.username,
     };
 
-    return this.jwtService.sign(payload, { expiresIn: '30s' });
-    // return this.jwtService.sign(payload, { expiresIn: '15m' });
+    return this.jwtService.sign(payload, { expiresIn: configs.tokens.access_token.expires_in });
   }
 
   public generateRefreshToken(user: User | UserRegisterCache): RefreshTokenResponse {
-    const payload = {
-      id: user.id,
-      username: user.username,
-    };
-
     const secret = RandomGenerator.randomString();
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '1m', secret });
+    const payload = { id: user.id, username: user.username };
+
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: configs.tokens.refresh_token.expires_in,
+      secret,
+    });
 
     return { secret, refreshToken };
   }
