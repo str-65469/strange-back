@@ -1,3 +1,4 @@
+import { SeederModule } from './database/seeders/seeder.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,6 +19,7 @@ import { ContactUs } from './database/entity/contact_us.entity';
     UsersModule,
     AuthModule,
     MailModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [AppService, ContactUsService],

@@ -14,7 +14,7 @@ import {
 import User from './user.entity';
 
 @Entity('user_details')
-export class UserDetails {
+export default class UserDetails {
   @PrimaryGeneratedColumn()
   public id: number;
 
