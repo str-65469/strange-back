@@ -6,14 +6,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import User from './user.entity';
 
-@Entity('user_details')
+@Entity()
 export default class UserDetails {
   @PrimaryGeneratedColumn()
   public id: number;
@@ -53,10 +52,6 @@ export default class UserDetails {
   })
   public main_champions?: Array<LolChampions>;
 
-  @OneToOne(() => User)
-  @JoinColumn({ name: 'user_id' })
-  public user_id: User;
-
   @Column({
     nullable: true,
     type: 'timestamptz',
@@ -75,4 +70,9 @@ export default class UserDetails {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   public updated_at: Date;
+
+  //! relations
+
+  @OneToOne(() => User, (user) => user.userDetails)
+  public user: User;
 }

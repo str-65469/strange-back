@@ -26,13 +26,13 @@ export class SeederController {
       throw new HttpException('not so fast', HttpStatus.FORBIDDEN);
     }
 
-    const length = len ?? 100;
+    const length = len ?? 1000;
 
     for (let i = length; i--; ) {
       const user = new User();
       user.username = faker.name.findName();
       user.email = faker.internet.email();
-      user.password = 'password';
+      user.password = '$2b$16$BIX.OGBn4J6wUDNniAqrC./AZ9W/gHoYzSbEqtmtrR2XOrtUYvI5K';
 
       const savedUser = await this.userRepo.save(user);
 
@@ -45,7 +45,7 @@ export class SeederController {
       userDetails.main_champions = Array.from({ length: 6 }, () =>
         faker.random.arrayElement(Object.values(LolChampions)),
       );
-      userDetails.user_id = savedUser;
+      userDetails.user = savedUser;
 
       await this.userDetailsRepo.save(userDetails);
     }

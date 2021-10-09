@@ -18,4 +18,9 @@ export class AppController {
   async contactUs(@Body() body: ContactUsDto) {
     return await this.contactUsService.contactUs(body);
   }
+
+  @Get('/test')
+  async test() {
+    return { ms: 12 };
+  }
 }

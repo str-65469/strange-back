@@ -3,10 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import UserDetails from './user_details.entity';
 
 @Entity('users')
 export default class User {
@@ -21,9 +24,6 @@ export default class User {
 
   @Column()
   public password: string;
-
-  //   @Column({ nullable: true })
-  //   public refresh_token?: string;
 
   @Column({ nullable: true })
   public secret?: string;
@@ -44,17 +44,15 @@ export default class User {
   })
   public updated_at: Date;
 
+  //! relations
+
+  @OneToOne(() => UserDetails, (userDetails) => userDetails.user)
+  @JoinColumn()
+  public userDetails: UserDetails;
+
   @BeforeInsert()
   async hashPassword(): Promise<void> {
-    // var bcrypt = require('bcrypt');
-    // const saltRounds = 10;
-    // const myPlaintextPassword = 's0/\/\P4$$w0rD';
-
-    // var salt = bcrypt.genSaltSync(16);
-    // var hash = bcrypt.hashSync(myPlaintextPassword, salt);
-
     const salt = await bcrypt.genSalt(16);
-    const hash = await bcrypt.hash(this.password, salt);
-    this.password = hash;
+    this.password = await bcrypt.hash(this.password, salt);
   }
 }

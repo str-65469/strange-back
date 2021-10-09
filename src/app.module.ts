@@ -10,6 +10,7 @@ import { AuthModule } from './http/auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { ContactUsService } from './app_services/contact_us/contact_us.service';
 import { ContactUs } from './database/entity/contact_us.entity';
+import { AppGateway } from './general.gateway';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { ContactUs } from './database/entity/contact_us.entity';
     SeederModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ContactUsService],
+  providers: [AppService, ContactUsService, AppGateway],
   exports: [],
 })
 export class AppModule {}

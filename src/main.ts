@@ -15,6 +15,10 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     origin: true,
+    // origin: [
+    //   'http://localhost:5000', // react markup
+    //   'http://localhost:3000', // react dashboard
+    // ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
@@ -22,7 +26,7 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
-  const PORT = 3000;
+  const PORT = 4000;
 
   await app.listen(PORT);
 
