@@ -15,15 +15,10 @@ export class UserController {
 
   @Get('test')
   async test() {
-    // const profiles = await connection
-    // .getRepository(Profile)
-    // .createQueryBuilder("profile")
-    // .leftJoinAndSelect("profile.user", "user")
-    // .getMany();
+    // return 'hello from user';
 
     return this.userRepo.find({
       relations: ['userDetails'],
     });
-    return 'hello from user';
   }
 }

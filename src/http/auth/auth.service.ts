@@ -1,9 +1,9 @@
 import { UserLoginDto } from '../user/dto/user-login.dto';
 import { UsersService } from '../user/users.service';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import User from 'src/database/entity/user.entity';
 import * as bcrypt from 'bcrypt';
-import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 
 export interface ValidateResponse {
   access_token: string;
@@ -19,7 +19,7 @@ export class AuthService {
     const user = await this.userService.findOneByEmail(userCredentials.email);
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const isPasswordMatch = await bcrypt.compare(userCredentials.password, user.password);
@@ -38,18 +38,4 @@ export class AuthService {
       throw new BadRequestException('Email already in use');
     }
   }
-
-  //   async refreshToken(token: string | any): Promise<any> {
-  //     // const decodedToken = await this.jwtService.decode(token);
-  //     const decodedToken = (await this.jwtService.decode(token)) as any;
-  //     const { email, id } = decodedToken;
-  //     const payload = { email, id };
-
-  //     const options: JwtSignOptions = {
-  //       secret: process.env.JWT_SECRET,
-  //       expiresIn: '2w',
-  //     };
-  //     const accessToken = await this.jwtService.sign(payload, options);
-  //     return { accessToken };
-  //   }
 }

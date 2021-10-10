@@ -33,5 +33,7 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
+/upload/*
+
 #migrations cen be ignored
 /src/database/migrations/*

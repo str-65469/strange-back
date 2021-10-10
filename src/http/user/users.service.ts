@@ -1,7 +1,8 @@
+import { LolLeague } from './../../enum/lol_league.enum';
 import { JwtService } from '@nestjs/jwt';
 import { LolServer } from './../../enum/lol_server.enum';
 import { UserRegisterCache } from '../../database/entity/user_register_cache.entity';
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, BadRequestException } from '@nestjs/common';
 import User from 'src/database/entity/user.entity';
 import { UserRegisterDto } from './dto/user-register.dto';
 import { Repository } from 'typeorm';
@@ -14,6 +15,7 @@ export class UsersService {
   constructor(
     private readonly jwtService: JwtService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(UserRegisterCache) private readonly userRegCacheRepo: Repository<UserRegisterCache>,
   ) {}
 
   async findOne(id: number): Promise<User | undefined> {
@@ -24,10 +26,23 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async checkLolCredentialsValid(server: LolServer, summoner_name: string): Promise<boolean> {
-    // use api here
+  async checkLolCredentialsValid(server: LolServer, summoner_name: string) {
+    const check = true;
 
-    return true;
+    // api here
+
+    if (check) {
+      return {
+        league: LolLeague.BRONZE,
+        server: server,
+        summoner_name: summoner_name,
+        check: true,
+      };
+    } else {
+      return {
+        check: false,
+      };
+    }
   }
 
   async cacheUserRegister(body: UserRegisterDto) {

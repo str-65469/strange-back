@@ -27,6 +27,7 @@ import { JwtRegisterAuthGuard } from './guards/jwt-register.guard';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtRefreshTokenAuthGuard } from './guards/jwt-refresh.guard';
+import { JwtAcessTokenAuthGuard } from './guards/jwt-access.guard';
 
 @Controller('/auth')
 export class AuthController {
@@ -53,13 +54,11 @@ export class AuthController {
 
     res.cookie('access_token', token, {
       expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      sameSite: 'none',
       httpOnly: true,
     });
 
     res.cookie('refresh_token', refreshToken, {
       expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      sameSite: 'none',
       httpOnly: true,
     });
 
@@ -74,15 +73,19 @@ export class AuthController {
     await this.authService.userExists(email);
 
     // second check if user lol credentials is valid
-    const check = await this.userService.checkLolCredentialsValid(server, summoner_name);
+    const checkedLolCreds = await this.userService.checkLolCredentialsValid(server, summoner_name);
 
-    if (check) {
+    if (checkedLolCreds.check) {
       // third cache into database
       const userCached = await this.userService.cacheUserRegister(body);
 
       // send to mail
       this.mailServie.sendUserConfirmation(userCached);
+
+      return checkedLolCreds;
     }
+
+    return checkedLolCreds;
   }
 
   @UseGuards(JwtRegisterAuthGuard)
@@ -111,13 +114,11 @@ export class AuthController {
     // send httpOnly access_token cookie
     res.cookie('access_token', accessToken, {
       expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      sameSite: 'none',
       httpOnly: true,
     });
 
     res.cookie('refresh_token', refreshToken, {
       expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      sameSite: 'none',
       httpOnly: true,
     });
 
@@ -143,16 +144,20 @@ export class AuthController {
 
     res.cookie('access_token', accessTokenNew, {
       expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      sameSite: 'none',
       httpOnly: true,
     });
 
     res.cookie('refresh_token', refreshNew.refreshToken, {
       expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      sameSite: 'none',
       httpOnly: true,
     });
 
     return res.send({ message: 'token refresh successful' });
+  }
+
+  @UseGuards(JwtAcessTokenAuthGuard)
+  @Get('/check')
+  public async checkIfAuth() {
+    return true;
   }
 }
