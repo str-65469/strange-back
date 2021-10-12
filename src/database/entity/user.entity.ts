@@ -29,6 +29,15 @@ export default class User {
   public secret?: string;
 
   @Column({ nullable: true })
+  public ip?: string;
+
+  @Column({ nullable: true })
+  public socket_id?: number;
+
+  @Column({ nullable: true })
+  public img_path?: string;
+
+  @Column({ nullable: true })
   public is_online?: boolean;
 
   @CreateDateColumn({
@@ -52,7 +61,7 @@ export default class User {
 
   @BeforeInsert()
   async hashPassword(): Promise<void> {
-    const salt = await bcrypt.genSalt(16);
+    const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
   }
 }

@@ -23,6 +23,12 @@ export default class UserDetails {
   @Column({ nullable: true })
   public discord_name?: string;
 
+  @Column({ nullable: true })
+  public level?: number;
+
+  @Column({ nullable: true })
+  public league_points?: number;
+
   @Column({
     nullable: true,
     type: 'enum',

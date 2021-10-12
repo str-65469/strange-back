@@ -14,6 +14,7 @@ export class FileHelper {
 
   static customFileName(_, file, callback) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+
     const fileExtName = extname(file.originalname);
     const fileName = `${uniqueSuffix}.${fileExtName}`;
 

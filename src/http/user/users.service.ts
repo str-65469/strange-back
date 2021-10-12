@@ -1,22 +1,35 @@
+import { Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
+import { UserRegisterCache } from '../../database/entity/user_register_cache.entity';
+import { UserRegisterDto } from './dto/user-register.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 import { LolLeague } from './../../enum/lol_league.enum';
 import { JwtService } from '@nestjs/jwt';
 import { LolServer } from './../../enum/lol_server.enum';
-import { UserRegisterCache } from '../../database/entity/user_register_cache.entity';
-import { Injectable, HttpException, BadRequestException } from '@nestjs/common';
-import User from 'src/database/entity/user.entity';
-import { UserRegisterDto } from './dto/user-register.dto';
 import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { RefreshTokenResponse } from '../jwt/jwt-access.service';
-import * as bcrypt from 'bcrypt';
+import { REQUEST } from '@nestjs/core';
+import { configs } from 'src/configs';
+import { Request } from 'express';
+import User from 'src/database/entity/user.entity';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class UsersService {
   constructor(
     private readonly jwtService: JwtService,
+    @Inject(REQUEST) private readonly request: Request,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(UserRegisterCache) private readonly userRegCacheRepo: Repository<UserRegisterCache>,
   ) {}
+
+  async userID() {
+    const accessToken = this.request.cookies?.access_token;
+
+    if (!accessToken) {
+      throw new UnauthorizedException(configs.messages.exceptions.accessTokenMissing);
+    }
+
+    const accessTokenDecoded = this.jwtService.decode(accessToken) as { id: number; email: string };
+    return accessTokenDecoded.id;
+  }
 
   async findOne(id: number): Promise<User | undefined> {
     return this.userRepository.findOne(id);
@@ -24,6 +37,14 @@ export class UsersService {
 
   async findOneByEmail(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { email } });
+  }
+
+  async updateImagePath(id, path: string): Promise<User> {
+    const user = await this.userRepository.findOne(id);
+
+    user.img_path = '/user/profiles/' + path;
+
+    return await this.userRepository.save(user);
   }
 
   async checkLolCredentialsValid(server: LolServer, summoner_name: string) {

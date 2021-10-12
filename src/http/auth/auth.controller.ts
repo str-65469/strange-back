@@ -122,7 +122,8 @@ export class AuthController {
       httpOnly: true,
     });
 
-    return res.send({ user: savedUser });
+    return res.redirect('http://localhost:3000/');
+    // return res.send({ user: savedUser });
   }
 
   @UseGuards(JwtRefreshTokenAuthGuard)
