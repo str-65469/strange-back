@@ -10,24 +10,22 @@ import { AuthModule } from './http/auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { ContactUsService } from './app_services/contact_us/contact_us.service';
 import { ContactUs } from './database/entity/contact_us.entity';
-import { AppGateway } from './general.gateway';
+import { DuoMatchGateway } from './duomatch.gateway';
 import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
+    MulterModule.register({ dest: './upload' }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     TypeOrmModule.forFeature([ContactUs]),
-    MulterModule.register({
-      dest: './upload',
-    }),
     UsersModule,
     AuthModule,
     MailModule,
     SeederModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ContactUsService, AppGateway],
+  providers: [AppService, ContactUsService, DuoMatchGateway],
   exports: [],
 })
 export class AppModule {}

@@ -5,11 +5,13 @@ import {
   OnGatewayInit,
   OnGatewayDisconnect,
   OnGatewayConnection,
+  SubscribeMessage,
+  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway()
-export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private wss: Server;
   private logger: Logger = new Logger('AppGateway');
@@ -26,5 +28,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected ${client.id}`);
+  }
+
+  @SubscribeMessage('choice')
+  handleEvent(@MessageBody() data: string) {
+    return { data, msg: 'hi' };
   }
 }
