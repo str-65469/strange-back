@@ -4,6 +4,8 @@ import { ContactUsService } from './app_services/contact_us/contact_us.service';
 import { ContactUsDto } from './app_services/contact_us/dto/ContactUsDto';
 import { JwtAcessTokenAuthGuard } from './http/auth/guards/jwt-access.guard';
 
+import { performance } from 'perf_hooks';
+
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService, private readonly contactUsService: ContactUsService) {}
@@ -21,6 +23,8 @@ export class AppController {
 
   @Get('/test')
   async test(@Req() req) {
+    var startTime = performance.now();
+
     // console.log(req);
     console.log('---------------');
 
@@ -28,6 +32,10 @@ export class AppController {
 
     console.log(ip);
 
-    return { ms: 12 };
+    var endTime = performance.now();
+
+    const finalTime = endTime - startTime;
+
+    return { message: `Call to doSomething took: ${finalTime} ms`, user: req.user, d: 123 };
   }
 }

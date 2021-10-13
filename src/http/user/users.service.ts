@@ -9,8 +9,8 @@ import { Repository } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { configs } from 'src/configs';
 import { Request } from 'express';
-import User from 'src/database/entity/user.entity';
 import { RandomGenerator } from 'src/helpers/random_generator';
+import User from 'src/database/entity/user.entity';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
@@ -18,7 +18,6 @@ export class UsersService {
     private readonly jwtService: JwtService,
     @Inject(REQUEST) private readonly request: Request,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectRepository(UserRegisterCache) private readonly userRegCacheRepo: Repository<UserRegisterCache>,
   ) {}
 
   async userID() {

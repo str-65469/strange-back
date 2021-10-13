@@ -1,4 +1,3 @@
-import { UserRegisterCache } from './../../database/entity/user_register_cache.entity';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
@@ -11,7 +10,7 @@ import { UserFileController } from './controllers/user_files.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserDetails, UserRegisterCache]),
+    TypeOrmModule.forFeature([User, UserDetails]),
     JwtModule.register({ secret: process.env.JWT_REGISTER_CACHE_SECRET }),
     MulterModule.register({
       dest: './upload',

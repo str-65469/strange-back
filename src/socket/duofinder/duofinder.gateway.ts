@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -9,6 +9,7 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { configs } from 'src/configs';
 
 @WebSocketGateway()
 export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -17,21 +18,21 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   private logger: Logger = new Logger('AppGateway');
 
   afterInit() {
-    this.logger.log('Initialized');
+    this.logger.log('Duo match socket Initialized');
   }
 
-  handleConnection(client: Socket) {
-    // this.wss.emit('msgToClient', 'wasssup');
-    client.emit('connection', 'Successfully connected');
-    this.logger.log(`Client connected ${client.id}`);
+  handleConnection(socket: Socket): void {
+    this.logger.log(`Client connected ${socket.id}`);
+  }
+
+  @SubscribeMessage(configs.socket.duomatchConnect)
+  handleEvent(@MessageBody() data: string): string {
+    console.log(123);
+
+    return data;
   }
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected ${client.id}`);
-  }
-
-  @SubscribeMessage('choice')
-  handleEvent(@MessageBody() data: string) {
-    return { data, msg: 'hi' };
   }
 }
