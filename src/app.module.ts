@@ -1,3 +1,4 @@
+import { SocketModule } from './socket/socket.module';
 import { SeederModule } from './database/seeders/seeder.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -10,11 +11,11 @@ import { AuthModule } from './http/auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { ContactUsService } from './app_services/contact_us/contact_us.service';
 import { ContactUs } from './database/entity/contact_us.entity';
-import { DuoMatchGateway } from './duomatch.gateway';
 import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
+    SocketModule,
     MulterModule.register({ dest: './upload' }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
@@ -25,7 +26,7 @@ import { MulterModule } from '@nestjs/platform-express';
     SeederModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ContactUsService, DuoMatchGateway],
+  providers: [AppService, ContactUsService],
   exports: [],
 })
 export class AppModule {}
