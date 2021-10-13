@@ -20,7 +20,14 @@ export class AppController {
   }
 
   @Get('/test')
-  async test() {
+  async test(@Req() req) {
+    // console.log(req);
+    console.log('---------------');
+
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
+
+    console.log(ip);
+
     return { ms: 12 };
   }
 }

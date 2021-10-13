@@ -13,7 +13,6 @@ import {
   Query,
   ParseIntPipe,
   UseGuards,
-  Param,
   HttpException,
   HttpStatus,
   Req,
@@ -90,7 +89,7 @@ export class AuthController {
 
   @UseGuards(JwtRegisterAuthGuard)
   @Get('/register/confirm/')
-  async registerVerify(@Query('id', ParseIntPipe) id: number, @Res() res: Response) {
+  async registerVerify(@Query('id', ParseIntPipe) id: number, @Req() req: Request, @Res() res: Response) {
     // get data from cache
     const cachedData = await this.userRegisterCacheRepo.findOne(id);
 
@@ -102,8 +101,11 @@ export class AuthController {
     const accessToken = this.jwtAcessService.generateAccessToken(cachedData);
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(cachedData);
 
+    const possibleIP = req.headers['x-forwarded-for'] as string;
+    const ip = possibleIP || req.socket.remoteAddress || null;
+
     // save cached data in user
-    const savedUser = await this.userService.saveUserByCachedData(cachedData, secret);
+    const savedUser = await this.userService.saveUserByCachedData(cachedData, secret, ip);
 
     // save additional data to user details
     await this.userDetailsService.saveUserDetailsByCachedData(cachedData);

@@ -10,6 +10,7 @@ import { REQUEST } from '@nestjs/core';
 import { configs } from 'src/configs';
 import { Request } from 'express';
 import User from 'src/database/entity/user.entity';
+import { RandomGenerator } from 'src/helpers/random_generator';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
@@ -89,7 +90,7 @@ export class UsersService {
     return await userCache.save();
   }
 
-  async saveUserByCachedData(userCached: UserRegisterCache, secret: string): Promise<User> {
+  async saveUserByCachedData(userCached: UserRegisterCache, secret: string, ip: string): Promise<User> {
     const { email, password, username } = userCached;
 
     const user = new User();
@@ -97,6 +98,8 @@ export class UsersService {
     user.password = password;
     user.username = username;
     user.secret = secret;
+    user.socket_id = RandomGenerator.randomString();
+    user.ip = ip;
 
     return await this.userRepository.save(user);
   }

@@ -32,7 +32,7 @@ export default class User {
   public ip?: string;
 
   @Column({ nullable: true })
-  public socket_id?: number;
+  public socket_id?: string;
 
   @Column({ nullable: true })
   public img_path?: string;
