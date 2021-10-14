@@ -46,7 +46,7 @@ export class AuthController {
   @Post('/login')
   async login(@Body() body: UserLoginDto, @Res() res: Response) {
     const user = await this.authService.validateUser(body);
-    const token = this.jwtAcessService.generateAccessToken(user);
+    const token = this.jwtAcessService.generateAccessToken(user, user.socket_id);
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(user);
 
     await this.userService.saveUser(user, secret);
@@ -97,15 +97,18 @@ export class AuthController {
       throw new HttpException('Cached information not found', HttpStatus.BAD_REQUEST);
     }
 
-    // generate access_token and refresh token and new secret
-    const accessToken = this.jwtAcessService.generateAccessToken(cachedData);
-    const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(cachedData);
+    const user = this.userService.findOne(cachedData.id);
 
+    // generate refresh token and new secret
+    const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(cachedData);
     const possibleIP = req.headers['x-forwarded-for'] as string;
     const ip = possibleIP || req.socket.remoteAddress || null;
 
     // save cached data in user
     const savedUser = await this.userService.saveUserByCachedData(cachedData, secret, ip);
+
+    // generate access_token and refresh token and new secret
+    const accessToken = this.jwtAcessService.generateAccessToken(cachedData, savedUser.socket_id);
 
     // save additional data to user details
     await this.userDetailsService.saveUserDetailsByCachedData(cachedData);
@@ -139,7 +142,7 @@ export class AuthController {
     const user = await this.userService.findOne(id);
 
     // generate access_token and refresh token and new secret
-    const accessTokenNew = this.jwtAcessService.generateAccessToken(user);
+    const accessTokenNew = this.jwtAcessService.generateAccessToken(user, user.socket_id);
     const refreshNew = this.jwtAcessService.generateRefreshToken(user);
 
     // update user secret

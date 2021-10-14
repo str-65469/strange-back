@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { JwtAcessService, AccessTokenPayload } from './../../http/jwt/jwt-access.service';
+import { Logger, UseGuards } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -7,15 +8,21 @@ import {
   OnGatewayConnection,
   SubscribeMessage,
   MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
 import { configs } from 'src/configs';
+import { Server, Socket } from 'socket.io';
+import * as cookie from 'cookie';
+import { JwtService } from '@nestjs/jwt';
+import { JwtAcessTokenAuthGuard } from 'src/http/auth/guards/jwt-access.guard';
 
 @WebSocketGateway()
 export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private wss: Server;
   private logger: Logger = new Logger('AppGateway');
+
+  constructor(private readonly jwtAccessService: JwtAcessService, private readonly jwtService: JwtService) {}
 
   afterInit() {
     this.logger.log('Duo match socket Initialized');
@@ -26,10 +33,24 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   @SubscribeMessage(configs.socket.duomatchConnect)
-  handleEvent(@MessageBody() data: string): string {
-    console.log(123);
+  handleEvent(@ConnectedSocket() socket: Socket): string {
+    const cookies = cookie.parse(socket.handshake.headers.cookie);
+    const token = cookies?.access_token;
+    this.jwtAccessService.validateToken({ token, secret: process.env.JWT_SECRET });
 
-    return data;
+    const accessTokenDecoded = this.jwtService.decode(token) as AccessTokenPayload;
+    const socketId = accessTokenDecoded.socket_id;
+
+    this.logger.log(
+      `User ${accessTokenDecoded.username} joined private socked with socket id of ${socketId}`,
+    );
+
+    socket.join(socketId);
+
+    // send found user and if anyone matched
+    this.wss.sockets.in(socketId).emit('duo_match_finder', { msg: 'testing' });
+
+    return 'joined';
   }
 
   handleDisconnect(client: Socket) {

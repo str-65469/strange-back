@@ -19,14 +19,21 @@ interface ValidateAcessTokenProps {
   expired_message?: string;
 }
 
+export interface AccessTokenPayload {
+  id: number;
+  username: string;
+  socket_id: string;
+}
+
 @Injectable()
 export class JwtAcessService {
   constructor(private readonly jwtService: JwtService) {}
 
-  public generateAccessToken(user: User | UserRegisterCache): string {
+  public generateAccessToken(user: User | UserRegisterCache, socketId: string): string {
     const payload = {
       id: user.id,
       username: user.username,
+      socket_id: socketId,
     };
 
     return this.jwtService.sign(payload, { expiresIn: configs.tokens.access_token.expires_in });

@@ -25,14 +25,14 @@ export default class User {
   @Column()
   public password: string;
 
+  @Column()
+  public socket_id: string;
+
   @Column({ nullable: true })
   public secret?: string;
 
   @Column({ nullable: true })
   public ip?: string;
-
-  @Column({ nullable: true })
-  public socket_id?: string;
 
   @Column({ nullable: true })
   public img_path?: string;

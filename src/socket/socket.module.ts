@@ -1,10 +1,11 @@
+import { JwtAcessService } from './../http/jwt/jwt-access.service';
 import { Module } from '@nestjs/common';
-import { UsersModule } from 'src/http/user/users.module';
 import { DuoMatchGateway } from './duofinder/duofinder.gateway';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [UsersModule],
+  imports: [JwtModule.register({ secret: process.env.JWT_SECRET })],
   controllers: [],
-  providers: [DuoMatchGateway],
+  providers: [DuoMatchGateway, JwtAcessService],
 })
 export class SocketModule {}
