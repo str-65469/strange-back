@@ -1,11 +1,15 @@
-import { JwtAcessService } from './../http/jwt/jwt-access.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { SocketUserService } from './user/socket_user.service';
 import { Module } from '@nestjs/common';
-import { DuoMatchGateway } from './duofinder/duofinder.gateway';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtAcessService } from 'src/http/jwt/jwt-access.service';
+import { DuoMatchGateway } from './duofinder/duofinder.gateway';
+import { DuoFinderService } from './duofinder/duo_finder.service';
+import User from 'src/database/entity/user.entity';
 
 @Module({
-  imports: [JwtModule.register({ secret: process.env.JWT_SECRET })],
+  imports: [JwtModule.register({ secret: process.env.JWT_SECRET }), TypeOrmModule.forFeature([User])],
   controllers: [],
-  providers: [DuoMatchGateway, JwtAcessService],
+  providers: [JwtAcessService, DuoMatchGateway, DuoFinderService, SocketUserService],
 })
 export class SocketModule {}

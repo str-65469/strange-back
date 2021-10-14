@@ -10,12 +10,13 @@ import { UsersModule } from './http/user/users.module';
 import { AuthModule } from './http/auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { ContactUsService } from './app_services/contact_us/contact_us.service';
-import { ContactUs } from './database/entity/contact_us.entity';
 import { MulterModule } from '@nestjs/platform-express';
+import { ContactUs } from './database/entity/contact_us.entity';
 
 @Module({
   imports: [
     SocketModule,
+    // SocketModule,
     MulterModule.register({ dest: './upload' }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),

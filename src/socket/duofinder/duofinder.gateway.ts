@@ -1,5 +1,6 @@
-import { JwtAcessService, AccessTokenPayload } from './../../http/jwt/jwt-access.service';
-import { Logger, UseGuards } from '@nestjs/common';
+import { DuoFinderService } from './duo_finder.service';
+import { SocketUserService } from './../user/socket_user.service';
+import { Logger } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -7,14 +8,14 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
   SubscribeMessage,
-  MessageBody,
   ConnectedSocket,
+  MessageBody,
 } from '@nestjs/websockets';
 import { configs } from 'src/configs';
 import { Server, Socket } from 'socket.io';
-import * as cookie from 'cookie';
-import { JwtService } from '@nestjs/jwt';
-import { JwtAcessTokenAuthGuard } from 'src/http/auth/guards/jwt-access.guard';
+import { DuoFinderResponseType } from './responses';
+
+const { duomatchConnect, duomatchFind } = configs.socket;
 
 @WebSocketGateway()
 export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -22,7 +23,10 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   private wss: Server;
   private logger: Logger = new Logger('AppGateway');
 
-  constructor(private readonly jwtAccessService: JwtAcessService, private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly socketUserService: SocketUserService,
+    private readonly duoFinderService: DuoFinderService,
+  ) {}
 
   afterInit() {
     this.logger.log('Duo match socket Initialized');
@@ -32,25 +36,46 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     this.logger.log(`Client connected ${socket.id}`);
   }
 
-  @SubscribeMessage(configs.socket.duomatchConnect)
-  handleEvent(@ConnectedSocket() socket: Socket): string {
-    const cookies = cookie.parse(socket.handshake.headers.cookie);
-    const token = cookies?.access_token;
-    this.jwtAccessService.validateToken({ token, secret: process.env.JWT_SECRET });
+  @SubscribeMessage(duomatchConnect)
+  handleDuoConnect(@ConnectedSocket() socket: Socket): void {
+    const { socket_id, username } = this.socketUserService.getUserPayload(socket);
 
-    const accessTokenDecoded = this.jwtService.decode(token) as AccessTokenPayload;
-    const socketId = accessTokenDecoded.socket_id;
-
-    this.logger.log(
-      `User ${accessTokenDecoded.username} joined private socked with socket id of ${socketId}`,
-    );
-
-    socket.join(socketId);
+    // joi to user specific id
+    socket.join(socket_id);
 
     // send found user and if anyone matched
-    this.wss.sockets.in(socketId).emit('duo_match_finder', { msg: 'testing' });
+    const foundUser = this.duoFinderService.findDuo();
+    const foundMatch = this.duoFinderService.findMatch();
 
-    return 'joined';
+    const { MATCH_FOUND, MATCH_NOT_FOUND } = DuoFinderResponseType;
+
+    this.wss.sockets.in(socket_id).emit('duo_match_finder', {
+      type: foundMatch ? MATCH_FOUND : MATCH_NOT_FOUND,
+      user: foundUser,
+      matched_user: foundMatch,
+    });
+
+    this.logger.log(`User ${username} joined private socked with socket id of ${socket_id}`);
+  }
+
+  @SubscribeMessage(duomatchFind)
+  handleDuoFind(@MessageBody() data, @ConnectedSocket() socket: Socket) {
+    const { id, socket_id } = this.socketUserService.getUserPayload(socket);
+
+    // find which user was this socket requested to by {id}
+
+    // check accept/decline logic
+
+    // find users or matched
+    const foundUser = this.duoFinderService.findDuo();
+    const foundMatch = this.duoFinderService.findMatch();
+    const { MATCH_FOUND, MATCH_NOT_FOUND } = DuoFinderResponseType;
+
+    this.wss.sockets.in(socket_id).emit('duo_match_finder', {
+      type: foundMatch ? MATCH_FOUND : MATCH_NOT_FOUND,
+      user: foundUser,
+      matched_user: foundMatch,
+    });
   }
 
   handleDisconnect(client: Socket) {
