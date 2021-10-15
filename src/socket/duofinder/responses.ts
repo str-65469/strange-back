@@ -25,4 +25,5 @@ export interface DuoFinderResponse {
   type: DuoFinderResponseType;
   user: UserResponse;
   matched_user?: UserResponse; // may not found matched
+  matched_users?: Array<UserResponse>; // may not found matched
 }

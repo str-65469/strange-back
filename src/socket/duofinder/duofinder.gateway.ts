@@ -38,23 +38,13 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   @SubscribeMessage(duomatchConnect)
   handleDuoConnect(@ConnectedSocket() socket: Socket) {
-    const { socket_id } = this.socketUserService.getUserPayload(socket);
+    const payload = this.socketUserService.getUserPayload(socket);
 
     // joi to user specific id
-    socket.join(socket_id);
+    socket.join(payload.socket_id);
 
     // send found user and if anyone matched
-    const foundUser = this.duoFinderService.findDuo();
-    const foundMatch = this.duoFinderService.findMatch();
-
-    const { MATCH_FOUND, MATCH_NOT_FOUND } = DuoFinderResponseType;
-
-    return {
-      type: foundMatch ? MATCH_FOUND : MATCH_NOT_FOUND,
-      user: foundUser,
-      t: socket_id,
-      matched_user: foundMatch,
-    };
+    return this.duoFinderService.initFirstMatch(payload);
   }
 
   @SubscribeMessage(duomatchFind)
