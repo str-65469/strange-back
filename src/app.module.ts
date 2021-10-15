@@ -16,7 +16,6 @@ import { ContactUs } from './database/entity/contact_us.entity';
 @Module({
   imports: [
     SocketModule,
-    // SocketModule,
     MulterModule.register({ dest: './upload' }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),

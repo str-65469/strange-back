@@ -97,21 +97,17 @@ export class AuthController {
       throw new HttpException('Cached information not found', HttpStatus.BAD_REQUEST);
     }
 
-    const user = this.userService.findOne(cachedData.id);
-
     // generate refresh token and new secret
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(cachedData);
     const possibleIP = req.headers['x-forwarded-for'] as string;
     const ip = possibleIP || req.socket.remoteAddress || null;
 
-    // save cached data in user
-    const savedUser = await this.userService.saveUserByCachedData(cachedData, secret, ip);
+    // save additional data to user details and data in user
+    const userDetailed = await this.userDetailsService.saveUserDetailsByCachedData(cachedData);
+    const savedUser = await this.userService.saveUserByCachedData(cachedData, userDetailed, secret, ip);
 
     // generate access_token and refresh token and new secret
     const accessToken = this.jwtAcessService.generateAccessToken(cachedData, savedUser.socket_id);
-
-    // save additional data to user details
-    await this.userDetailsService.saveUserDetailsByCachedData(cachedData);
 
     // delete user cached data
     await this.userRegisterCacheService.delete(cachedData.id);

@@ -11,6 +11,7 @@ import { configs } from 'src/configs';
 import { Request } from 'express';
 import { RandomGenerator } from 'src/helpers/random_generator';
 import User from 'src/database/entity/user.entity';
+import UserDetails from 'src/database/entity/user_details.entity';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
@@ -20,7 +21,7 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async userID() {
+  userID() {
     const accessToken = this.request.cookies?.access_token;
 
     if (!accessToken) {
@@ -37,6 +38,16 @@ export class UsersService {
 
   async findOneByEmail(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { email } });
+  }
+
+  async getUserDetails() {
+    const userId = this.userID();
+
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userDetails', 'user_details')
+      .where('user.id = :id', { id: userId })
+      .getOne();
   }
 
   async updateImagePath(id, path: string): Promise<User> {
@@ -89,7 +100,12 @@ export class UsersService {
     return await userCache.save();
   }
 
-  async saveUserByCachedData(userCached: UserRegisterCache, secret: string, ip: string): Promise<User> {
+  async saveUserByCachedData(
+    userCached: UserRegisterCache,
+    userDetailed: UserDetails,
+    secret: string,
+    ip: string,
+  ): Promise<User> {
     const { email, password, username } = userCached;
 
     const user = new User();
@@ -98,6 +114,7 @@ export class UsersService {
     user.username = username;
     user.secret = secret;
     user.socket_id = RandomGenerator.randomString();
+    user.userDetails = userDetailed;
     user.ip = ip;
 
     return await this.userRepository.save(user);

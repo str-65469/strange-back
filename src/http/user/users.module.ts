@@ -1,3 +1,4 @@
+import { JwtAcessService } from 'src/http/jwt/jwt-access.service';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
@@ -17,7 +18,7 @@ import { UserFileController } from './controllers/user_files.controller';
     }),
   ],
   controllers: [UserController, UserFileController],
-  providers: [UsersService],
+  providers: [UsersService, JwtAcessService],
   exports: [UsersService],
 })
 export class UsersModule {}

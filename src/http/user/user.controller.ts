@@ -1,8 +1,9 @@
 import { UsersService } from './users.service';
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import User from 'src/database/entity/user.entity';
+import { JwtAcessTokenAuthGuard } from '../auth/guards/jwt-access.guard';
 
 @Controller('user')
 export class UserController {
@@ -13,12 +14,9 @@ export class UserController {
     private readonly userService: UsersService,
   ) {}
 
-  @Get('test')
-  async test() {
-    // return 'hello from user';
-
-    return this.userRepo.find({
-      relations: ['userDetails'],
-    });
+  @UseGuards(JwtAcessTokenAuthGuard)
+  @Get()
+  async user() {
+    return await this.userService.getUserDetails();
   }
 }
