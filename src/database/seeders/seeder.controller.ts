@@ -27,21 +27,29 @@ export class SeederController {
       throw new HttpException('not so fast', HttpStatus.FORBIDDEN);
     }
 
-    const length = len ?? 1000;
+    const length = len ?? 700;
 
     for (let i = length; i--; ) {
       const user = new User();
       user.username = faker.name.findName();
       user.email = faker.internet.email();
       user.socket_id = RandomGenerator.randomString();
+      user.img_path = `https://picsum.photos/id/${RandomGenerator.randomIntInterval(1, 900)}/200/300`;
+      user.secret = RandomGenerator.randomString();
       user.password = '$2b$16$BIX.OGBn4J6wUDNniAqrC./AZ9W/gHoYzSbEqtmtrR2XOrtUYvI5K';
 
       const savedUser = await this.userRepo.save(user);
 
       const userDetails = new UserDetails();
+
       userDetails.summoner_name = faker.name.findName();
       userDetails.discord_name = faker.name.findName();
-      userDetails.server = faker.random.arrayElement(Object.values(LolServer));
+      userDetails.server = faker.random.arrayElement([
+        LolServer.NORTH_AMERICA,
+        LolServer.RUSSIA,
+        LolServer.EU_NORDIC_WEST,
+        LolServer.EU_NORDIC_EAST,
+      ]);
       userDetails.main_lane = faker.random.arrayElement(Object.values(LolMainLane));
       userDetails.league = faker.random.arrayElement(Object.values(LolLeague));
       userDetails.main_champions = Array.from({ length: 6 }, () =>

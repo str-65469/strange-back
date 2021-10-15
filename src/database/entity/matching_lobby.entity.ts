@@ -1,5 +1,4 @@
 import {
-  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -9,42 +8,18 @@ import {
 } from 'typeorm';
 import User from './user.entity';
 
-@Entity('matching_spams')
-export class MatchingSpams {
+@Entity('matching_lobby')
+export class MatchingLobby {
   @PrimaryGeneratedColumn()
   public id: number;
-
-  @Column({
-    nullable: false,
-    type: 'int',
-    array: true,
-  })
-  public accept_list: Array<number>;
-
-  @Column({
-    nullable: false,
-    type: 'int',
-    array: true,
-  })
-  public decline_list: Array<number>;
-
-  @Column({
-    nullable: false,
-    type: 'int',
-    array: true,
-  })
-  public remove_list: Array<number>;
-
-  @Column({
-    nullable: false,
-    type: 'int',
-    array: true,
-  })
-  public matched_list: Array<number>;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
   public user_id: User;
+
+  @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: 'matched_user_id' })
+  public liked_user_id: number;
 
   @CreateDateColumn({
     type: 'timestamptz',

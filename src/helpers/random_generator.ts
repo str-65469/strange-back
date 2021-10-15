@@ -9,4 +9,12 @@ export class RandomGenerator {
     }
     return result;
   }
+
+  public static randomIntInterval(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
+  public static randomArray(array: Array<any>) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
 }

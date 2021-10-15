@@ -30,6 +30,8 @@ async function bootstrap() {
 bootstrap();
 
 /**
+ *!		| socket refresh token
+ *
  *TODO	| remove crypto not used anywhere
  *TODO 	| add custom exception in every exception
  *? 	| socket flow helped greatly (https://stackoverflow.com/questions/17476294/how-to-send-a-message-to-a-particular-client-with-socket-io)

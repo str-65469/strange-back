@@ -37,8 +37,8 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   @SubscribeMessage(duomatchConnect)
-  handleDuoConnect(@ConnectedSocket() socket: Socket): void {
-    const { socket_id, username } = this.socketUserService.getUserPayload(socket);
+  handleDuoConnect(@ConnectedSocket() socket: Socket) {
+    const { socket_id } = this.socketUserService.getUserPayload(socket);
 
     // joi to user specific id
     socket.join(socket_id);
@@ -49,13 +49,12 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     const { MATCH_FOUND, MATCH_NOT_FOUND } = DuoFinderResponseType;
 
-    this.wss.sockets.in(socket_id).emit('duo_match_finder', {
+    return {
       type: foundMatch ? MATCH_FOUND : MATCH_NOT_FOUND,
       user: foundUser,
+      t: socket_id,
       matched_user: foundMatch,
-    });
-
-    this.logger.log(`User ${username} joined private socked with socket id of ${socket_id}`);
+    };
   }
 
   @SubscribeMessage(duomatchFind)
