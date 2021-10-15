@@ -11,6 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import User from './user.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export default class UserDetails {
@@ -58,26 +59,27 @@ export default class UserDetails {
   })
   public main_champions?: Array<LolChampions>;
 
+  @Exclude()
   @Column({
     nullable: true,
     type: 'timestamptz',
   })
   public last_update_details?: Date;
 
+  @Exclude()
   @CreateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   public created_at: Date;
 
+  @Exclude()
   @UpdateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   public updated_at: Date;
-
-  //! relations
 
   @OneToOne(() => User, (user) => user.userDetails)
   public user: User;
