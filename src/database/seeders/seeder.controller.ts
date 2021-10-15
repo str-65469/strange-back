@@ -8,6 +8,7 @@ import * as faker from 'faker';
 import { LolMainLane } from 'src/enum/lol_main_lane.enum';
 import { LolLeague } from 'src/enum/lol_league.enum';
 import UserDetails from '../entity/user_details.entity';
+import { RandomGenerator } from 'src/helpers/random_generator';
 
 @Controller('/seed')
 export class SeederController {
@@ -32,6 +33,7 @@ export class SeederController {
       const user = new User();
       user.username = faker.name.findName();
       user.email = faker.internet.email();
+      user.socket_id = RandomGenerator.randomString();
       user.password = '$2b$16$BIX.OGBn4J6wUDNniAqrC./AZ9W/gHoYzSbEqtmtrR2XOrtUYvI5K';
 
       const savedUser = await this.userRepo.save(user);
