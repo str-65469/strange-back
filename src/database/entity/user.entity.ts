@@ -61,10 +61,6 @@ export default class User {
   })
   public updated_at: Date;
 
-  @OneToOne(() => UserDetails, (userDetails) => userDetails.user)
-  @JoinColumn()
-  public userDetails: UserDetails;
-
   @BeforeInsert()
   async hashPassword(): Promise<void> {
     const salt = await bcrypt.genSalt(12);

@@ -103,8 +103,8 @@ export class AuthController {
     const ip = possibleIP || req.socket.remoteAddress || null;
 
     // save additional data to user details and data in user
-    const userDetailed = await this.userDetailsService.saveUserDetailsByCachedData(cachedData);
-    const savedUser = await this.userService.saveUserByCachedData(cachedData, userDetailed, secret, ip);
+    const savedUser = await this.userService.saveUserByCachedData(cachedData, secret, ip);
+    await this.userDetailsService.saveUserDetailsByCachedData(cachedData, savedUser);
 
     // generate access_token and refresh token and new secret
     const accessToken = this.jwtAcessService.generateAccessToken(cachedData, savedUser.socket_id);

@@ -4,6 +4,7 @@ import { UserRegisterCache } from 'src/database/entity/user_register_cache.entit
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import UserDetails from 'src/database/entity/user_details.entity';
+import User from 'src/database/entity/user.entity';
 
 @Injectable()
 export class UserDetailsServiceService {
@@ -12,13 +13,14 @@ export class UserDetailsServiceService {
     private readonly userDetailsRepo: Repository<UserDetails>,
   ) {}
 
-  async saveUserDetailsByCachedData(userCached: UserRegisterCache) {
+  async saveUserDetailsByCachedData(userCached: UserRegisterCache, user: User) {
     const { server, summoner_name } = userCached;
 
-    const userDetails = new UserDetails();
-    userDetails.server = server;
-    userDetails.summoner_name = summoner_name;
+    const userDetailed = new UserDetails();
+    userDetailed.server = server;
+    userDetailed.summoner_name = summoner_name;
+    userDetailed.user_id = user;
 
-    return await this.userDetailsRepo.save(userDetails);
+    return await this.userDetailsRepo.save(userDetailed);
   }
 }

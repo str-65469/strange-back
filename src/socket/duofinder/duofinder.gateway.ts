@@ -1,4 +1,4 @@
-import { DuoFinderService } from './duo_finder.service';
+import { DuoFinderService, UserCombined } from './duo_finder.service';
 import { SocketUserService } from './../user/socket_user.service';
 import { Logger } from '@nestjs/common';
 import {
@@ -13,7 +13,7 @@ import {
 } from '@nestjs/websockets';
 import { configs } from 'src/configs';
 import { Server, Socket } from 'socket.io';
-import { DuoFinderResponseType } from './responses';
+import { HandleDuoFindBody } from './responses';
 
 const { duomatchConnect, duomatchFind } = configs.socket;
 
@@ -37,34 +37,37 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   @SubscribeMessage(duomatchConnect)
-  handleDuoConnect(@ConnectedSocket() socket: Socket) {
+  public async handleDuoConnect(@ConnectedSocket() socket: Socket) {
     const payload = this.socketUserService.getUserPayload(socket);
 
-    // joi to user specific id
+    // join to user specific id
     socket.join(payload.socket_id);
 
+    // get detailed user
+    const userDetaled: UserCombined = await this.socketUserService.findFullDetailed(payload.id);
+
     // send found user and if anyone matched
-    return this.duoFinderService.initFirstMatch(payload);
+    return await this.duoFinderService.initFirstMatch(userDetaled);
   }
 
   @SubscribeMessage(duomatchFind)
-  handleDuoFind(@MessageBody() data, @ConnectedSocket() socket: Socket) {
-    const { id, socket_id } = this.socketUserService.getUserPayload(socket);
+  public async handleDuoFind(@MessageBody() data: HandleDuoFindBody, @ConnectedSocket() socket: Socket) {
+    const payload = this.socketUserService.getUserPayload(socket);
 
-    // find which user was this socket requested to by {id}
+    // get detailed user
+    const userDetaled: UserCombined = await this.socketUserService.findFullDetailed(payload.id);
 
     // check accept/decline logic
+    const foundAnyone = await this.duoFinderService.acceptDeclineLogic(userDetaled, data);
 
-    // find users or matched
-    const foundUser = this.duoFinderService.findDuo();
-    const foundMatch = this.duoFinderService.findMatch();
-    const { MATCH_FOUND, MATCH_NOT_FOUND } = DuoFinderResponseType;
+    if (!foundAnyone) {
+      // find new user or matched
+      const resp = await this.duoFinderService.findDuo(userDetaled, data);
 
-    this.wss.sockets.in(socket_id).emit('duo_match_finder', {
-      type: foundMatch ? MATCH_FOUND : MATCH_NOT_FOUND,
-      user: foundUser,
-      matched_user: foundMatch,
-    });
+      this.wss.sockets.in(payload.socket_id).emit('duo_match_finder', resp);
+    } else {
+      this.wss.sockets.in(payload.socket_id).emit('duo_match_finder', foundAnyone);
+    }
   }
 
   handleDisconnect(client: Socket) {

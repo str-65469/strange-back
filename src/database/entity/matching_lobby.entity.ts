@@ -15,7 +15,7 @@ export class MatchingLobby {
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  public user_id: User;
+  public user_id: number;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'matched_user_id' })

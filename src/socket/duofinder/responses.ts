@@ -1,4 +1,5 @@
 export enum DuoFinderResponseType {
+  DUO_FOUND = 'DUO_FOUND',
   MATCH_FOUND = 'MATCH_FOUND',
   MATCH_NOT_FOUND = 'MATCH_NOT_FOUND',
 }
@@ -26,4 +27,17 @@ export interface DuoFinderResponse {
   user: UserResponse;
   matched_user?: UserResponse; // may not found matched
   matched_users?: Array<UserResponse>; // may not found matched
+}
+
+export enum DuoFinderTransferTypes {
+  ACCEPT = 'ACCEPT',
+  DECLINE = 'DECLINE',
+}
+
+export interface HandleDuoFindBody {
+  prevFound: {
+    id: number;
+  };
+  type: DuoFinderTransferTypes;
+  isMatched: boolean;
 }

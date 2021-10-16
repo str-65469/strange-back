@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LolLeague } from './../../enum/lol_league.enum';
 import { JwtService } from '@nestjs/jwt';
 import { LolServer } from './../../enum/lol_server.enum';
-import { Repository } from 'typeorm';
+import { Repository, getManager } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { configs } from 'src/configs';
 import { Request } from 'express';
@@ -43,11 +43,14 @@ export class UsersService {
   async getUserDetails() {
     const userId = this.userID();
 
-    return await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userDetails', 'user_details')
-      .where('user.id = :id', { id: userId })
-      .getOne();
+    return await getManager()
+      .createQueryBuilder('users', 'u')
+      .leftJoinAndSelect('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
+      .where('u.id = :id', { id: userId })
+      .select(
+        'u.id, u.username, u.img_path, u.email, us.discord_name, us.league, us.league_points, us.level, us.main_champions, us.main_lane, us.server, us.summoner_name',
+      )
+      .getRawOne();
   }
 
   async updateImagePath(id, path: string): Promise<User> {
@@ -100,12 +103,7 @@ export class UsersService {
     return await userCache.save();
   }
 
-  async saveUserByCachedData(
-    userCached: UserRegisterCache,
-    userDetailed: UserDetails,
-    secret: string,
-    ip: string,
-  ): Promise<User> {
+  async saveUserByCachedData(userCached: UserRegisterCache, secret: string, ip: string): Promise<User> {
     const { email, password, username } = userCached;
 
     const user = new User();
@@ -114,7 +112,6 @@ export class UsersService {
     user.username = username;
     user.secret = secret;
     user.socket_id = RandomGenerator.randomString();
-    user.userDetails = userDetailed;
     user.ip = ip;
 
     return await this.userRepository.save(user);

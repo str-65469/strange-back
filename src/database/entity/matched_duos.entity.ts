@@ -14,12 +14,12 @@ export class MatchedDuos {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @Column({ nullable: false })
-  public is_favorite: boolean;
+  @Column({ nullable: true })
+  public is_favorite?: boolean;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  public user_id: User;
+  public user_id: number;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'matched_user_id' })

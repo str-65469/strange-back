@@ -6,6 +6,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -59,28 +60,30 @@ export default class UserDetails {
   })
   public main_champions?: Array<LolChampions>;
 
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
+  @OneToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: 'user_id' })
+  public user_id: User;
+
+  @Exclude({ toPlainOnly: true })
   @Column({
     nullable: true,
     type: 'timestamptz',
   })
   public last_update_details?: Date;
 
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   @CreateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   public created_at: Date;
 
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   @UpdateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   public updated_at: Date;
-
-  @OneToOne(() => User, (user) => user.userDetails)
-  public user: User;
 }

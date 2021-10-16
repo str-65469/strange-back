@@ -40,24 +40,24 @@ export class SeederController {
 
       const savedUser = await this.userRepo.save(user);
 
-      const userDetails = new UserDetails();
+      const userDetailed = new UserDetails();
 
-      userDetails.summoner_name = faker.name.findName();
-      userDetails.discord_name = faker.name.findName();
-      userDetails.server = faker.random.arrayElement([
+      userDetailed.user_id = savedUser;
+      userDetailed.summoner_name = faker.name.findName();
+      userDetailed.discord_name = faker.name.findName();
+      userDetailed.server = faker.random.arrayElement([
         LolServer.NORTH_AMERICA,
         LolServer.RUSSIA,
         LolServer.EU_NORDIC_WEST,
         LolServer.EU_NORDIC_EAST,
       ]);
-      userDetails.main_lane = faker.random.arrayElement(Object.values(LolMainLane));
-      userDetails.league = faker.random.arrayElement(Object.values(LolLeague));
-      userDetails.main_champions = Array.from({ length: 6 }, () =>
+      userDetailed.main_lane = faker.random.arrayElement(Object.values(LolMainLane));
+      userDetailed.league = faker.random.arrayElement(Object.values(LolLeague));
+      userDetailed.main_champions = Array.from({ length: 6 }, () =>
         faker.random.arrayElement(Object.values(LolChampions)),
       );
-      userDetails.user = savedUser;
 
-      await this.userDetailsRepo.save(userDetails);
+      await this.userDetailsRepo.save(userDetailed);
     }
 
     console.log('hello');
