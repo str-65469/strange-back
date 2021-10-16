@@ -1,3 +1,4 @@
+import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { UserRegisterCache } from '../../database/entity/user_register_cache.entity';
 import { UserRegisterDto } from './dto/user-register.dto';
@@ -5,13 +6,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LolLeague } from './../../enum/lol_league.enum';
 import { JwtService } from '@nestjs/jwt';
 import { LolServer } from './../../enum/lol_server.enum';
-import { Repository, getManager } from 'typeorm';
+import { Repository, getManager, getConnection } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { configs } from 'src/configs';
 import { Request } from 'express';
 import { RandomGenerator } from 'src/helpers/random_generator';
 import User from 'src/database/entity/user.entity';
 import UserDetails from 'src/database/entity/user_details.entity';
+import { UserProfileUpdateDto } from './dto/user-update.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
@@ -117,9 +119,48 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
+  async createAndSaveUserSpam(user_id: number) {
+    //
+    //   const spam = new MatchingSpams();
+    //   spam.user_id = user_id;
+    //   return await
+  }
+
   async saveUser(user: User, secret: string) {
     user.secret = secret;
 
     return await this.userRepository.save(user);
+  }
+
+  async updateUserProfile(data: UserProfileUpdateDto) {
+    const userId = this.userID();
+
+    // update user username
+    await this.userRepository.save({
+      id: userId,
+      username: data.username,
+    });
+
+    // update user details
+    await getConnection()
+      .createQueryBuilder()
+      .update(UserDetails)
+      .set({
+        discord_name: data.discord_name,
+        main_champions: data.main_champions,
+        main_lane: data.main_lane,
+      })
+      .where('id = :id', { id: userId })
+      .execute();
+
+    // return
+    return await getManager()
+      .createQueryBuilder('users', 'u')
+      .leftJoinAndSelect('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
+      .where('u.id = :id', { id: userId })
+      .select(
+        'u.id, u.username, u.img_path, u.email, us.discord_name, us.league, us.league_points, us.level, us.main_champions, us.main_lane, us.server, us.summoner_name',
+      )
+      .getRawOne();
   }
 }

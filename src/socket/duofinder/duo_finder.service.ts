@@ -1,22 +1,69 @@
-import { MatchingSpams } from './../../database/entity/matching_spams.entity';
 import { SocketUserService } from './../user/socket_user.service';
 import { Injectable } from '@nestjs/common';
-import User from 'src/database/entity/user.entity';
-import UserDetails from 'src/database/entity/user_details.entity';
 import { DuoFinderResponseType, DuoFinderTransferTypes, HandleDuoFindBody } from './responses';
 
-export interface UserCombined extends User, UserDetails, MatchingSpams {}
+// export interface UserCombined extends User, UserDetails, MatchingSpams {}
+//! change later
+export interface UserCombined {
+  id: any;
+  username: any;
+  img_path: any;
+  email: any;
+  discord_name: any;
+  league: any;
+  league_points: any;
+  level: any;
+  main_champions: any;
+  main_lane: any;
+  server: any;
+  summoner_name: any;
+  accept_list: any;
+  decline_list: any;
+  remove_list: any;
+  matched_list: any;
+}
 
 @Injectable()
 export class DuoFinderService {
   constructor(private readonly socketUserService: SocketUserService) {}
 
   public async initFirstMatch(userDetaled: UserCombined) {
+    // find if I accepted someone and somebody else accepted me while I was away (DUO)
+    // 		get mine first
+    //		get ids from that
+    //		based on that get other half
+    // const users = this.checkIfBothInLobby(userDetaled);
+
+    // for (const user of users) {
+    //   // save both into matched table
+    //   await this.socketUserService.saveUsersIntoMatched(userDetaled.id, user.id);
+    //   await this.socketUserService.saveUsersIntoMatched(user.id, userDetaled.id);
+
+    //   // remove both from lobby
+    //   await this.socketUserService.removeBothFromLobby(user.id);
+    // }
+
+    // // remove from lobby
+    // await this.socketUserService.removeUserFromLobby(data.prevFound.id);
+
+    // // update both matched_list
+    // await this.socketUserService.updateFilterListInSpam({
+    //   user_id: userDetaled.id,
+    //   id: data.prevFound.id,
+    //   list: 'matched_list',
+    // });
+    // await this.socketUserService.updateFilterListInSpam({
+    //   user_id: data.prevFound.id,
+    //   id: userDetaled.id,
+    //   list: 'matched_list',
+    // });
+
     // get matches (from matched user table)
     const matchedUsers = await this.socketUserService.findMatchedUsers(userDetaled.id);
 
     // find new user (from detailed and later joined to user) (order must be like this)
     const findDuoDetails = await this.socketUserService.findNewDuoDetails(userDetaled);
+
     const findDuo = await this.socketUserService.findDuo(findDuoDetails?.id);
 
     return {
@@ -24,6 +71,7 @@ export class DuoFinderService {
       found_duo: findDuo ?? {},
       found_duo_details: findDuoDetails ?? {},
       matched_users: matchedUsers ?? [],
+      new_matched_users: [],
     };
   }
 
@@ -47,20 +95,26 @@ export class DuoFinderService {
 
     //! accept
     if (data.type === DuoFinderTransferTypes.ACCEPT) {
-      // find if accepted dude is in lobby for my accept (if somebody liked me already)
-      const waitingUser = await this.socketUserService.findIfUserIsWaiting(data.prevFound.id);
+      // find if dude is in lobby and waiting for my accept (if somebody liked me already) (singular)
+      const waitingUser = await this.socketUserService.findIfUserIsWaiting(data.prevFound.id, userDetaled.id);
 
       if (waitingUser) {
-        // add to matched
+        // add both to matched
         await this.socketUserService.saveUsersIntoMatched(userDetaled.id, data.prevFound.id);
+        await this.socketUserService.saveUsersIntoMatched(data.prevFound.id, userDetaled.id);
 
         // remove from lobby
-        await this.socketUserService.removeUserFromLobby(data.prevFound.id);
+        await this.socketUserService.removeUserFromLobby(data.prevFound.id, userDetaled.id);
 
-        // update matched_list
+        // update both matched_list
         await this.socketUserService.updateFilterListInSpam({
           user_id: userDetaled.id,
           id: data.prevFound.id,
+          list: 'matched_list',
+        });
+        await this.socketUserService.updateFilterListInSpam({
+          user_id: data.prevFound.id,
+          id: userDetaled.id,
           list: 'matched_list',
         });
 
@@ -69,10 +123,20 @@ export class DuoFinderService {
         const findDuoDetails = await this.socketUserService.getUserDuoDetails(data.prevFound.id);
         const findDuo = await this.socketUserService.findDuo(findDuoDetails?.id);
 
+        const secondFindDuoDetails = await this.socketUserService.getUserDuoDetails(userDetaled.id);
+        const secondFindDuo = await this.socketUserService.findDuo(secondFindDuoDetails?.id);
+
         return {
-          type: DuoFinderResponseType.MATCH_FOUND,
-          found_duo: findDuo ?? {},
-          found_duo_details: findDuoDetails ?? {},
+          foundUser: {
+            type: DuoFinderResponseType.MATCH_FOUND,
+            found_duo: findDuo ?? {},
+            found_duo_details: findDuoDetails ?? {},
+          },
+          myselfUser: {
+            type: DuoFinderResponseType.MATCH_FOUND,
+            found_duo: secondFindDuo ?? {},
+            found_duo_details: secondFindDuoDetails ?? {},
+          },
         };
       } else {
         // update accept_list

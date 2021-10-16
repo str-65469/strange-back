@@ -1,7 +1,7 @@
 import { LolLeague } from 'src/enum/lol_league.enum';
 import { MatchedDuos } from './../../database/entity/matched_duos.entity';
 import { MatchingSpams } from './../../database/entity/matching_spams.entity';
-import { getManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Socket } from 'socket.io';
 import { Injectable } from '@nestjs/common';
 import { AccessTokenPayload, JwtAcessService } from 'src/http/jwt/jwt-access.service';
@@ -10,6 +10,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserCombined } from '../duofinder/duo_finder.service';
 import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
 import { HandleDuoFindBody } from '../duofinder/responses';
+import User from 'src/database/entity/user.entity';
+import UserDetails from 'src/database/entity/user_details.entity';
 import * as cookie from 'cookie';
 
 @Injectable()
@@ -17,6 +19,8 @@ export class SocketUserService {
   constructor(
     private readonly jwtAccessService: JwtAcessService,
     private readonly jwtService: JwtService,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(UserDetails) private readonly userDetailsRepo: Repository<UserDetails>,
     @InjectRepository(MatchedDuos) private readonly matchedRepo: Repository<MatchedDuos>,
     @InjectRepository(MatchingLobby) private readonly lobbyRepo: Repository<MatchingLobby>,
     @InjectRepository(MatchingSpams) private readonly spamRepo: Repository<MatchingSpams>,
@@ -42,8 +46,8 @@ export class SocketUserService {
 
     if (ids.length) {
       // get user and user details
-      const matchedUsers = await getManager()
-        .createQueryBuilder('users', 'u')
+      const matchedUsers = await this.userRepo
+        .createQueryBuilder('u')
         .leftJoinAndSelect('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
         .where('u.id IN (:...ids)', { ids })
         .select(
@@ -80,8 +84,8 @@ export class SocketUserService {
       filteredLeagues = leagues.filter((_, i) => i >= currEnumIndex - 1 && i <= currEnumIndex + 1);
     }
 
-    return await getManager()
-      .createQueryBuilder('user_details', 'ud')
+    return await this.userDetailsRepo
+      .createQueryBuilder('ud')
       .where('user_id NOT IN (:...ids)', { ids: filterList })
       .andWhere('server = :server', { server: userDetaled.server })
       .andWhere('league IN (:...leagues)', { leagues: filteredLeagues })
@@ -115,8 +119,8 @@ export class SocketUserService {
       filteredLeagues = leagues.filter((el, i) => i >= currEnumIndex - 1 && i <= currEnumIndex + 1);
     }
 
-    return await getManager()
-      .createQueryBuilder('user_details', 'ud')
+    return await this.userDetailsRepo
+      .createQueryBuilder('ud')
       .where('user_id NOT IN (:...ids)', { ids: filterList })
       .andWhere('server = :server', { server: userDetaled.server })
       .andWhere('league IN (:...leagues)', { leagues: filteredLeagues })
@@ -129,61 +133,67 @@ export class SocketUserService {
   }
 
   async getUserDuoDetails(user_id: number) {
-    return await getManager()
-      .createQueryBuilder('user_details', 'ud')
+    return await this.userDetailsRepo
+      .createQueryBuilder()
       .andWhere('user_id = :user_id', { user_id })
       .select(
-        'ud.id, ud.discord_name, ud.league, ud.league_points, ud.level, ud.main_champions, ud.main_lane, ud.server, ud.summoner_name',
+        'id, discord_name, league, league_points, level, main_champions, main_lane, server, summoner_name',
       )
       .getRawOne();
   }
 
   public async findDuo(id: number) {
-    const duo = await getManager()
-      .createQueryBuilder('users', 'u')
-      .where('u.id = :id', { id })
-      .select('u.email, u.id, u.img_path, u.username')
+    const duo = await this.userRepo
+      .createQueryBuilder()
+      .where('id = :id', { id })
+      .select('email, id, img_path, username', 'socket_id')
       .getRawOne();
 
-    // duo.full_image_path = duo.img_path ? process.env.APP_URL + '/upload' + duo.img_path : null;
-    duo.full_image_path = duo.img_path ?? null;
+    const temp = JSON.parse(JSON.stringify(duo));
+    temp.full_image_path = duo.img_path ?? null;
+    // temp.full_image_path = duo.img_path ? process.env.APP_URL + '/upload' + duo.img_path : null;
 
-    return duo;
+    return temp;
   }
 
-  public async findIfUserIsWaiting(id: number) {
-    return await this.lobbyRepo.findOne({
-      where: { user_id: id },
-    });
+  public async findIfUserIsWaiting(user_id: number, matched_user_id: number) {
+    return await this.lobbyRepo
+      .createQueryBuilder()
+      .where('user_id = :user_id AND matched_user_id = :matched_user_id', { user_id, matched_user_id })
+      .getRawOne();
   }
 
-  public async saveUsersIntoMatched(user_id: number, id: number) {
+  public async saveUsersIntoMatched(user_id: number, matched_user_id: number) {
     const matched = new MatchedDuos();
     matched.user_id = user_id;
-    matched.matched_user_id = id;
+    matched.matched_user_id = matched_user_id;
 
     return await this.matchedRepo.save(matched);
   }
 
-  public async removeUserFromLobby(user_id: number) {
-    return await this.lobbyRepo.delete({ user_id });
-  }
-
-  public async addUsersToLobby(user_id: number, id: number) {
+  public async addUsersToLobby(user_id: number, liked_user_id: number) {
     const lobby = new MatchingLobby();
     lobby.user_id = user_id;
-    lobby.liked_user_id = id;
+    lobby.liked_user_id = liked_user_id;
 
     return await this.lobbyRepo.save(lobby);
+  }
+
+  public async removeUserFromLobby(user_id: number, matched_user_id: number) {
+    return await this.lobbyRepo
+      .createQueryBuilder()
+      .delete()
+      .where('user_id = :user_id AND matched_user_id = :matched_user_id', { user_id, matched_user_id })
+      .execute();
   }
 
   //! General
 
   public async findFullDetailed(id: number) {
-    return await getManager()
-      .createQueryBuilder('users', 'u')
-      .leftJoin('matching_spams', 'ms', 'ms.user_id = u.id') // use filters (spams)
-      .leftJoin('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
+    return await this.userRepo
+      .createQueryBuilder('u')
+      .leftJoin(MatchingSpams, 'ms', 'ms.user_id = u.id') // use filters (spams)
+      .leftJoin(UserDetails, 'ud', 'ud.user_id = u.id') // use filters (spams)
       .select('*')
       .where('u.id = :id', { id })
       .getRawOne();

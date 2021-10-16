@@ -44,7 +44,7 @@ export class MatchingSpams {
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  public user_id: User;
+  public user_id: number;
 
   @CreateDateColumn({
     type: 'timestamptz',
