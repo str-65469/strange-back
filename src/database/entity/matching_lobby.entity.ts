@@ -13,12 +13,12 @@ export class MatchingLobby {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @ManyToOne(() => User, (user) => user.id)
+  //   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
   public user_id: number;
 
-  @ManyToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: 'matched_user_id' })
+  //   @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: 'liked_user_id' })
   public liked_user_id: number;
 
   @CreateDateColumn({

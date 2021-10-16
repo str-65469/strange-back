@@ -52,6 +52,8 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   @SubscribeMessage(duomatchFind)
   public async handleDuoFind(@MessageBody() data: HandleDuoFindBody, @ConnectedSocket() socket: Socket) {
+    console.log('==================');
+
     const payload = this.socketUserService.getUserPayload(socket);
 
     // get detailed user

@@ -146,7 +146,7 @@ export class SocketUserService {
     const duo = await this.userRepo
       .createQueryBuilder()
       .where('id = :id', { id })
-      .select('email, id, img_path, username', 'socket_id')
+      .select('email, id, img_path, username, socket_id')
       .getRawOne();
 
     const temp = JSON.parse(JSON.stringify(duo));
@@ -156,10 +156,10 @@ export class SocketUserService {
     return temp;
   }
 
-  public async findIfUserIsWaiting(user_id: number, matched_user_id: number) {
+  public async findIfUserIsWaiting(user_id: number, liked_user_id: number) {
     return await this.lobbyRepo
       .createQueryBuilder()
-      .where('user_id = :user_id AND matched_user_id = :matched_user_id', { user_id, matched_user_id })
+      .where('user_id = :user_id AND liked_user_id = :liked_user_id', { user_id, liked_user_id })
       .getRawOne();
   }
 
@@ -171,6 +171,28 @@ export class SocketUserService {
     return await this.matchedRepo.save(matched);
   }
 
+  public async checkIfBothInLobby(userDetaled: UserCombined) {
+    const mines = await this.lobbyRepo
+      .createQueryBuilder()
+      .where('user_id = :user_id', { user_id: userDetaled.id })
+      .select('*')
+      .getRawMany();
+
+    if (mines && mines.length) {
+      const oponentIds = mines.map((e) => e.liked_user_id);
+
+      // oponent who liked me
+      return await this.lobbyRepo
+        .createQueryBuilder()
+        .where('user_id IN (:...oponent_ids)', { oponent_ids: oponentIds })
+        .andWhere('liked_user_id = :liked_user_id', { liked_user_id: userDetaled.id })
+        .select('*')
+        .getRawMany();
+    }
+
+    return [];
+  }
+
   public async addUsersToLobby(user_id: number, liked_user_id: number) {
     const lobby = new MatchingLobby();
     lobby.user_id = user_id;
@@ -179,11 +201,11 @@ export class SocketUserService {
     return await this.lobbyRepo.save(lobby);
   }
 
-  public async removeUserFromLobby(user_id: number, matched_user_id: number) {
+  public async removeUserFromLobby(user_id: number, liked_user_id: number) {
     return await this.lobbyRepo
       .createQueryBuilder()
       .delete()
-      .where('user_id = :user_id AND matched_user_id = :matched_user_id', { user_id, matched_user_id })
+      .where('user_id = :user_id AND liked_user_id = :liked_user_id', { user_id, liked_user_id })
       .execute();
   }
 

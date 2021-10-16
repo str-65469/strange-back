@@ -29,41 +29,36 @@ export class DuoFinderService {
 
   public async initFirstMatch(userDetaled: UserCombined) {
     // find if I accepted someone and somebody else accepted me while I was away (DUO)
-    // 		get mine first
-    //		get ids from that
-    //		based on that get other half
-    // const users = this.checkIfBothInLobby(userDetaled);
+    const users = await this.socketUserService.checkIfBothInLobby(userDetaled);
 
-    // for (const user of users) {
-    //   // save both into matched table
-    //   await this.socketUserService.saveUsersIntoMatched(userDetaled.id, user.id);
-    //   await this.socketUserService.saveUsersIntoMatched(user.id, userDetaled.id);
+    if (users && users.length) {
+      for (const user of users) {
+        // save both into matched table
+        await this.socketUserService.saveUsersIntoMatched(userDetaled.id, user.user_id);
+        await this.socketUserService.saveUsersIntoMatched(user.user_id, userDetaled.id);
 
-    //   // remove both from lobby
-    //   await this.socketUserService.removeBothFromLobby(user.id);
-    // }
+        // remove both from lobby
+        await this.socketUserService.removeUserFromLobby(userDetaled.id, user.user_id);
+        await this.socketUserService.removeUserFromLobby(user.user_id, userDetaled.id);
 
-    // // remove from lobby
-    // await this.socketUserService.removeUserFromLobby(data.prevFound.id);
-
-    // // update both matched_list
-    // await this.socketUserService.updateFilterListInSpam({
-    //   user_id: userDetaled.id,
-    //   id: data.prevFound.id,
-    //   list: 'matched_list',
-    // });
-    // await this.socketUserService.updateFilterListInSpam({
-    //   user_id: data.prevFound.id,
-    //   id: userDetaled.id,
-    //   list: 'matched_list',
-    // });
+        await this.socketUserService.updateFilterListInSpam({
+          user_id: userDetaled.id,
+          id: user.user_id,
+          list: 'matched_list',
+        });
+        await this.socketUserService.updateFilterListInSpam({
+          user_id: user.user_id,
+          id: userDetaled.id,
+          list: 'matched_list',
+        });
+      }
+    }
 
     // get matches (from matched user table)
     const matchedUsers = await this.socketUserService.findMatchedUsers(userDetaled.id);
 
     // find new user (from detailed and later joined to user) (order must be like this)
     const findDuoDetails = await this.socketUserService.findNewDuoDetails(userDetaled);
-
     const findDuo = await this.socketUserService.findDuo(findDuoDetails?.id);
 
     return {
