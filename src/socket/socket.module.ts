@@ -10,11 +10,19 @@ import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import User from 'src/database/entity/user.entity';
 import UserDetails from 'src/database/entity/user_details.entity';
+import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notifications.entity';
 
 @Module({
   imports: [
     JwtModule.register({ secret: process.env.JWT_SECRET }),
-    TypeOrmModule.forFeature([MatchedDuos, MatchingLobby, MatchingSpams, User, UserDetails]),
+    TypeOrmModule.forFeature([
+      MatchedDuos,
+      MatchingLobby,
+      MatchingSpams,
+      User,
+      UserDetails,
+      MatchedDuosNotifications,
+    ]),
   ],
   controllers: [],
   providers: [JwtAcessService, DuoMatchGateway, DuoFinderService, SocketUserService],

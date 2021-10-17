@@ -52,6 +52,9 @@ export default class UserDetails {
   })
   public league?: LolLeague;
 
+  @Column({ nullable: true })
+  public league_number?: number;
+
   @Column({
     nullable: true,
     type: 'enum',
@@ -64,6 +67,9 @@ export default class UserDetails {
   @OneToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
   public user_id: User;
+
+  @Column({ nullable: true, type: 'float' })
+  public win_rate?: number;
 
   @Exclude({ toPlainOnly: true })
   @Column({

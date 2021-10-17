@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { JwtAcessService } from 'src/http/jwt/jwt-access.service';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -16,8 +17,13 @@ import { UserFileController } from './controllers/user_files.controller';
     MulterModule.register({
       dest: './upload',
     }),
+    HttpModule.register({
+      baseURL: process.env.CHECKED_SERVER_URL,
+      timeout: 10000, // 10 sec
+    }),
   ],
   controllers: [UserController, UserFileController],
+
   providers: [UsersService, JwtAcessService],
   exports: [UsersService],
 })

@@ -1,3 +1,4 @@
+import { ConfigModule } from '@nestjs/config';
 import { RegisterMailCheckService } from './services/register_check.service';
 import { Module } from '@nestjs/common';
 import { MailService } from './mail.service';
@@ -8,6 +9,7 @@ import { ContactUsMailService } from './services/contact_us.service';
 
 @Module({
   imports: [
+    // ConfigModule.forRoot(),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',

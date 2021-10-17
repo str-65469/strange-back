@@ -1,3 +1,4 @@
+import { LolLeague } from 'src/enum/lol_league.enum';
 import {
   BaseEntity,
   Column,
@@ -17,6 +18,12 @@ interface RegisterCacheConstrParams {
 
   secret_token?: string;
   expiry_date?: Date;
+
+  level?: number;
+  league?: LolLeague;
+  league_number?: number;
+  league_points?: number;
+  win_rate?: number;
 }
 
 @Entity('user_register_cache')
@@ -52,6 +59,13 @@ export class UserRegisterCache extends BaseEntity {
   })
   public expiry_date?: Date;
 
+  @Column({ nullable: true }) public level?: number;
+
+  @Column({ nullable: true, type: 'enum', enum: LolLeague }) public league?: LolLeague;
+  @Column({ nullable: true }) public league_number?: number;
+  @Column({ nullable: true }) public league_points?: number;
+  @Column({ nullable: true }) public win_rate?: number;
+
   @CreateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
@@ -82,6 +96,22 @@ export class UserRegisterCache extends BaseEntity {
 
       if (params.expiry_date) {
         this.expiry_date = params.expiry_date;
+      }
+
+      if (params.level) {
+        this.level = params.level;
+      }
+      if (params.league) {
+        this.league = params.league;
+      }
+      if (params.league_number) {
+        this.league_number = params.league_number;
+      }
+      if (params.league_points) {
+        this.league_points = params.league_points;
+      }
+      if (params.win_rate) {
+        this.win_rate = params.win_rate;
       }
     }
   }

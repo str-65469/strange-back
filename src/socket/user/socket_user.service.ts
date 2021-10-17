@@ -1,3 +1,4 @@
+import { MatchedDuosNotifications } from './../../database/entity/matched_duos_notifications.entity';
 import { LolLeague } from 'src/enum/lol_league.enum';
 import { MatchedDuos } from './../../database/entity/matched_duos.entity';
 import { MatchingSpams } from './../../database/entity/matching_spams.entity';
@@ -24,6 +25,8 @@ export class SocketUserService {
     @InjectRepository(MatchedDuos) private readonly matchedRepo: Repository<MatchedDuos>,
     @InjectRepository(MatchingLobby) private readonly lobbyRepo: Repository<MatchingLobby>,
     @InjectRepository(MatchingSpams) private readonly spamRepo: Repository<MatchingSpams>,
+    @InjectRepository(MatchedDuosNotifications)
+    private readonly notificationRepo: Repository<MatchedDuosNotifications>,
   ) {}
 
   public getUserPayload(socket: Socket): AccessTokenPayload {
@@ -42,11 +45,10 @@ export class SocketUserService {
       where: { user_id: id },
     });
 
-    const ids = matchedUsers.map((e) => e.id);
-
-    if (ids.length) {
-      // get user and user details
-      const matchedUsers = await this.userRepo
+    if (matchedUsers.length) {
+      // get user and user details based on ids
+      const ids = matchedUsers.map((e) => e.id);
+      const matchedUsersDetails = await this.userRepo
         .createQueryBuilder('u')
         .leftJoinAndSelect('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
         .where('u.id IN (:...ids)', { ids })
@@ -55,7 +57,7 @@ export class SocketUserService {
         )
         .getRawMany();
 
-      return matchedUsers;
+      return matchedUsersDetails;
     }
 
     return [];
@@ -171,6 +173,14 @@ export class SocketUserService {
     return await this.matchedRepo.save(matched);
   }
 
+  public async saveMatchedDuoNotification(user_id: number, matched_user_id: number) {
+    const notification = new MatchedDuosNotifications();
+    notification.user_id = user_id;
+    notification.matched_user_id = matched_user_id;
+
+    return await this.notificationRepo.save(notification);
+  }
+
   public async checkIfBothInLobby(userDetaled: UserCombined) {
     const mines = await this.lobbyRepo
       .createQueryBuilder()
@@ -231,6 +241,38 @@ export class SocketUserService {
     spam[props.list] = newList;
 
     return await this.spamRepo.save(spam);
+  }
+
+  public async getNotifications(user_id: number) {
+    const notifications = await this.notificationRepo
+      .createQueryBuilder()
+      .where('user_id = :user_id', { user_id })
+      .select('*')
+      .getRawMany();
+
+    if (notifications.length) {
+      // get user and user details based on ids
+      const ids = notifications.map((e) => e.matched_user_id);
+
+      let matchedUsersDetails = await this.userRepo
+        .createQueryBuilder('u')
+        .leftJoinAndSelect('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
+        .where('u.id IN (:...ids)', { ids })
+        .select(
+          'u.id, u.username, u.img_path, u.email, us.discord_name, us.league, us.league_points, us.level, us.main_champions, us.main_lane, us.server, us.summoner_name',
+        )
+        .getRawMany();
+
+      // add is_seend from matched table
+      matchedUsersDetails = matchedUsersDetails.map((el) => {
+        el.is_seen = notifications.find((not) => not.matched_user_id == el.id)?.is_seen ?? false;
+        return el;
+      });
+
+      return matchedUsersDetails;
+    }
+
+    return [];
   }
 }
 

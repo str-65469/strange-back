@@ -1,3 +1,4 @@
+import { MatchingSpamService } from './app_services/matching_spam/matchingspamservice.service';
 import { SocketModule } from './socket/socket.module';
 import { SeederModule } from './database/seeders/seeder.module';
 import { Module } from '@nestjs/common';

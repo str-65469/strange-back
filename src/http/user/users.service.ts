@@ -1,5 +1,5 @@
-import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
-import { Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
+import { catchError, map } from 'rxjs/operators';
+import { HttpException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { UserRegisterCache } from '../../database/entity/user_register_cache.entity';
 import { UserRegisterDto } from './dto/user-register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,10 +14,12 @@ import { RandomGenerator } from 'src/helpers/random_generator';
 import User from 'src/database/entity/user.entity';
 import UserDetails from 'src/database/entity/user_details.entity';
 import { UserProfileUpdateDto } from './dto/user-update.dto';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
   constructor(
+    private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
     @Inject(REQUEST) private readonly request: Request,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
@@ -64,25 +66,35 @@ export class UsersService {
   }
 
   async checkLolCredentialsValid(server: LolServer, summoner_name: string) {
-    const check = true;
+    return await this.httpService
+      .get('/api/summoner_profile', {
+        params: {
+          server,
+          summonerName: summoner_name,
+        },
+      })
+      .pipe(
+        map((res) => {
+          const data: CheckResp = res.data;
 
-    // api here
+          const resp = {
+            level: data.level,
+            league: data.division,
+            league_number: data.divisionNumber,
+            league_points: data.leaguePoints,
+            win_rate: data.winRatio,
+          };
 
-    if (check) {
-      return {
-        league: LolLeague.BRONZE,
-        server: server,
-        summoner_name: summoner_name,
-        check: true,
-      };
-    } else {
-      return {
-        check: false,
-      };
-    }
+          return resp;
+        }),
+        catchError((e) => {
+          throw new HttpException('Check your division or summoner name please', e.response.status);
+          // throw new HttpException(e.response.data, e.response.status);
+        }),
+      );
   }
 
-  async cacheUserRegister(body: UserRegisterDto) {
+  async cacheUserRegister(body: UserRegisterDto, details: ReturnResp) {
     const { email, password, server, summoner_name, username } = body;
 
     const d1 = new Date();
@@ -100,6 +112,12 @@ export class UsersService {
       username,
       secret_token: secret,
       expiry_date: expiryDate,
+
+      league: details.league,
+      league_number: details.league_number,
+      league_points: details.league_points,
+      level: details.level,
+      win_rate: details.win_rate,
     });
 
     return await userCache.save();
@@ -163,4 +181,23 @@ export class UsersService {
       )
       .getRawOne();
   }
+}
+
+interface CheckResp {
+  level: number;
+  summonerName: string;
+  division: LolLeague;
+  divisionNumber: number;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
+  winRatio: number;
+}
+
+export interface ReturnResp {
+  level: number;
+  league: LolLeague;
+  league_number: number;
+  league_points: number;
+  win_rate: number;
 }

@@ -17,6 +17,7 @@ export class MatchingSpams {
   @Column({
     nullable: false,
     type: 'int',
+    default: [],
     array: true,
   })
   public accept_list: Array<number>;
@@ -24,6 +25,7 @@ export class MatchingSpams {
   @Column({
     nullable: false,
     type: 'int',
+    default: [],
     array: true,
   })
   public decline_list: Array<number>;
@@ -31,6 +33,7 @@ export class MatchingSpams {
   @Column({
     nullable: false,
     type: 'int',
+    default: [],
     array: true,
   })
   public remove_list: Array<number>;
@@ -38,6 +41,7 @@ export class MatchingSpams {
   @Column({
     nullable: false,
     type: 'int',
+    default: [],
     array: true,
   })
   public matched_list: Array<number>;

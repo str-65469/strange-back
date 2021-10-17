@@ -68,11 +68,13 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
       this.wss.sockets.in(payload.socket_id).emit('duo_match_finder', resp);
     } else {
-      // send to myself and user
-      this.wss.sockets.in(payload.socket_id).emit('duo_match_finder', foundAnyone.foundUser); // myself
-      this.wss.sockets
-        .in(foundAnyone.myselfUser.found_duo.socket_id)
-        .emit('duo_match_finder', foundAnyone.myselfUser); // to user
+      const { userToMyself, myselfToUser } = foundAnyone;
+
+      // send to myself
+      this.wss.sockets.in(myselfToUser.found_duo.socked_id).emit('duo_match_finder', userToMyself); // myself
+
+      // send to user
+      this.wss.sockets.in(userToMyself.found_duo.socket_id).emit('duo_match_finder', myselfToUser); // to user
     }
   }
 

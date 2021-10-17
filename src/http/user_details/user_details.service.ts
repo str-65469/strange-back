@@ -21,6 +21,12 @@ export class UserDetailsServiceService {
     userDetailed.summoner_name = summoner_name;
     userDetailed.user_id = user;
 
+    userDetailed.league = userCached.league;
+    userDetailed.league_number = userCached.league_number;
+    userDetailed.league_points = userCached.league_points;
+    userDetailed.level = userCached.level;
+    userDetailed.win_rate = userCached.win_rate;
+
     return await this.userDetailsRepo.save(userDetailed);
   }
 }

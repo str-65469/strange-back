@@ -3,8 +3,13 @@ import { ContactUs } from 'src/database/entity/contact_us.entity';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { ContactUsMailProps, ContactUsMailService } from './services/contact_us.service';
 import { RegisterMailCheckService } from './services/register_check.service';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export const SENDER_ADDRESS = `"${process.env.APP_TITLE} 👻" <${process.env.MAIL_USER}>`;
+
+console.log(process.env.APP_TITLE);
+console.log(process.env.MAIL_USER);
 
 @Injectable()
 export class MailService {

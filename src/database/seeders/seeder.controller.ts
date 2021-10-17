@@ -45,6 +45,8 @@ export class SeederController {
       userDetailed.user_id = savedUser;
       userDetailed.summoner_name = faker.name.findName();
       userDetailed.discord_name = faker.name.findName();
+      userDetailed.win_rate = faker.datatype.float();
+      userDetailed.league_number = faker.random.arrayElement([1, 2, 3, 4]);
       userDetailed.server = faker.random.arrayElement([
         LolServer.NORTH_AMERICA,
         LolServer.RUSSIA,

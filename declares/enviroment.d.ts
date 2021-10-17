@@ -7,6 +7,10 @@ declare global {
 
       APP_TITLE: string;
       APP_URL: string;
+      DASHBOARD_URL: string;
+      CHECKED_SERVER_URL: string;
+
+      COOKIE_DOMAIN: string;
 
       POSTGRES_HOST: string;
       POSTGRES_DATABASE: string;

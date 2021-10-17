@@ -37,9 +37,15 @@ export class DuoFinderService {
         await this.socketUserService.saveUsersIntoMatched(userDetaled.id, user.user_id);
         await this.socketUserService.saveUsersIntoMatched(user.user_id, userDetaled.id);
 
+        // save to my notification
+        await this.socketUserService.saveMatchedDuoNotification(userDetaled.id, user.user_id);
+
         // remove both from lobby
         await this.socketUserService.removeUserFromLobby(userDetaled.id, user.user_id);
         await this.socketUserService.removeUserFromLobby(user.user_id, userDetaled.id);
+
+        // save notification for me
+        await this.socketUserService.saveMatchedDuoNotification(userDetaled.id, user.user_id);
 
         await this.socketUserService.updateFilterListInSpam({
           user_id: userDetaled.id,
@@ -54,24 +60,26 @@ export class DuoFinderService {
       }
     }
 
-    // get matches (from matched user table)
-    const matchedUsers = await this.socketUserService.findMatchedUsers(userDetaled.id);
+    const matchedUsers = await this.socketUserService.findMatchedUsers(userDetaled.id); // get matches (from matched user table)
+    const notifications = await this.socketUserService.getNotifications(userDetaled.id); // get all notifications
 
-    // find new user (from detailed and later joined to user) (order must be like this)
+    // find new user (order must be like this)
     const findDuoDetails = await this.socketUserService.findNewDuoDetails(userDetaled);
-    const findDuo = await this.socketUserService.findDuo(findDuoDetails?.id);
+    const findDuo = findDuoDetails ? await this.socketUserService.findDuo(findDuoDetails?.id) : {};
 
     return {
       type: DuoFinderResponseType.DUO_FOUND,
-      found_duo: findDuo ?? {},
+      found_duo: findDuo,
       found_duo_details: findDuoDetails ?? {},
+
+      // for init
       matched_users: matchedUsers ?? [],
-      new_matched_users: [],
+      notifications: notifications ?? [],
     };
   }
 
   public async findDuo(userDetaled: UserCombined, data: HandleDuoFindBody) {
-    // find new user (from detailed and later joined to user) (order must be like this)
+    // find new user (order must be like this)
     const findDuoDetails = await this.socketUserService.findNewDuoDetailsFiltered(userDetaled, data);
     const findDuo = await this.socketUserService.findDuo(findDuoDetails?.id);
 
@@ -121,16 +129,22 @@ export class DuoFinderService {
         const secondFindDuoDetails = await this.socketUserService.getUserDuoDetails(userDetaled.id);
         const secondFindDuo = await this.socketUserService.findDuo(secondFindDuoDetails?.id);
 
+        // save notification for other guy (for me it will be rendered on screen)
+        const oponentNotifcation = await this.socketUserService.saveMatchedDuoNotification(
+          secondFindDuo.id,
+          findDuo.id,
+        );
+
         return {
-          foundUser: {
+          userToMyself: {
             type: DuoFinderResponseType.MATCH_FOUND,
             found_duo: findDuo ?? {},
             found_duo_details: findDuoDetails ?? {},
           },
-          myselfUser: {
-            type: DuoFinderResponseType.MATCH_FOUND,
+          myselfToUser: {
+            type: DuoFinderResponseType.MATCH_FOUND_OTHER,
             found_duo: secondFindDuo ?? {},
-            found_duo_details: secondFindDuoDetails ?? {},
+            found_duo_details: { secondFindDuoDetails, is_seen: oponentNotifcation.is_seen } ?? {},
           },
         };
       } else {

@@ -1,3 +1,5 @@
+import { map } from 'rxjs/operators';
+import { MatchingSpamService } from './../../app_services/matching_spam/matchingspamservice.service';
 import { UserRegisterCacheService } from './../user_register_cache/user_register_cache.service';
 import { UserDetailsServiceService } from '../user_details/user_details.service';
 import { Repository } from 'typeorm';
@@ -38,6 +40,7 @@ export class AuthController {
     private readonly mailServie: MailService,
     private readonly userDetailsService: UserDetailsServiceService,
     private readonly userRegisterCacheService: UserRegisterCacheService,
+    private readonly matchingSpamService: MatchingSpamService,
 
     @InjectRepository(UserRegisterCache)
     private readonly userRegisterCacheRepo: Repository<UserRegisterCache>,
@@ -45,21 +48,38 @@ export class AuthController {
 
   @Post('/login')
   async login(@Body() body: UserLoginDto, @Res() res: Response) {
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+
     const user = await this.authService.validateUser(body);
     const token = this.jwtAcessService.generateAccessToken(user, user.socket_id);
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(user);
 
     await this.userService.saveUser(user, secret);
 
-    res.cookie('access_token', token, {
-      expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      httpOnly: true,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      res.cookie('access_token', token, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+      });
 
-    res.cookie('refresh_token', refreshToken, {
-      expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      httpOnly: true,
-    });
+      res.cookie('refresh_token', refreshToken, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+      });
+    } else {
+      res.cookie('access_token', token, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+        domain: process.env.COOKIE_DOMAIN,
+      });
+
+      res.cookie('refresh_token', refreshToken, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+        domain: process.env.COOKIE_DOMAIN,
+      });
+    }
 
     return res.send(user);
   }
@@ -74,28 +94,34 @@ export class AuthController {
     // second check if user lol credentials is valid
     const checkedLolCreds = await this.userService.checkLolCredentialsValid(server, summoner_name);
 
-    if (checkedLolCreds.check) {
-      // third cache into database
-      const userCached = await this.userService.cacheUserRegister(body);
+    return checkedLolCreds.pipe(
+      map(async (res) => {
+        // third cache into database
+        const userCached = await this.userService.cacheUserRegister(body, res);
 
-      // send to mail
-      this.mailServie.sendUserConfirmation(userCached);
+        // send to mail
+        this.mailServie.sendUserConfirmation(userCached);
 
-      return checkedLolCreds;
-    }
-
-    return checkedLolCreds;
+        return { checkedLolCreds, check: true };
+      }),
+    );
   }
 
   @UseGuards(JwtRegisterAuthGuard)
   @Get('/register/confirm/')
   async registerVerify(@Query('id', ParseIntPipe) id: number, @Req() req: Request, @Res() res: Response) {
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+
     // get data from cache
     const cachedData = await this.userRegisterCacheRepo.findOne(id);
 
     if (!cachedData) {
       throw new HttpException('Cached information not found', HttpStatus.BAD_REQUEST);
     }
+
+    // create user spam filter
+    await this.matchingSpamService.createEmptySpam(cachedData.id);
 
     // generate refresh token and new secret
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(cachedData);
@@ -113,23 +139,39 @@ export class AuthController {
     await this.userRegisterCacheService.delete(cachedData.id);
 
     // send httpOnly access_token cookie
-    res.cookie('access_token', accessToken, {
-      expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      httpOnly: true,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      res.cookie('access_token', accessToken, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+      });
 
-    res.cookie('refresh_token', refreshToken, {
-      expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      httpOnly: true,
-    });
+      res.cookie('refresh_token', refreshToken, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+      });
+    } else {
+      res.cookie('access_token', accessToken, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+        domain: process.env.COOKIE_DOMAIN,
+      });
 
-    return res.redirect('http://localhost:3000/');
-    // return res.send({ user: savedUser });
+      res.cookie('refresh_token', refreshToken, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+        domain: process.env.COOKIE_DOMAIN,
+      });
+    }
+
+    return res.redirect(`${process.env.DASHBOARD_URL}/profile`);
   }
 
   @UseGuards(JwtRefreshTokenAuthGuard)
   @Get('/refresh')
   public async refreshToken(@Req() req: Request, @Res() res: Response) {
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+
     const cookies = req.cookies;
     const accessToken = cookies.access_token;
 
@@ -144,15 +186,29 @@ export class AuthController {
     // update user secret
     await this.userService.saveUser(user, refreshNew.secret);
 
-    res.cookie('access_token', accessTokenNew, {
-      expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      httpOnly: true,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      res.cookie('access_token', accessTokenNew, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+      });
 
-    res.cookie('refresh_token', refreshNew.refreshToken, {
-      expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-      httpOnly: true,
-    });
+      res.cookie('refresh_token', refreshNew, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+      });
+    } else {
+      res.cookie('access_token', accessTokenNew, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+        domain: process.env.COOKIE_DOMAIN,
+      });
+
+      res.cookie('refresh_token', refreshNew, {
+        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
+        httpOnly: true,
+        domain: process.env.COOKIE_DOMAIN,
+      });
+    }
 
     return res.send({ message: 'token refresh successful' });
   }
