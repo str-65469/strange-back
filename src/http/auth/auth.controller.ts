@@ -120,9 +120,6 @@ export class AuthController {
       throw new HttpException('Cached information not found', HttpStatus.BAD_REQUEST);
     }
 
-    // create user spam filter
-    await this.matchingSpamService.createEmptySpam(cachedData.id);
-
     // generate refresh token and new secret
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(cachedData);
     const possibleIP = req.headers['x-forwarded-for'] as string;
@@ -137,6 +134,9 @@ export class AuthController {
 
     // delete user cached data
     await this.userRegisterCacheService.delete(cachedData.id);
+
+    // create user spam filter
+    await this.matchingSpamService.createEmptySpam(savedUser.id);
 
     // send httpOnly access_token cookie
     if (process.env.NODE_ENV === 'development') {
