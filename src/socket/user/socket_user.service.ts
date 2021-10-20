@@ -47,7 +47,8 @@ export class SocketUserService {
 
     if (matchedUsers.length) {
       // get user and user details based on ids
-      const ids = matchedUsers.map((e) => e.id);
+      const ids = matchedUsers.map((e) => e.matched_user_id);
+
       const matchedUsersDetails = await this.userRepo
         .createQueryBuilder('u')
         .leftJoinAndSelect('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
