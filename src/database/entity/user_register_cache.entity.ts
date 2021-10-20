@@ -64,7 +64,7 @@ export class UserRegisterCache extends BaseEntity {
   @Column({ nullable: true, type: 'enum', enum: LolLeague }) public league?: LolLeague;
   @Column({ nullable: true }) public league_number?: number;
   @Column({ nullable: true }) public league_points?: number;
-  @Column({ nullable: true }) public win_rate?: number;
+  @Column({ nullable: true, type: 'float8' }) public win_rate?: number;
 
   @CreateDateColumn({
     type: 'timestamptz',
