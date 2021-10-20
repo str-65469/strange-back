@@ -130,7 +130,7 @@ export class AuthController {
     await this.userDetailsService.saveUserDetailsByCachedData(cachedData, savedUser);
 
     // generate access_token and refresh token and new secret
-    const accessToken = this.jwtAcessService.generateAccessToken(cachedData, savedUser.socket_id);
+    const accessToken = this.jwtAcessService.generateAccessToken(savedUser, savedUser.socket_id);
 
     // delete user cached data
     await this.userRegisterCacheService.delete(cachedData.id);
