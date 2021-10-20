@@ -67,13 +67,13 @@ export class UsersService {
   }
 
   async checkLolCredentialsValid(server: LolServer, summoner_name: string) {
-    return of({
-      level: 30,
-      league: LolLeague.BRONZE,
-      league_number: 2,
-      league_points: 69,
-      win_rate: 3.5,
-    });
+    // return of({
+    //   level: 30,
+    //   league: LolLeague.BRONZE,
+    //   league_number: 2,
+    //   league_points: 69,
+    //   win_rate: 3.5,
+    // });
 
     return await this.httpService
       .get('/api/summoner_profile', {
