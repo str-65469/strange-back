@@ -36,7 +36,9 @@ export class JwtAcessService {
       socket_id: socketId,
     };
 
-    return this.jwtService.sign(payload, { expiresIn: configs.tokens.access_token.expires_in });
+    return this.jwtService.sign(payload, {
+      expiresIn: configs.tokens.access_token.expires_in,
+    });
   }
 
   public generateRefreshToken(user: User | UserRegisterCache): RefreshTokenResponse {
@@ -74,27 +76,4 @@ export class JwtAcessService {
 
     return true;
   }
-  //   public validateAcessToken(token): boolean {
-  //     jwt.verify(token, process.env.JWT_SECRET, (err: jwt.VerifyErrors) => {
-  //       if (err) {
-  //         if (err.name === MessageCode.TOKEN_EXPIRED) {
-  //           throw new GeneralException(HttpStatus.UNAUTHORIZED, {
-  //             message: configs.messages.exceptions.accessTokenExpired,
-  //             status_code: HttpStatus.UNAUTHORIZED,
-  //             message_code: MessageCode.TOKEN_EXPIRED,
-  //             detailed: err,
-  //           });
-  //         }
-
-  //         throw new GeneralException(HttpStatus.UNAUTHORIZED, {
-  //           message: err.message,
-  //           status_code: HttpStatus.UNAUTHORIZED,
-  //           message_code: MessageCode.GENERAL,
-  //           detailed: err,
-  //         });
-  //       }
-  //     });
-
-  //     return true;
-  //   }
 }

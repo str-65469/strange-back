@@ -52,6 +52,7 @@ export class AuthController {
     res.clearCookie('refresh_token');
 
     const user = await this.authService.validateUser(body);
+
     const token = this.jwtAcessService.generateAccessToken(user, user.socket_id);
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(user);
 
@@ -181,10 +182,10 @@ export class AuthController {
 
     // generate access_token and refresh token and new secret
     const accessTokenNew = this.jwtAcessService.generateAccessToken(user, user.socket_id);
-    const refreshNew = this.jwtAcessService.generateRefreshToken(user);
+    const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(user);
 
     // update user secret
-    await this.userService.saveUser(user, refreshNew.secret);
+    await this.userService.saveUser(user, secret);
 
     if (process.env.NODE_ENV === 'development') {
       res.cookie('access_token', accessTokenNew, {
@@ -192,7 +193,7 @@ export class AuthController {
         httpOnly: true,
       });
 
-      res.cookie('refresh_token', refreshNew, {
+      res.cookie('refresh_token', refreshToken, {
         expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
         httpOnly: true,
       });
@@ -203,7 +204,7 @@ export class AuthController {
         domain: process.env.COOKIE_DOMAIN,
       });
 
-      res.cookie('refresh_token', refreshNew, {
+      res.cookie('refresh_token', refreshToken, {
         expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
         httpOnly: true,
         domain: process.env.COOKIE_DOMAIN,
@@ -217,5 +218,19 @@ export class AuthController {
   @Get('/check')
   public async checkIfAuth() {
     return true;
+  }
+
+  @UseGuards(JwtAcessTokenAuthGuard)
+  @Post('/logout')
+  public async logout(@Res() res: Response) {
+    if (process.env.NODE_ENV === 'development') {
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+    } else {
+      res.clearCookie('access_token', { domain: process.env.COOKIE_DOMAIN });
+      res.clearCookie('refresh_token', { domain: process.env.COOKIE_DOMAIN });
+    }
+
+    return res.send({ message: 'logout successful' });
   }
 }
