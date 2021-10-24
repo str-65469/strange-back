@@ -40,5 +40,4 @@ export interface HandleDuoFindBody {
     id: number;
   };
   type: DuoFinderTransferTypes;
-  isMatched: boolean;
 }

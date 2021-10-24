@@ -41,9 +41,11 @@ export class SocketUserService {
   }
 
   public async findMatchedUsers(id: number) {
-    const matchedUsers = await this.matchedRepo.find({
-      where: { user_id: id },
-    });
+    const matchedUsers = await this.matchedRepo
+      .createQueryBuilder()
+      .where('user_id = :id', { id })
+      .select('*')
+      .getRawMany();
 
     if (matchedUsers.length) {
       // get user and user details based on ids

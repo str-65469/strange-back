@@ -61,6 +61,10 @@ export class DuoFinderService {
     }
 
     const matchedUsers = await this.socketUserService.findMatchedUsers(userDetaled.id); // get matches (from matched user table)
+
+    console.log('================');
+    console.log(matchedUsers);
+
     const notifications = await this.socketUserService.getNotifications(userDetaled.id); // get all notifications
 
     // find new user (order must be like this)
@@ -91,11 +95,6 @@ export class DuoFinderService {
   }
 
   public async acceptDeclineLogic(userDetaled: UserCombined, data: HandleDuoFindBody) {
-    // dont do anything if accept/decline was clicked on already matched user
-    if (data.isMatched) {
-      return null;
-    }
-
     //! accept
     if (data.type === DuoFinderTransferTypes.ACCEPT) {
       // find if dude is in lobby and waiting for my accept (if somebody liked me already) (singular)
@@ -144,7 +143,7 @@ export class DuoFinderService {
           myselfToUser: {
             type: DuoFinderResponseType.MATCH_FOUND_OTHER,
             found_duo: secondFindDuo ?? {},
-            found_duo_details: { secondFindDuoDetails, is_seen: oponentNotifcation.is_seen } ?? {},
+            found_duo_details: { ...secondFindDuoDetails, is_seen: oponentNotifcation.is_seen } ?? {},
           },
         };
       } else {
@@ -157,6 +156,8 @@ export class DuoFinderService {
 
         // add to lobby
         await this.socketUserService.addUsersToLobby(userDetaled.id, data.prevFound.id);
+
+        return null;
       }
     }
     //! decline
