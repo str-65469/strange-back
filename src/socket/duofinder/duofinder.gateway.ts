@@ -32,8 +32,8 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     this.logger.log('Duo match socket Initialized');
   }
 
-  handleConnection(socket: Socket): void {
-    this.logger.log(`Client connected ${socket.id}`);
+  handleConnection(): void {
+    this.logger.log(`Client connected`);
   }
 
   @SubscribeMessage(duomatchConnect)
@@ -42,6 +42,7 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     // join to user specific id
     socket.join(payload.socket_id);
+    this.logger.log(`Client connected ${payload.socket_id}`);
 
     // get detailed user
     const userDetaled: UserCombined = await this.socketUserService.findFullDetailed(payload.id);
@@ -58,19 +59,20 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     // check accept/decline logic
     const foundAnyone = await this.duoFinderService.acceptDeclineLogic(userDetaled, data);
 
-    if (!foundAnyone) {
-      // find new user or matched
-      const resp = await this.duoFinderService.findDuo(userDetaled, data);
+    // find new user or matched
+    const resp = await this.duoFinderService.findDuo(userDetaled, data);
 
+    if (!foundAnyone) {
       this.wss.sockets.in(payload.socket_id).emit('duo_match_finder', resp);
     } else {
       const { userToMyself, myselfToUser } = foundAnyone;
 
       // send to myself
-      this.wss.sockets.in(myselfToUser.found_duo.socked_id).emit('duo_match_finder', userToMyself); // myself
+      socket.emit('duo_match_finder', userToMyself); // send match found
+      socket.emit('duo_match_finder', resp); // send new match
 
       // send to user
-      this.wss.sockets.in(userToMyself.found_duo.socket_id).emit('duo_match_finder', myselfToUser); // to user
+      this.wss.sockets.to(userToMyself.found_duo.socket_id).emit('duo_match_finder', myselfToUser);
     }
   }
 

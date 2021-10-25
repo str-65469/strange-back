@@ -5,7 +5,7 @@
   "username": "giorgi",
   "password": "giorgi",
   "database": "strangeelo",
-  "logging": true,
+  "logging": false,
   "synchronize": false,
   "entities": [
     "dist/**/*.entity.js"

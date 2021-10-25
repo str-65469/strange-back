@@ -23,6 +23,7 @@
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "migrate:generate": "yarn run typeorm -- migration:generate -n",
     "migrate:run": "yarn run typeorm -- migration:run",
+    "migrate:down": "yarn run typeorm -- migration:down",
     "migratemain": "yarn run typeorm migration:generate -n Main",
     "clean": "rimraf src/database/migrations/*",
     "migrate": "yarn run clean && yarn run migratemain && yarn run migrate:run"

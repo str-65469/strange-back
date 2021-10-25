@@ -1,8 +1,9 @@
+import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { LolChampions } from './../../enum/lol_champions.enum';
 import { LolServer } from './../../enum/lol_server.enum';
 import { Controller, Get, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, DeepPartial, getConnection, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import User from '../entity/user.entity';
 import * as faker from 'faker';
 import { LolMainLane } from 'src/enum/lol_main_lane.enum';
@@ -13,12 +14,9 @@ import { RandomGenerator } from 'src/helpers/random_generator';
 @Controller('/seed')
 export class SeederController {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
-    @InjectRepository(UserDetails)
-    private readonly userDetailsRepo: Repository<UserDetails>,
-
-    private connection: Connection,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(UserDetails) private readonly userDetailsRepo: Repository<UserDetails>,
+    @InjectRepository(MatchingSpams) private readonly matchRepo: Repository<MatchingSpams>,
   ) {}
 
   @Get('/user')
@@ -36,7 +34,7 @@ export class SeederController {
       user.socket_id = RandomGenerator.randomString();
       user.img_path = `https://picsum.photos/id/${RandomGenerator.randomIntInterval(1, 900)}/200/300`;
       user.secret = RandomGenerator.randomString();
-      user.password = '$2b$16$BIX.OGBn4J6wUDNniAqrC./AZ9W/gHoYzSbEqtmtrR2XOrtUYvI5K';
+      user.password = 'password';
 
       const savedUser = await this.userRepo.save(user);
 
@@ -58,6 +56,10 @@ export class SeederController {
       userDetailed.main_champions = Array.from({ length: 6 }, () =>
         faker.random.arrayElement(Object.values(LolChampions)),
       );
+
+      const spam = new MatchingSpams();
+      spam.user_id = savedUser.id;
+      await this.matchRepo.save(spam);
 
       await this.userDetailsRepo.save(userDetailed);
     }

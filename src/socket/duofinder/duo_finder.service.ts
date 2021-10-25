@@ -61,14 +61,11 @@ export class DuoFinderService {
     }
 
     const matchedUsers = await this.socketUserService.findMatchedUsers(userDetaled.id); // get matches (from matched user table)
-
-    console.log('================');
-    console.log(matchedUsers);
-
     const notifications = await this.socketUserService.getNotifications(userDetaled.id); // get all notifications
 
     // find new user (order must be like this)
     const findDuoDetails = await this.socketUserService.findNewDuoDetails(userDetaled);
+
     const findDuo = findDuoDetails ? await this.socketUserService.findDuo(findDuoDetails?.id) : {};
 
     return {
@@ -129,10 +126,7 @@ export class DuoFinderService {
         const secondFindDuo = await this.socketUserService.findDuo(secondFindDuoDetails?.id);
 
         // save notification for other guy (for me it will be rendered on screen)
-        const oponentNotifcation = await this.socketUserService.saveMatchedDuoNotification(
-          secondFindDuo.id,
-          findDuo.id,
-        );
+        await this.socketUserService.saveMatchedDuoNotification(secondFindDuo.id, findDuo.id);
 
         return {
           userToMyself: {
@@ -143,7 +137,7 @@ export class DuoFinderService {
           myselfToUser: {
             type: DuoFinderResponseType.MATCH_FOUND_OTHER,
             found_duo: secondFindDuo ?? {},
-            found_duo_details: { ...secondFindDuoDetails, is_seen: oponentNotifcation.is_seen } ?? {},
+            found_duo_details: secondFindDuoDetails ?? {},
           },
         };
       } else {
