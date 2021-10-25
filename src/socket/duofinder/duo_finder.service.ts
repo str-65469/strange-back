@@ -44,9 +44,7 @@ export class DuoFinderService {
         await this.socketUserService.removeUserFromLobby(userDetaled.id, user.user_id);
         await this.socketUserService.removeUserFromLobby(user.user_id, userDetaled.id);
 
-        // save notification for me
-        await this.socketUserService.saveMatchedDuoNotification(userDetaled.id, user.user_id);
-
+        // update both matched list spam
         await this.socketUserService.updateFilterListInSpam({
           user_id: userDetaled.id,
           id: user.user_id,
@@ -65,7 +63,6 @@ export class DuoFinderService {
 
     // find new user (order must be like this)
     const findDuoDetails = await this.socketUserService.findNewDuoDetails(userDetaled);
-
     const findDuo = findDuoDetails ? await this.socketUserService.findDuo(findDuoDetails?.id) : {};
 
     return {

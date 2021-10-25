@@ -239,9 +239,22 @@ export class SocketUserService {
       where: { user_id: props.user_id },
     });
 
-    const newList = [...spam[props.list], props.id];
+    let newList = [...spam[props.list], props.id];
 
-    spam[props.list] = newList;
+    const { list } = props;
+
+    if (
+      (list === 'accept_list' && newList.length > 800) ||
+      (list === 'decline_list' && newList.length > 800) ||
+      (list === 'matched_list' && newList.length > 300) ||
+      (list === 'remove_list' && newList.length > 500)
+    ) {
+      const tempList = newList.slice();
+      tempList.shift(); // remove oldest added item (e.g. first)
+      newList = tempList;
+    }
+
+    spam[list] = newList;
 
     return await this.spamRepo.save(spam);
   }

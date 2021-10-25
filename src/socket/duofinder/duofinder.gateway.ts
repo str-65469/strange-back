@@ -39,10 +39,10 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @SubscribeMessage(duomatchConnect)
   public async handleDuoConnect(@ConnectedSocket() socket: Socket) {
     const payload = this.socketUserService.getUserPayload(socket);
+    this.logger.log(`Client connected ${payload.socket_id}`);
 
     // join to user specific id
     socket.join(payload.socket_id);
-    this.logger.log(`Client connected ${payload.socket_id}`);
 
     // get detailed user
     const userDetaled: UserCombined = await this.socketUserService.findFullDetailed(payload.id);
