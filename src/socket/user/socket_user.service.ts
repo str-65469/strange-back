@@ -281,7 +281,9 @@ export class SocketUserService {
 
       // add is_seend from matched table
       matchedUsersDetails = matchedUsersDetails.map((el) => {
-        el.is_seen = notifications.find((not) => not.matched_user_id == el.id)?.is_seen ?? false;
+        const notf = notifications.find((not) => not.matched_user_id == el.id);
+        el.is_seen = notf?.is_seen ?? false;
+        el.notification_id = notf?.id ?? null;
         return el;
       });
 

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ContactUsService } from './app_services/contact_us/contact_us.service';
-import { ContactUsDto } from './app_services/contact_us/dto/ContactUsDto';
+import { ContactUsService } from './app/contact_us/contact_us.service';
+import { ContactUsDto } from './app/contact_us/dto/ContactUsDto';
 import { JwtAcessTokenAuthGuard } from './http/auth/guards/jwt-access.guard';
 
 import { performance } from 'perf_hooks';

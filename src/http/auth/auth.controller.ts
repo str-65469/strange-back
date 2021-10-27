@@ -1,5 +1,5 @@
 import { map } from 'rxjs/operators';
-import { MatchingSpamService } from './../../app_services/matching_spam/matchingspamservice.service';
+import { MatchingSpamService } from '../../app/matching_spam/matchingspamservice.service';
 import { UserRegisterCacheService } from './../user_register_cache/user_register_cache.service';
 import { UserDetailsServiceService } from '../user_details/user_details.service';
 import { Repository } from 'typeorm';

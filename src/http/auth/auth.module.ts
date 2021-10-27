@@ -1,4 +1,4 @@
-import { MatchingSpamService } from './../../app_services/matching_spam/matchingspamservice.service';
+import { MatchingSpamService } from '../../app/matching_spam/matchingspamservice.service';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { UserDetailsServiceService } from '../user_details/user_details.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
