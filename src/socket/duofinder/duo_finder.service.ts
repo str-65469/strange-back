@@ -123,7 +123,7 @@ export class DuoFinderService {
         const secondFindDuo = await this.socketUserService.findDuo(secondFindDuoDetails?.id);
 
         // save notification for other guy (for me it will be rendered on screen)
-        await this.socketUserService.saveMatchedDuoNotification(secondFindDuo.id, findDuo.id);
+        await this.socketUserService.saveMatchedDuoNotification(findDuo.id, secondFindDuo.id);
 
         return {
           userToMyself: {
