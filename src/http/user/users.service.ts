@@ -15,7 +15,6 @@ import User from 'src/database/entity/user.entity';
 import UserDetails from 'src/database/entity/user_details.entity';
 import { UserProfileUpdateDto } from './dto/user-update.dto';
 import { HttpService } from '@nestjs/axios';
-import { of } from 'rxjs';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {

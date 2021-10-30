@@ -10,9 +10,20 @@ export class NotificationsService {
     private readonly notificationRepo: Repository<MatchedDuosNotifications>,
   ) {}
 
-  public async delete(id: number) {
+  public async delete(id: number): Promise<boolean> {
     const res = await this.notificationRepo.createQueryBuilder().delete().where('id = :id', { id }).execute();
 
     return res.affected == 1;
+  }
+
+  public async updateMatchedNotification(id: number): Promise<boolean> {
+    const res = await this.notificationRepo
+      .createQueryBuilder()
+      .update()
+      .set({ is_seen: true })
+      .where('user_id = :id', { id })
+      .execute();
+
+    return res.affected > 0;
   }
 }

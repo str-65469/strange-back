@@ -1,6 +1,6 @@
 import { UserSafeInterceptor } from './interceptor/user_safe.interceptor';
 import { UsersService } from './users.service';
-import { Body, Controller, Get, Put, UseGuards, UseInterceptors, Post } from '@nestjs/common';
+import { Body, Controller, Get, UseGuards, UseInterceptors, Post } from '@nestjs/common';
 import { JwtAcessTokenAuthGuard } from '../auth/guards/jwt-access.guard';
 import { UserProfileUpdateDto } from './dto/user-update.dto';
 
