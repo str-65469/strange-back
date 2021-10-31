@@ -1,3 +1,4 @@
+import { FileHelper } from 'src/helpers/file_helper';
 import { MatchedDuosNotifications } from './../../database/entity/matched_duos_notifications.entity';
 import { LolLeague } from 'src/enum/lol_league.enum';
 import { MatchedDuos } from './../../database/entity/matched_duos.entity';
@@ -60,7 +61,10 @@ export class SocketUserService {
         )
         .getRawMany();
 
-      return matchedUsersDetails;
+      return matchedUsersDetails.map((el) => {
+        el.full_image_path = FileHelper.imagePath(el.img_path);
+        return el;
+      });
     }
 
     return [];
@@ -94,6 +98,7 @@ export class SocketUserService {
       .where('user_id NOT IN (:...ids)', { ids: filterList })
       .andWhere('server = :server', { server: userDetaled.server })
       .andWhere('league IN (:...leagues)', { leagues: filteredLeagues })
+      .orderBy('id', 'ASC')
       .limit(1)
       .select(
         'ud.id, ud.discord_name, ud.league, ud.league_points, ud.level, ud.main_champions, ud.main_lane, ud.server, ud.summoner_name, ud.win_rate',
@@ -130,6 +135,7 @@ export class SocketUserService {
       .andWhere('server = :server', { server: userDetaled.server })
       .andWhere('league IN (:...leagues)', { leagues: filteredLeagues })
       .andWhere('user_id > :id', { id: data.prevFound.id }) //! critical (oponnent id is more than prevous oponent)
+      .orderBy('id', 'ASC')
       .limit(1)
       .select(
         'ud.id, ud.discord_name, ud.league, ud.league_points, ud.level, ud.main_champions, ud.main_lane, ud.server, ud.summoner_name',
@@ -155,12 +161,7 @@ export class SocketUserService {
       .getRawOne();
 
     const temp = JSON.parse(JSON.stringify(duo));
-
-    if (process.env.NODE_ENV === 'development') {
-      temp.full_image_path = duo.img_path ?? null;
-    } else {
-      temp.full_image_path = duo.img_path ? process.env.APP_URL + '/upload' + duo.img_path : null;
-    }
+    temp.full_image_path = FileHelper.imagePath(temp.img_path);
 
     return temp;
   }
