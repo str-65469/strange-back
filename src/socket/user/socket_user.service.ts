@@ -155,8 +155,12 @@ export class SocketUserService {
       .getRawOne();
 
     const temp = JSON.parse(JSON.stringify(duo));
-    temp.full_image_path = duo.img_path ?? null;
-    // temp.full_image_path = duo.img_path ? process.env.APP_URL + '/upload' + duo.img_path : null;
+
+    if (process.env.NODE_ENV === 'development') {
+      temp.full_image_path = duo.img_path ?? null;
+    } else {
+      temp.full_image_path = duo.img_path ? process.env.APP_URL + '/upload' + duo.img_path : null;
+    }
 
     return temp;
   }
