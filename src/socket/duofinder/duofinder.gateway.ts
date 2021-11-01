@@ -13,7 +13,7 @@ import {
 } from '@nestjs/websockets';
 import { configs } from 'src/configs';
 import { Server, Socket } from 'socket.io';
-import { HandleDuoFindBody } from './responses';
+import { DuoFinderResponseType, HandleDuoFindBody } from './responses';
 
 const { duomatchConnect, duomatchFind } = configs.socket;
 
@@ -55,6 +55,11 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   public async handleDuoFind(@MessageBody() data: HandleDuoFindBody, @ConnectedSocket() socket: Socket) {
     const payload = this.socketUserService.getUserPayload(socket);
     const userDetaled: UserCombined = await this.socketUserService.findFullDetailed(payload.id);
+
+    if (data && data.prevFound && Object.values(data.prevFound).length == 0) {
+      socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND }); //! if nobody was sent from front just return nothing (which means init didnt send any user)
+      return;
+    }
 
     // check accept/decline logic
     const foundAnyone = await this.duoFinderService.acceptDeclineLogic(userDetaled, data);

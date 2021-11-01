@@ -3,6 +3,7 @@ export enum DuoFinderResponseType {
   MATCH_FOUND = 'MATCH_FOUND',
   MATCH_FOUND_OTHER = 'MATCH_FOUND_OTHER',
   MATCH_NOT_FOUND = 'MATCH_NOT_FOUND',
+  NOBODY_FOUND = 'NOBODY_FOUND',
 }
 
 interface UserResponse {
