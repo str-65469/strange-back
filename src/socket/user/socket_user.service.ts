@@ -57,7 +57,7 @@ export class SocketUserService {
         .leftJoinAndSelect('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
         .where('u.id IN (:...ids)', { ids })
         .select(
-          'u.id, u.username, u.img_path, u.email, us.discord_name, us.league, us.league_points, us.level, us.main_champions, us.main_lane, us.server, us.summoner_name, us.win_rate',
+          'u.id, u.username, u.img_path, u.email, us.discord_name, us.league, us.league_points, us.level, us.main_champions, us.main_lane, us.server, us.summoner_name, us.win_rate, us.league_number',
         )
         .getRawMany();
 
@@ -101,7 +101,7 @@ export class SocketUserService {
       .orderBy('id', 'ASC')
       .limit(1)
       .select(
-        'ud.id, ud.discord_name, ud.league, ud.league_points, ud.level, ud.main_champions, ud.main_lane, ud.server, ud.summoner_name, ud.win_rate',
+        'ud.id, ud.discord_name, ud.league, ud.league_points, ud.level, ud.main_champions, ud.main_lane, ud.server, ud.summoner_name, ud.win_rate, ud.league_number',
       )
       .getRawOne();
   }
@@ -138,7 +138,7 @@ export class SocketUserService {
       .orderBy('id', 'ASC')
       .limit(1)
       .select(
-        'ud.id, ud.discord_name, ud.league, ud.league_points, ud.level, ud.main_champions, ud.main_lane, ud.server, ud.summoner_name',
+        'ud.id, ud.discord_name, ud.league, ud.league_points, ud.level, ud.main_champions, ud.main_lane, ud.server, ud.summoner_name, ud.league_number',
       )
       .getRawOne();
   }
@@ -148,7 +148,7 @@ export class SocketUserService {
       .createQueryBuilder()
       .andWhere('user_id = :user_id', { user_id })
       .select(
-        'id, discord_name, league, league_points, level, main_champions, main_lane, server, summoner_name',
+        'id, discord_name, league, league_points, level, main_champions, main_lane, server, summoner_name, league_number',
       )
       .getRawOne();
   }

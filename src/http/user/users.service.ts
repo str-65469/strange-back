@@ -52,7 +52,7 @@ export class UsersService {
       .leftJoinAndSelect('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
       .where('u.id = :id', { id: userId })
       .select(
-        'u.id, u.username, u.img_path, u.email, us.discord_name, us.league, us.league_points, us.level, us.main_champions, us.main_lane, us.server, us.summoner_name, us.win_rate',
+        'u.id, u.username, u.img_path, u.email, us.discord_name, us.league, us.league_points, us.level, us.main_champions, us.main_lane, us.server, us.summoner_name, us.win_rate, us.league_number',
       )
       .getRawOne();
   }
