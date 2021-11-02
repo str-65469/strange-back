@@ -13,7 +13,7 @@ export class NotificationsService {
   public async delete(id: number): Promise<boolean> {
     const res = await this.notificationRepo.createQueryBuilder().delete().where('id = :id', { id }).execute();
 
-    return res.affected == 1;
+    return res.affected > 0;
   }
 
   public async updateMatchedNotification(id: number): Promise<boolean> {
@@ -21,7 +21,7 @@ export class NotificationsService {
       .createQueryBuilder()
       .update()
       .set({ is_seen: true })
-      .where('user_id = :id', { id })
+      .where('id = :id', { id })
       .execute();
 
     return res.affected > 0;

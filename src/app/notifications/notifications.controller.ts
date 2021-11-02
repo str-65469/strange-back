@@ -16,9 +16,8 @@ export class NotificationsController {
     return await this.notificationService.delete(matchId);
   }
 
-  @Get('matcheds/update/seen')
-  async setMatchedNotificationTrue(): Promise<boolean> {
-    const userId = this.userService.userID();
-    return await this.notificationService.updateMatchedNotification(userId);
+  @Get('matcheds/update/seen/:matchId')
+  async setMatchedNotificationTrue(@Param('matchId', ParseIntPipe) matchId: number): Promise<boolean> {
+    return await this.notificationService.updateMatchedNotification(matchId);
   }
 }
