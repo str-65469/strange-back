@@ -58,7 +58,7 @@ export class DuoFinderService {
       }
     }
 
-    const matchedUsers = await this.socketUserService.findMatchedUsers(userDetaled.id); // get matches (from matched user table)
+    // const matchedUsers = await this.socketUserService.findMatchedUsers(userDetaled.id); // get matches (from matched user table)
     const notifications = await this.socketUserService.getNotifications(userDetaled.id); // get all notifications
 
     // find new user (order must be like this)
@@ -71,7 +71,7 @@ export class DuoFinderService {
       found_duo_details: findDuoDetails ?? {},
 
       // for init
-      matched_users: matchedUsers ?? [],
+      //   matched_users: matchedUsers ?? [],
       notifications: notifications ?? [],
     };
   }
