@@ -79,6 +79,11 @@ export class DuoFinderService {
   public async findDuo(userDetaled: UserCombined, data: HandleDuoFindBody) {
     // find new user (order must be like this)
     const findDuoDetails = await this.socketUserService.findNewDuoDetailsFiltered(userDetaled, data);
+
+    if (!findDuoDetails) {
+      return null;
+    }
+
     const findDuo = await this.socketUserService.findDuo(findDuoDetails?.id);
 
     return {

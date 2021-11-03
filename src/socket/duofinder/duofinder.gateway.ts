@@ -67,6 +67,11 @@ export class DuoMatchGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     // find new user or matched
     const resp = await this.duoFinderService.findDuo(userDetaled, data);
 
+    if (!resp) {
+      socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND }); //! if nobody was sent from front just return nothing (which means init didnt send any user)
+      return;
+    }
+
     if (!foundAnyone) {
       this.wss.sockets.in(payload.socket_id).emit('duo_match_finder', resp);
     } else {
