@@ -1,5 +1,15 @@
+import { UserPasswordUpdateDto } from './dto/user-update-password.dto';
 import { catchError, map } from 'rxjs/operators';
-import { HttpException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  Inject,
+  Injectable,
+  Scope,
+  UnauthorizedException,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { UserRegisterCache } from '../../database/entity/user_register_cache.entity';
 import { UserRegisterDto } from './dto/user-register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -187,6 +197,26 @@ export class UsersService {
         'u.id, u.username, u.img_path, u.email, us.discord_name, us.league, us.league_points, us.level, us.main_champions, us.main_lane, us.server, us.summoner_name',
       )
       .getRawOne();
+  }
+
+  async updateUserPassword(data: UserPasswordUpdateDto) {
+    const userId = this.userID();
+
+    const salt = await bcrypt.genSalt(12);
+    const password = await bcrypt.hash(data.password, salt);
+
+    const resp = await this.userRepository
+      .createQueryBuilder()
+      .update()
+      .set({ password, email: data.email })
+      .where('id = :id', { id: userId })
+      .execute();
+
+    if (resp.affected > 0) {
+      return 'Sucessfull';
+    }
+
+    throw new BadRequestException('something went wrong with password update');
   }
 }
 
