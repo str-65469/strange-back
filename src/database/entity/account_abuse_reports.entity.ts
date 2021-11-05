@@ -9,4 +9,7 @@ export class AccountAbuseReport extends GeneralEntity {
 
   @Column({ type: 'enum', enum: LolServer })
   public server: LolServer;
+
+  @Column({ nullable: true })
+  public image: string;
 }
