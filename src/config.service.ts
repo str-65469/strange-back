@@ -39,16 +39,15 @@ export class ConfigService {
       password: this.getValue('POSTGRES_PASSWORD'),
       database: this.getValue('POSTGRES_DATABASE'),
 
-      logging: false,
-      //   logging: true,
+      logging: false, // true
       synchronize: false,
       entities: ['dist/**/*.entity.js'],
 
-      migrationsTableName: 'migration',
-      migrations: ['src/database/migration/*.ts'],
+      migrationsTableName: 'migrations',
+      migrations: ['src/database/migrations/*.ts'],
 
       cli: {
-        migrationsDir: 'src/database/migration',
+        migrationsDir: 'src/database/migrations',
       },
     };
   }
