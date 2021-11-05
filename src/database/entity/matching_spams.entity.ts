@@ -1,65 +1,15 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { GeneralEntity } from '../entity_inheritance/general';
 import User from './user.entity';
 
 @Entity('matching_spams')
-export class MatchingSpams {
-  @PrimaryGeneratedColumn()
-  public id: number;
-
-  @Column({
-    nullable: false,
-    type: 'int',
-    default: [],
-    array: true,
-  })
-  public accept_list: Array<number>;
-
-  @Column({
-    nullable: false,
-    type: 'int',
-    default: [],
-    array: true,
-  })
-  public decline_list: Array<number>;
-
-  @Column({
-    nullable: false,
-    type: 'int',
-    default: [],
-    array: true,
-  })
-  public remove_list: Array<number>;
-
-  @Column({
-    nullable: false,
-    type: 'int',
-    default: [],
-    array: true,
-  })
-  public matched_list: Array<number>;
+export class MatchingSpams extends GeneralEntity {
+  @Column({ nullable: false, type: 'int', default: [], array: true }) public accept_list: Array<number>;
+  @Column({ nullable: false, type: 'int', default: [], array: true }) public decline_list: Array<number>;
+  @Column({ nullable: false, type: 'int', default: [], array: true }) public remove_list: Array<number>;
+  @Column({ nullable: false, type: 'int', default: [], array: true }) public matched_list: Array<number>;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
   public user_id: number;
-
-  @CreateDateColumn({
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  public created_at: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  public updated_at: Date;
 }

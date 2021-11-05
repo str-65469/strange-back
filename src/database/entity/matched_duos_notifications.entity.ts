@@ -1,19 +1,9 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { GeneralEntity } from '../entity_inheritance/general';
 import User from './user.entity';
 
 @Entity('matched_duos_notifications')
-export class MatchedDuosNotifications {
-  @PrimaryGeneratedColumn()
-  public id: number;
-
+export class MatchedDuosNotifications extends GeneralEntity {
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
   @Column()
@@ -26,17 +16,4 @@ export class MatchedDuosNotifications {
 
   @Column({ default: false, type: 'boolean' })
   public is_seen: boolean;
-
-  @CreateDateColumn({
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  public created_at: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  public updated_at: Date;
 }

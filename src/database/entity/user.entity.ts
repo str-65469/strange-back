@@ -1,23 +1,10 @@
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import UserDetails from './user_details.entity';
+import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { GeneralEntity } from '../entity_inheritance/general';
+import * as bcrypt from 'bcrypt';
 
 @Entity('users')
-export default class User {
-  @PrimaryGeneratedColumn()
-  public id: number;
-
+export default class User extends GeneralEntity {
   @Column()
   public username: string;
 
@@ -46,21 +33,6 @@ export default class User {
   @Exclude({ toPlainOnly: true })
   @Column({ nullable: true })
   public is_online?: boolean;
-
-  @Exclude({ toPlainOnly: true })
-  @CreateDateColumn({
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  public created_at: Date;
-
-  @Exclude({ toPlainOnly: true })
-  @UpdateDateColumn({
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  public updated_at: Date;
 
   @BeforeInsert()
   @BeforeUpdate()

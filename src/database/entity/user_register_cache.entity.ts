@@ -28,43 +28,19 @@ interface RegisterCacheConstrParams {
 
 @Entity('user_register_cache')
 export class UserRegisterCache extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  public id: number;
-
-  @Column()
-  public username: string;
-
-  @Column()
-  public email: string;
-
-  @Column()
-  public password: string;
-
-  @Column({
-    nullable: true,
-    type: 'enum',
-    enum: LolServer,
-  })
-  public server?: LolServer;
-
-  @Column({ nullable: true })
-  public summoner_name?: string;
-
-  @Column({ nullable: true })
-  public secret_token?: string;
-
-  @Column({
-    type: 'timestamptz',
-    nullable: true,
-  })
-  public expiry_date?: Date;
-
+  @PrimaryGeneratedColumn() public id: number;
+  @Column() public username: string;
+  @Column() public email: string;
+  @Column() public password: string;
   @Column({ nullable: true }) public level?: number;
-
-  @Column({ nullable: true, type: 'enum', enum: LolLeague }) public league?: LolLeague;
+  @Column({ nullable: true }) public secret_token?: string;
   @Column({ nullable: true }) public league_number?: number;
   @Column({ nullable: true }) public league_points?: number;
+  @Column({ nullable: true }) public summoner_name?: string;
   @Column({ nullable: true, type: 'float8' }) public win_rate?: number;
+  @Column({ nullable: true, type: 'enum', enum: LolServer }) public server?: LolServer;
+  @Column({ nullable: true, type: 'enum', enum: LolLeague }) public league?: LolLeague;
+  @Column({ type: 'timestamptz', nullable: true }) public expiry_date?: Date;
 
   @CreateDateColumn({
     type: 'timestamptz',
