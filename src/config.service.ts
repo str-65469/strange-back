@@ -21,15 +21,6 @@ export class ConfigService {
     return this;
   }
 
-  public getPort() {
-    return this.getValue('PORT', true);
-  }
-
-  public isProduction() {
-    const mode = this.getValue('MODE', false);
-    return mode != 'DEV';
-  }
-
   public getTypeOrmConfig(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
@@ -44,10 +35,10 @@ export class ConfigService {
       entities: ['dist/**/*.entity.js'],
 
       migrationsTableName: 'migrations',
-      migrations: ['src/database/migrations/*.ts'],
+      migrations: ['src/database/migration/*.ts'],
 
       cli: {
-        migrationsDir: 'src/database/migrations',
+        migrationsDir: 'src/database/migration',
       },
     };
   }

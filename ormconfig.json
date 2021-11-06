@@ -4,7 +4,7 @@
   "port": 5432,
   "username": "giorgi",
   "password": "giorgi",
-  "database": "strangeelo",
+  "database": "strangeelo_refactor",
   "logging": false,
   "synchronize": false,
   "entities": [

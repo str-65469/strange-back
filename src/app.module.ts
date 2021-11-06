@@ -21,8 +21,8 @@ import { MailModule } from './mail/mail.module';
 import { ContactUsService } from './app/contact_us/contact_us.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { ContactUs } from './database/entity/contact_us.entity';
-import User from './database/entity/user.entity';
 import { ResponseBody } from './shared/res/response_body';
+import User from './database/entity/user.entity';
 
 @Module({
   imports: [
