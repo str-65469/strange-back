@@ -4,8 +4,8 @@ import { GeneralEntity } from '../entity_inheritance/general';
 
 @Entity('contact_us')
 export class ContactUs extends GeneralEntity {
-  @Column() public name: string;
-  @Column() public email: string;
-  @Column({ type: 'text', nullable: true }) public message?: string;
-  @Column({ type: 'enum', enum: ContactUseMessageTypes }) public message_type: ContactUseMessageTypes;
+  @Column() name: string;
+  @Column() email: string;
+  @Column({ type: 'text', nullable: true }) message?: string;
+  @Column({ type: 'enum', enum: ContactUseMessageTypes }) message_type: ContactUseMessageTypes;
 }

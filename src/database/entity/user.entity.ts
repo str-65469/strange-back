@@ -1,38 +1,19 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
-import { Exclude } from 'class-transformer';
 import { GeneralEntity } from '../entity_inheritance/general';
 import * as bcrypt from 'bcrypt';
 
 @Entity('users')
 export default class User extends GeneralEntity {
-  @Column()
-  public username: string;
+  @Column() username: string;
+  @Column() email: string;
+  @Column() password: string;
+  @Column() socket_id: string;
+  @Column({ nullable: true }) secret?: string;
+  @Column({ nullable: true }) ip?: string;
+  @Column({ nullable: true }) img_path?: string;
+  @Column({ nullable: true }) is_online?: boolean;
 
-  @Column()
-  public email: string;
-
-  @Exclude({ toPlainOnly: true })
-  @Column()
-  public password: string;
-
-  @Exclude({ toPlainOnly: true })
-  @Column()
-  public socket_id: string;
-
-  @Exclude({ toPlainOnly: true })
-  @Column({ nullable: true })
-  public secret?: string;
-
-  @Exclude({ toPlainOnly: true })
-  @Column({ nullable: true })
-  public ip?: string;
-
-  @Column({ nullable: true })
-  public img_path?: string;
-
-  @Exclude({ toPlainOnly: true })
-  @Column({ nullable: true })
-  public is_online?: boolean;
+  //! relations
 
   @BeforeInsert()
   @BeforeUpdate()

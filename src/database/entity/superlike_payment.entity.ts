@@ -6,11 +6,11 @@ import { GeneralEntity } from '../entity_inheritance/general';
 
 @Entity('superlike_payment')
 export class SuperLikePayment extends GeneralEntity {
-  @Column({ type: 'float' }) public amount: number;
-  @Column({ type: 'enum', enum: SuperLikeServiceType }) public like_service_type: SuperLikeServiceType;
-  @Column({ type: 'enum', enum: PaymentType }) public payment_type: PaymentType;
+  @Column({ type: 'float' }) amount: number;
+  @Column({ type: 'enum', enum: SuperLikeServiceType }) like_service_type: SuperLikeServiceType;
+  @Column({ type: 'enum', enum: PaymentType }) payment_type: PaymentType;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  public user_id: User;
+  user_id: User;
 }

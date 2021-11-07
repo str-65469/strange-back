@@ -6,9 +6,9 @@ import User from './user.entity';
 export class MatchingLobby extends GeneralEntity {
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  public user_id: number;
+  user_id: number;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'liked_user_id' })
-  public liked_user_id: number;
+  liked_user_id: number;
 }

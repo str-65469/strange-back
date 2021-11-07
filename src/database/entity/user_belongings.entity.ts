@@ -5,9 +5,9 @@ import User from './user.entity';
 @Entity('user_belongings')
 export default class UserBelongings extends GeneralEntity {
   @Column({ nullable: true })
-  public super_like?: number;
+  super_like?: number;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  public user_id: User;
+  user_id: User;
 }

@@ -4,12 +4,7 @@ import { GeneralEntity } from '../entity_inheritance/general';
 
 @Entity('report_account_abuse')
 export class AccountAbuseReport extends GeneralEntity {
-  @Column()
-  public summoner_name: string;
-
-  @Column({ type: 'enum', enum: LolServer })
-  public server: LolServer;
-
-  @Column({ nullable: true })
-  public image: string;
+  @Column() summoner_name: string;
+  @Column({ type: 'enum', enum: LolServer }) server: LolServer;
+  @Column({ nullable: true }) image: string;
 }

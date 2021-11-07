@@ -7,13 +7,13 @@ export class MatchedDuosNotifications extends GeneralEntity {
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
   @Column()
-  public user_id: number;
+  user_id: number;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'matched_user_id' })
   @Column()
-  public matched_user_id: number;
+  matched_user_id: number;
 
   @Column({ default: false, type: 'boolean' })
-  public is_seen: boolean;
+  is_seen: boolean;
 }
