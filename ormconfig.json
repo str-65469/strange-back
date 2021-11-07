@@ -12,9 +12,9 @@
   ],
   "migrationsTableName": "migrations",
   "migrations": [
-    "src/database/migrations/*.ts"
+    "src/database/migration/*.ts"
   ],
   "cli": {
-    "migrationsDir": "src/database/migrations"
+    "migrationsDir": "src/database/migration"
   }
 }

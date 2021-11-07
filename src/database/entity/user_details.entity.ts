@@ -28,9 +28,6 @@ export default class UserDetails extends GeneralEntity {
   public user_id: User;
 
   @Exclude({ toPlainOnly: true })
-  @Column({
-    nullable: true,
-    type: 'timestamptz',
-  })
+  @Column({ nullable: true, type: 'timestamptz' })
   public last_update_details?: Date;
 }

@@ -33,6 +33,7 @@ export class UsersService {
     private readonly jwtService: JwtService,
     @Inject(REQUEST) private readonly request: Request,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(UserRegisterCache) private readonly userCacheRepository: Repository<UserRegisterCache>,
   ) {}
 
   userID() {
@@ -121,23 +122,22 @@ export class UsersService {
     const expiryDate = d2;
     const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '30m' });
 
-    const userCache = new UserRegisterCache({
-      email,
-      password,
-      server,
-      summoner_name,
-      username,
-      secret_token: secret,
-      expiry_date: expiryDate,
+    const userCache = new UserRegisterCache();
 
-      league: details.league,
-      league_number: details.league_number,
-      league_points: details.league_points,
-      level: details.level,
-      win_rate: details.win_rate,
-    });
+    userCache.email = email;
+    userCache.password = password;
+    userCache.server = server;
+    userCache.summoner_name = summoner_name;
+    userCache.username = username;
+    userCache.secret_token = secret;
+    userCache.expiry_date = expiryDate;
+    userCache.league = details.league;
+    userCache.league_number = details.league_number;
+    userCache.league_points = details.league_points;
+    userCache.level = details.level;
+    userCache.win_rate = details.win_rate;
 
-    return await userCache.save();
+    return await this.userCacheRepository.save(userCache);
   }
 
   async saveUserByCachedData(userCached: UserRegisterCache, secret: string, ip: string): Promise<User> {
