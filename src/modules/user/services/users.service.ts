@@ -16,7 +16,7 @@ import { configs } from 'src/configs';
 import { Repository } from 'typeorm';
 import { Request } from 'express';
 
-import UserDetails from 'src/database/entity/user_details.entity';
+import { UserDetails } from 'src/database/entity/user_details.entity';
 import User from 'src/database/entity/user.entity';
 
 @Injectable({ scope: Scope.REQUEST })

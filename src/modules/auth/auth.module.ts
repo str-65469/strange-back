@@ -11,7 +11,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { UserRegisterCacheService } from '../user/services/user_register_cache.service';
-import UserDetails from 'src/database/entity/user_details.entity';
+import { UserDetails } from 'src/database/entity/user_details.entity';
 
 @Module({
   imports: [

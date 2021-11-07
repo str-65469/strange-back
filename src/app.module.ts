@@ -23,7 +23,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ContactUs } from './database/entity/contact_us.entity';
 import { ResponseBody } from './app/shared/res/response_body';
 import User from './database/entity/user.entity';
-import UserDetails from './database/entity/user_details.entity';
+import { UserDetails } from './database/entity/user_details.entity';
 
 @Module({
   imports: [

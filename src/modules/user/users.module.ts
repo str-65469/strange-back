@@ -7,7 +7,7 @@ import { Module } from '@nestjs/common';
 import { UsersService } from './services/users.service';
 import User from 'src/database/entity/user.entity';
 import { JwtModule } from '@nestjs/jwt';
-import UserDetails from 'src/database/entity/user_details.entity';
+import { UserDetails } from 'src/database/entity/user_details.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { UserFileController } from './controllers/user_files.controller';
 

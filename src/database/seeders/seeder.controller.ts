@@ -8,7 +8,7 @@ import User from '../entity/user.entity';
 import * as faker from 'faker';
 import { LolMainLane } from 'src/app/enum/lol_main_lane.enum';
 import { LolLeague } from 'src/app/enum/lol_league.enum';
-import UserDetails from '../entity/user_details.entity';
+import { UserDetails } from '../entity/user_details.entity';
 import { RandomGenerator } from 'src/app/helpers/random_generator';
 
 const { EU_NORDIC_EAST, EU_NORDIC_WEST } = LolServer;

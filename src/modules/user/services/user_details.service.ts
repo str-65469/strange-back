@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import UserDetails from 'src/database/entity/user_details.entity';
+import { UserDetails } from 'src/database/entity/user_details.entity';
 import User from 'src/database/entity/user.entity';
 
 @Injectable()

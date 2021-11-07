@@ -7,7 +7,7 @@ import { LolServer } from '../../app/enum/lol_server.enum';
 import User from './user.entity';
 
 @Entity()
-export default class UserDetails extends GeneralEntity {
+export class UserDetails extends GeneralEntity {
   @Column({ nullable: true }) summoner_name?: string;
   @Column({ nullable: true }) discord_name?: string;
   @Column({ nullable: true }) level?: number;

@@ -13,7 +13,7 @@ import { UserCombined } from '../duofinder/duo_finder.service';
 import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
 import { HandleDuoFindBody } from '../duofinder/responses';
 import User from 'src/database/entity/user.entity';
-import UserDetails from 'src/database/entity/user_details.entity';
+import { UserDetails } from 'src/database/entity/user_details.entity';
 import * as cookie from 'cookie';
 
 @Injectable()

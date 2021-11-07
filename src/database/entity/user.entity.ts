@@ -3,10 +3,10 @@ import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
 import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
 import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notifications.entity';
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import { BeforeInsert, Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { GeneralEntity } from '../entity_inheritance/general';
 import UserBelongings from './user_belongings.entity';
-import UserDetails from './user_details.entity';
+import { UserDetails } from './user_details.entity';
 import { genSalt, hash } from 'bcrypt';
 import { Exclude } from 'class-transformer';
 
