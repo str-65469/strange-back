@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { GeneralEntity } from '../entity_inheritance/general';
-import { LolLeague } from '../../enum/lol_league.enum';
-import { LolChampions } from '../../enum/lol_champions.enum';
-import { LolMainLane } from '../../enum/lol_main_lane.enum';
-import { LolServer } from '../../enum/lol_server.enum';
+import { LolLeague } from '../../app/enum/lol_league.enum';
+import { LolChampions } from '../../app/enum/lol_champions.enum';
+import { LolMainLane } from '../../app/enum/lol_main_lane.enum';
+import { LolServer } from '../../app/enum/lol_server.enum';
 import User from './user.entity';
 
 @Entity()

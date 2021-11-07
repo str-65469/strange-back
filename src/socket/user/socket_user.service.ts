@@ -1,12 +1,12 @@
-import { FileHelper } from 'src/helpers/file_helper';
+import { FileHelper } from 'src/app/helpers/file_helper';
 import { MatchedDuosNotifications } from './../../database/entity/matched_duos_notifications.entity';
-import { LolLeague } from 'src/enum/lol_league.enum';
+import { LolLeague } from 'src/app/enum/lol_league.enum';
 import { MatchedDuos } from './../../database/entity/matched_duos.entity';
 import { MatchingSpams } from './../../database/entity/matching_spams.entity';
 import { Repository } from 'typeorm';
 import { Socket } from 'socket.io';
 import { Injectable } from '@nestjs/common';
-import { AccessTokenPayload, JwtAcessService } from 'src/http/jwt/jwt-access.service';
+import { AccessTokenPayload, JwtAcessService } from '../../app/jwt/jwt-access.service';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserCombined } from '../duofinder/duo_finder.service';
@@ -42,11 +42,7 @@ export class SocketUserService {
   }
 
   public async findMatchedUsers(id: number) {
-    const matchedUsers = await this.matchedRepo
-      .createQueryBuilder()
-      .where('user_id = :id', { id })
-      .select('*')
-      .getRawMany();
+    const matchedUsers = await this.matchedRepo.createQueryBuilder().where('user_id = :id', { id }).select('*').getRawMany();
 
     if (matchedUsers.length) {
       // get user and user details based on ids
@@ -147,9 +143,7 @@ export class SocketUserService {
     return await this.userDetailsRepo
       .createQueryBuilder()
       .andWhere('user_id = :user_id', { user_id })
-      .select(
-        'id, discord_name, league, league_points, level, main_champions, main_lane, server, summoner_name, league_number',
-      )
+      .select('id, discord_name, league, league_points, level, main_champions, main_lane, server, summoner_name, league_number')
       .getRawOne();
   }
 

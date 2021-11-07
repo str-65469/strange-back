@@ -1,4 +1,4 @@
-import { ContactUseMessageTypes } from './../../enum/contact_us_message_type.enum';
+import { ContactUseMessageTypes } from '../../app/enum/contact_us_message_type.enum';
 import { Column, Entity } from 'typeorm';
 import { GeneralEntity } from '../entity_inheritance/general';
 

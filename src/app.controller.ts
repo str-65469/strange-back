@@ -2,11 +2,11 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AppService } from './app.service';
-import { ContactUsService } from './app/contact_us/contact_us.service';
-import { ContactUsDto } from './app/contact_us/dto/ContactUsDto';
+import { ContactUsService } from './app/core/contact_us/contact_us.service';
+import { ContactUsDto } from './app/core/contact_us/dto/ContactUsDto';
 import User from './database/entity/user.entity';
 import UserDetails from './database/entity/user_details.entity';
-import { JwtAcessTokenAuthGuard } from './http/auth/guards/jwt-access.guard';
+import { JwtAcessTokenAuthGuard } from './modules/auth/guards/jwt-access.guard';
 
 @Controller()
 export class AppController {

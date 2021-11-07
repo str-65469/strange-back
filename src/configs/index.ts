@@ -1,6 +1,6 @@
-import messages from './messages';
-import socket from './socket';
-import tokens from './tokens';
+import messages from './addons/messages';
+import socket from './addons/socket';
+import tokens from './addons/tokens';
 
 export const configs = {
   tokens,

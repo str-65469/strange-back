@@ -1,4 +1,4 @@
-import { LolServer } from 'src/enum/lol_server.enum';
+import { LolServer } from 'src/app/enum/lol_server.enum';
 import { Column, Entity } from 'typeorm';
 import { GeneralEntity } from '../entity_inheritance/general';
 

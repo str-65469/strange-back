@@ -1,15 +1,15 @@
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
-import { LolChampions } from './../../enum/lol_champions.enum';
-import { LolServer } from './../../enum/lol_server.enum';
+import { LolChampions } from '../../app/enum/lol_champions.enum';
+import { LolServer } from '../../app/enum/lol_server.enum';
 import { Controller, Get, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import User from '../entity/user.entity';
 import * as faker from 'faker';
-import { LolMainLane } from 'src/enum/lol_main_lane.enum';
-import { LolLeague } from 'src/enum/lol_league.enum';
+import { LolMainLane } from 'src/app/enum/lol_main_lane.enum';
+import { LolLeague } from 'src/app/enum/lol_league.enum';
 import UserDetails from '../entity/user_details.entity';
-import { RandomGenerator } from 'src/helpers/random_generator';
+import { RandomGenerator } from 'src/app/helpers/random_generator';
 
 const { EU_NORDIC_EAST, EU_NORDIC_WEST } = LolServer;
 const servers = [EU_NORDIC_WEST, EU_NORDIC_EAST];
@@ -50,9 +50,7 @@ export class SeederController {
         server: faker.random.arrayElement(servers),
         main_lane: faker.random.arrayElement(Object.values(LolMainLane)),
         league: faker.random.arrayElement(Object.values(LolLeague)),
-        main_champions: Array.from({ length: 6 }, () =>
-          faker.random.arrayElement(Object.values(LolChampions)),
-        ),
+        main_champions: Array.from({ length: 6 }, () => faker.random.arrayElement(Object.values(LolChampions))),
         user: savedUser,
       });
 

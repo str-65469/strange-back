@@ -1,6 +1,6 @@
-import { SuperLikeServiceType } from './../../enum/superlike_servie_type.enum';
+import { SuperLikeServiceType } from '../../app/enum/superlike_servie_type.enum';
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { PaymentType } from 'src/enum/payment_type.enum';
+import { PaymentType } from 'src/app/enum/payment_type.enum';
 import { GeneralEntity } from '../entity_inheritance/general';
 import User from './user.entity';
 

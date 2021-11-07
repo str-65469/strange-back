@@ -2,7 +2,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SocketUserService } from './user/socket_user.service';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtAcessService } from 'src/http/jwt/jwt-access.service';
+import { JwtAcessService } from '../app/jwt/jwt-access.service';
 import { DuoMatchGateway } from './duofinder/duofinder.gateway';
 import { DuoFinderService } from './duofinder/duo_finder.service';
 import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
@@ -15,14 +15,7 @@ import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notif
 @Module({
   imports: [
     JwtModule.register({ secret: process.env.JWT_SECRET }),
-    TypeOrmModule.forFeature([
-      MatchedDuos,
-      MatchingLobby,
-      MatchingSpams,
-      User,
-      UserDetails,
-      MatchedDuosNotifications,
-    ]),
+    TypeOrmModule.forFeature([MatchedDuos, MatchingLobby, MatchingSpams, User, UserDetails, MatchedDuosNotifications]),
   ],
   controllers: [],
   providers: [JwtAcessService, DuoMatchGateway, DuoFinderService, SocketUserService],
