@@ -2,6 +2,7 @@ import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import User from 'src/database/entity/user.entity';
 
 @Injectable()
 export class MatchingSpamService {
@@ -9,9 +10,8 @@ export class MatchingSpamService {
     @InjectRepository(MatchingSpams)
     private readonly spamRepo: Repository<MatchingSpams>,
   ) {}
-  public async createEmptySpam(id: number) {
-    const spam = new MatchingSpams();
-    spam.user_id = id;
+  public async createEmptySpam(user: User) {
+    const spam = this.spamRepo.create({ user });
 
     return await this.spamRepo.save(spam);
   }

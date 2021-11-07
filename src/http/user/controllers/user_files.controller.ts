@@ -1,3 +1,4 @@
+import { UserSafeInterceptor } from './../interceptor/user_safe.interceptor';
 import { UsersService } from 'src/http/user/users.service';
 import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -16,23 +17,14 @@ export class UserFileController {
         destination: './upload/user/profiles',
         filename: FileHelper.customFileName,
       }),
-
       fileFilter: FileHelper.imageFileFilter,
-      limits: {
-        fileSize: FileHelper.FILE_SIZE_MB_1,
-      },
+      limits: { fileSize: FileHelper.FILE_SIZE_MB_1 },
     }),
+    UserSafeInterceptor,
   )
   async uploadProfileImage(@UploadedFile() file: Express.Multer.File) {
-    const response = {
-      originalname: file.originalname,
-      filename: file.filename,
-    };
+    const id = this.userService.userID();
 
-    const userID = this.userService.userID();
-
-    const updatedUser = await this.userService.updateImagePath(userID, file.filename);
-
-    return { response, user: updatedUser };
+    return await this.userService.updateImagePath(id, file.filename);
   }
 }

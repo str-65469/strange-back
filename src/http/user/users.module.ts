@@ -1,3 +1,4 @@
+import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { HttpModule } from '@nestjs/axios';
 import { JwtAcessService } from 'src/http/jwt/jwt-access.service';
 import { UserController } from './user.controller';
@@ -12,7 +13,7 @@ import { UserFileController } from './controllers/user_files.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserDetails]),
+    TypeOrmModule.forFeature([User, UserDetails, UserRegisterCache]),
     JwtModule.register({ secret: process.env.JWT_REGISTER_CACHE_SECRET }),
     MulterModule.register({
       dest: './upload',

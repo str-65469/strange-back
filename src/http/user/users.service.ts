@@ -1,30 +1,23 @@
-import { UserPasswordUpdateDto } from './dto/user-update-password.dto';
-import { catchError, map } from 'rxjs/operators';
-import {
-  HttpException,
-  Inject,
-  Injectable,
-  Scope,
-  UnauthorizedException,
-  HttpStatus,
-  BadRequestException,
-} from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { HttpException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { UserRegisterCache } from '../../database/entity/user_register_cache.entity';
+import { LolCredentials, LolCredentialsResponse } from './schemas/lol_credentials';
+import { UserPasswordUpdateDto } from './dto/user-update-password.dto';
+import { RandomGenerator } from 'src/helpers/random_generator';
+import { UserProfileUpdateDto } from './dto/user-update.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { LolLeague } from './../../enum/lol_league.enum';
-import { JwtService } from '@nestjs/jwt';
 import { LolServer } from './../../enum/lol_server.enum';
-import { Repository, getManager, getConnection } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { catchError, map } from 'rxjs/operators';
+import { HttpService } from '@nestjs/axios';
+import { JwtService } from '@nestjs/jwt';
+import { genSalt, hash } from 'bcrypt';
 import { REQUEST } from '@nestjs/core';
 import { configs } from 'src/configs';
+import { Repository } from 'typeorm';
 import { Request } from 'express';
-import { RandomGenerator } from 'src/helpers/random_generator';
-import User from 'src/database/entity/user.entity';
+
 import UserDetails from 'src/database/entity/user_details.entity';
-import { UserProfileUpdateDto } from './dto/user-update.dto';
-import { HttpService } from '@nestjs/axios';
+import User from 'src/database/entity/user.entity';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
@@ -32,8 +25,9 @@ export class UsersService {
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
     @Inject(REQUEST) private readonly request: Request,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectRepository(UserRegisterCache) private readonly userCacheRepository: Repository<UserRegisterCache>,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(UserDetails) private readonly userDetailsRepo: Repository<UserDetails>,
+    @InjectRepository(UserRegisterCache) private readonly registerCacheRepo: Repository<UserRegisterCache>,
   ) {}
 
   userID() {
@@ -47,44 +41,31 @@ export class UsersService {
     return accessTokenDecoded.id;
   }
 
-  async findOne(id: number): Promise<User | undefined> {
-    return this.userRepository.findOne(id);
+  async findOne(id: number): Promise<User> {
+    return await this.userRepo.findOne(id);
   }
 
   async findOneByEmail(email: string): Promise<User | undefined> {
-    return this.userRepository.findOne({ where: { email } });
+    return this.userRepo.findOne({ where: { email } });
   }
 
-  async getUserDetails() {
-    const userId = this.userID();
+  async getUserDetails(id?: number) {
+    const userId = id ?? this.userID();
 
-    return await getManager()
-      .createQueryBuilder('users', 'u')
-      .leftJoinAndSelect('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
-      .where('u.id = :id', { id: userId })
-      .select(
-        'u.id, u.username, u.img_path, u.email, us.discord_name, us.league, us.league_points, us.level, us.main_champions, us.main_lane, us.server, us.summoner_name, us.win_rate, us.league_number',
-      )
-      .getRawOne();
+    return await this.userRepo.findOne(userId, {
+      relations: ['details'],
+    });
   }
 
-  async updateImagePath(id, path: string): Promise<User> {
-    const user = await this.userRepository.findOne(id);
+  async updateImagePath(id, path: string) {
+    const user = await this.userRepo.findOne(id);
 
     user.img_path = '/user/profiles/' + path;
 
-    return await this.userRepository.save(user);
+    return await this.userRepo.save(user);
   }
 
   async checkLolCredentialsValid(server: LolServer, summoner_name: string) {
-    // return of({
-    //   level: 30,
-    //   league: LolLeague.BRONZE,
-    //   league_number: 2,
-    //   league_points: 69,
-    //   win_rate: 3.5,
-    // });
-
     return await this.httpService
       .get('/api/summoner_profile', {
         params: {
@@ -94,17 +75,15 @@ export class UsersService {
       })
       .pipe(
         map((res) => {
-          const data: CheckResp = res.data;
+          const data: LolCredentials = res.data;
 
-          const resp = {
+          return {
             level: data.level,
             league: data.division,
             league_number: data.divisionNumber,
             league_points: data.leaguePoints,
             win_rate: data.winRatio,
           };
-
-          return resp;
         }),
         catchError((e) => {
           throw new HttpException('Check your division or summoner name please', e?.response?.status);
@@ -112,129 +91,84 @@ export class UsersService {
       );
   }
 
-  async cacheUserRegister(body: UserRegisterDto, details: ReturnResp) {
+  async cacheUserRegister(body: UserRegisterDto, details: LolCredentialsResponse): Promise<UserRegisterCache> {
     const { email, password, server, summoner_name, username } = body;
+    const { league, league_number, league_points, level, win_rate } = details;
+
+    const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '30m' });
 
     const d1 = new Date();
     const d2 = new Date(d1);
     d2.setMinutes(d1.getMinutes() + 30);
 
-    const expiryDate = d2;
-    const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '30m' });
-
-    const userCache = new UserRegisterCache();
-
-    userCache.email = email;
-    userCache.password = password;
-    userCache.server = server;
-    userCache.summoner_name = summoner_name;
-    userCache.username = username;
-    userCache.secret_token = secret;
-    userCache.expiry_date = expiryDate;
-    userCache.league = details.league;
-    userCache.league_number = details.league_number;
-    userCache.league_points = details.league_points;
-    userCache.level = details.level;
-    userCache.win_rate = details.win_rate;
-
-    return await this.userCacheRepository.save(userCache);
+    return await this.registerCacheRepo.save({
+      email,
+      password,
+      server,
+      summoner_name,
+      username,
+      league,
+      league_number,
+      league_points,
+      level,
+      win_rate,
+      secret_token: secret,
+      expiry_date: d2,
+    });
   }
 
   async saveUserByCachedData(userCached: UserRegisterCache, secret: string, ip: string): Promise<User> {
     const { email, password, username } = userCached;
 
-    const user = new User();
-    user.email = email;
-    user.password = password;
-    user.username = username;
-    user.secret = secret;
-    user.socket_id = RandomGenerator.randomString();
-    user.ip = ip;
+    const user = this.userRepo.create({
+      ip,
+      email,
+      password,
+      username,
+      secret,
+      socket_id: RandomGenerator.randomString(),
+    });
 
-    return await this.userRepository.save(user);
-  }
-
-  async createAndSaveUserSpam(user_id: number) {
-    //
-    //   const spam = new MatchingSpams();
-    //   spam.user_id = user_id;
-    //   return await
+    return await this.userRepo.save(user);
   }
 
   async saveUser(user: User, secret: string) {
     user.secret = secret;
 
-    return await this.userRepository.save(user);
+    return await this.userRepo.save(user);
   }
 
   async updateUserProfile(data: UserProfileUpdateDto) {
-    const userId = this.userID();
+    const id = this.userID();
+    const { username, discord_name, main_champions, main_lane } = data;
 
     // update user username
-    await this.userRepository.save({
-      id: userId,
-      username: data.username,
-    });
+    await this.userRepo.save({ id, username });
+
+    const userDetails = await this.userDetailsRepo.findOne({ where: { user: id } });
+
+    userDetails.discord_name = discord_name;
+    userDetails.main_champions = main_champions;
+    userDetails.main_lane = main_lane;
 
     // update user details
-    await getConnection()
-      .createQueryBuilder()
-      .update(UserDetails)
-      .set({
-        discord_name: data.discord_name,
-        main_champions: data.main_champions,
-        main_lane: data.main_lane,
-      })
-      .where('id = :id', { id: userId })
-      .execute();
+    await this.userDetailsRepo.save(userDetails);
 
-    // return
-    return await getManager()
-      .createQueryBuilder('users', 'u')
-      .leftJoinAndSelect('user_details', 'us', 'us.user_id = u.id') // use filters (spams)
-      .where('u.id = :id', { id: userId })
-      .select(
-        'u.id, u.username, u.img_path, u.email, us.discord_name, us.league, us.league_points, us.level, us.main_champions, us.main_lane, us.server, us.summoner_name',
-      )
-      .getRawOne();
+    return await this.getUserDetails(id);
   }
 
-  async updateUserPassword(data: UserPasswordUpdateDto) {
-    const userId = this.userID();
+  async updateUserCredentials(data: UserPasswordUpdateDto): Promise<User> {
+    const id = this.userID();
+    const salt = await genSalt(12);
+    const password = await hash(data.password, salt);
 
-    const salt = await bcrypt.genSalt(12);
-    const password = await bcrypt.hash(data.password, salt);
+    // update user
+    const user = await this.findOne(id);
+    user.password = password;
+    user.email = data.email;
 
-    const resp = await this.userRepository
-      .createQueryBuilder()
-      .update()
-      .set({ password, email: data.email })
-      .where('id = :id', { id: userId })
-      .execute();
+    await this.userRepo.save(user);
 
-    if (resp.affected > 0) {
-      return 'Sucessfull';
-    }
-
-    throw new BadRequestException('something went wrong with password update');
+    return await this.getUserDetails(id);
   }
-}
-
-interface CheckResp {
-  level: number;
-  summonerName: string;
-  division: LolLeague;
-  divisionNumber: number;
-  leaguePoints: number;
-  wins: number;
-  losses: number;
-  winRatio: number;
-}
-
-export interface ReturnResp {
-  level: number;
-  league: LolLeague;
-  league_number: number;
-  league_points: number;
-  win_rate: number;
 }

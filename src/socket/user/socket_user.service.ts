@@ -175,16 +175,16 @@ export class SocketUserService {
 
   public async saveUsersIntoMatched(user_id: number, matched_user_id: number) {
     const matched = new MatchedDuos();
-    matched.user_id = user_id;
-    matched.matched_user_id = matched_user_id;
+    // matched.user_id = user_id;
+    // matched.matched_user_id = matched_user_id;
 
     return await this.matchedRepo.save(matched);
   }
 
   public async saveMatchedDuoNotification(user_id: number, matched_user_id: number) {
     const notification = new MatchedDuosNotifications();
-    notification.user_id = user_id;
-    notification.matched_user_id = matched_user_id;
+    // notification.user_id = user_id;
+    // notification.matched_user_id = matched_user_id;
 
     return await this.notificationRepo.save(notification);
   }
@@ -213,8 +213,8 @@ export class SocketUserService {
 
   public async addUsersToLobby(user_id: number, liked_user_id: number) {
     const lobby = new MatchingLobby();
-    lobby.user_id = user_id;
-    lobby.liked_user_id = liked_user_id;
+    // lobby.user_id = user_id;
+    // lobby.liked_user_id = liked_user_id;
 
     return await this.lobbyRepo.save(lobby);
   }

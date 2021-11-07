@@ -3,7 +3,7 @@ import { UsersService } from '../user/users.service';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import User from 'src/database/entity/user.entity';
-import * as bcrypt from 'bcrypt';
+import { compare } from 'bcrypt';
 
 export interface ValidateResponse {
   access_token: string;
@@ -22,7 +22,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordMatch = await bcrypt.compare(userCredentials.password, user.password);
+    const isPasswordMatch = await compare(userCredentials.password, user.password);
 
     if (!isPasswordMatch) {
       throw new UnauthorizedException('Invalid credentials');

@@ -23,6 +23,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ContactUs } from './database/entity/contact_us.entity';
 import { ResponseBody } from './shared/res/response_body';
 import User from './database/entity/user.entity';
+import UserDetails from './database/entity/user_details.entity';
 
 @Module({
   imports: [
@@ -30,7 +31,14 @@ import User from './database/entity/user.entity';
     MulterModule.register({ dest: './upload' }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
-    TypeOrmModule.forFeature([ContactUs, MatchedDuosNotifications, MatchedDuos, User, AccountAbuseReport]),
+    TypeOrmModule.forFeature([
+      ContactUs,
+      MatchedDuosNotifications,
+      MatchedDuos,
+      User,
+      UserDetails,
+      AccountAbuseReport,
+    ]),
     UsersModule,
     AuthModule,
     MailModule,

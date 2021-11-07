@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne } from 'typeorm';
 import { GeneralEntity } from '../entity_inheritance/general';
 import User from './user.entity';
 
@@ -9,7 +9,6 @@ export class MatchingSpams extends GeneralEntity {
   @Column({ nullable: false, type: 'int', default: [], array: true }) remove_list: Array<number>;
   @Column({ nullable: false, type: 'int', default: [], array: true }) matched_list: Array<number>;
 
-  @ManyToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: 'user_id' })
-  user_id: number;
+  @ManyToOne(() => User, (user) => user.spams)
+  user: User;
 }

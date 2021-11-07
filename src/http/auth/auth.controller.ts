@@ -6,19 +6,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { UserRegisterDto } from './../user/dto/user-register.dto';
 import { UserLoginDto } from '../user/dto/user-login.dto';
-import {
-  Controller,
-  Post,
-  Res,
-  Body,
-  Get,
-  Query,
-  ParseIntPipe,
-  UseGuards,
-  HttpException,
-  HttpStatus,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Res, Body, Get, Query, ParseIntPipe, UseGuards, HttpException, HttpStatus, Req } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { JwtAcessService } from '../jwt/jwt-access.service';
@@ -127,17 +115,17 @@ export class AuthController {
     const ip = possibleIP || req.socket.remoteAddress || null;
 
     // save additional data to user details and data in user
-    const savedUser = await this.userService.saveUserByCachedData(cachedData, secret, ip);
-    await this.userDetailsService.saveUserDetailsByCachedData(cachedData, savedUser);
+    const user = await this.userService.saveUserByCachedData(cachedData, secret, ip);
+    await this.userDetailsService.saveUserDetailsByCachedData(cachedData, user);
 
     // generate access_token and refresh token and new secret
-    const accessToken = this.jwtAcessService.generateAccessToken(savedUser, savedUser.socket_id);
+    const accessToken = this.jwtAcessService.generateAccessToken(user, user.socket_id);
 
     // delete user cached data
     await this.userRegisterCacheService.delete(cachedData.id);
 
     // create user spam filter
-    await this.matchingSpamService.createEmptySpam(savedUser.id);
+    await this.matchingSpamService.createEmptySpam(user);
 
     // send httpOnly access_token cookie
     if (process.env.NODE_ENV === 'development') {

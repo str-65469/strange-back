@@ -16,16 +16,15 @@ export class UserController {
     return await this.userService.getUserDetails();
   }
 
+  @UseInterceptors(UserSafeInterceptor)
   @Post('/profile/update')
   async userProfileUpdate(@Body() data: UserProfileUpdateDto) {
-    const user = await this.userService.updateUserProfile(data);
-    user.full_image_path = user.img_path ? process.env.APP_URL + '/upload' + user.img_path : null;
-
-    return user;
+    return await this.userService.updateUserProfile(data);
   }
 
+  @UseInterceptors(UserSafeInterceptor)
   @Put('/profile/update-password')
   async updatePassword(@Body() data: UserPasswordUpdateDto) {
-    return this.userService.updateUserPassword(data);
+    return this.userService.updateUserCredentials(data);
   }
 }
