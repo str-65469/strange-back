@@ -35,6 +35,7 @@ export class AppController {
 
   @Get('/test')
   async test() {
+    return this.userDetalsRepo.findOne(1);
     return await this.userDetalsRepo.findOne({
       where: {
         user: Not(In([356, 357, 358, 359])),

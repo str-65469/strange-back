@@ -17,8 +17,9 @@ export class UserDetails extends GeneralEntity {
   @Column({ nullable: true, type: 'enum', enum: LolServer }) server?: LolServer;
   @Column({ nullable: true, type: 'enum', enum: LolMainLane }) main_lane?: LolMainLane;
   @Column({ nullable: true, type: 'enum', enum: LolLeague }) league?: LolLeague;
+
   @Column({ nullable: true, type: 'enum', enum: LolChampions, array: true })
-  main_champions?: Array<LolChampions>;
+  main_champions?: LolChampions[];
 
   @Column({ nullable: true, type: 'timestamptz' })
   last_update_details?: Date;
