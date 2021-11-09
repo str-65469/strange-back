@@ -74,4 +74,22 @@ export class MatchedDuosService {
 
     return [];
   }
+
+  async save(user: User, matchedUser: User) {
+    const matched = this.matchedRepo.create({
+      user,
+      matchedUser,
+    });
+
+    return await this.matchedRepo.save(matched);
+  }
+
+  public async getMatcheds(user: User) {
+    return await this.matchedRepo
+      .find({
+        where: { user },
+        relations: ['matchedUser'],
+      })
+      .then((matcheds) => matcheds.map((m) => m.matchedUser));
+  }
 }

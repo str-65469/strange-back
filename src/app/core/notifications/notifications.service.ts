@@ -2,6 +2,7 @@ import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notif
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import User from 'src/database/entity/user.entity';
 
 @Injectable()
 export class NotificationsService {
@@ -10,13 +11,22 @@ export class NotificationsService {
     private readonly notificationRepo: Repository<MatchedDuosNotifications>,
   ) {}
 
-  public async delete(id: number): Promise<boolean> {
+  async save(user: User, matchedUser: User) {
+    const matched = this.notificationRepo.create({
+      user,
+      matchedUser,
+    });
+
+    return await this.notificationRepo.save(matched);
+  }
+
+  async delete(id: number): Promise<boolean> {
     const res = await this.notificationRepo.createQueryBuilder().delete().where('id = :id', { id }).execute();
 
     return res.affected > 0;
   }
 
-  public async updateMatchedNotification(id: number): Promise<boolean> {
+  async updateMatchedNotification(id: number): Promise<boolean> {
     const res = await this.notificationRepo
       .createQueryBuilder()
       .update()
@@ -25,5 +35,11 @@ export class NotificationsService {
       .execute();
 
     return res.affected > 0;
+  }
+
+  async all(user: User) {
+    return await this.notificationRepo.find({
+      where: { user },
+    });
   }
 }

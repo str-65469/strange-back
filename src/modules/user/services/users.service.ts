@@ -1,3 +1,4 @@
+import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { HttpException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { UserRegisterCache } from '../../../database/entity/user_register_cache.entity';
 import { LolCredentials, LolCredentialsResponse } from '../schemas/lol_credentials';
@@ -13,15 +14,21 @@ import { JwtService } from '@nestjs/jwt';
 import { genSalt, hash } from 'bcrypt';
 import { REQUEST } from '@nestjs/core';
 import { configs } from 'src/configs';
-import { Repository } from 'typeorm';
+import { In, Not, Raw, Repository } from 'typeorm';
 import { Request } from 'express';
-
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import User from 'src/database/entity/user.entity';
+import { Socket } from 'socket.io';
+import { AccessTokenPayload, JwtAcessService } from 'src/app/jwt/jwt-access.service';
+import * as cookie from 'cookie';
+import { LolLeague } from 'src/app/enum/lol_league.enum';
+
+export type UserSpamDetailed = User & { details: UserDetails; spams: MatchingSpams };
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
   constructor(
+    private readonly jwtAccessService: JwtAcessService,
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
     @Inject(REQUEST) private readonly request: Request,
@@ -41,12 +48,8 @@ export class UsersService {
     return accessTokenDecoded.id;
   }
 
-  async findOne(id: number): Promise<User> {
+  async user(id: number) {
     return await this.userRepo.findOne(id);
-  }
-
-  async findOneByEmail(email: string): Promise<User | undefined> {
-    return this.userRepo.findOne({ where: { email } });
   }
 
   async getUserDetails(id?: number) {
@@ -55,6 +58,28 @@ export class UsersService {
     return await this.userRepo.findOne(userId, {
       relations: ['details'],
     });
+  }
+
+  userSocketPayload(socket: Socket): AccessTokenPayload {
+    const headerCookies = socket.handshake.headers.cookie;
+    const cookies = cookie.parse(headerCookies);
+    const token = cookies?.access_token;
+    this.jwtAccessService.validateToken({ token, secret: process.env.JWT_SECRET });
+    const accessTokenDecoded = this.jwtService.decode(token) as AccessTokenPayload;
+
+    return accessTokenDecoded;
+  }
+
+  async userSpamAndDetails(id: number) {
+    return await this.userRepo.findOne(id, { relations: ['spams', 'details'] });
+  }
+
+  async findOne(id: number): Promise<User> {
+    return await this.userRepo.findOne(id);
+  }
+
+  async findOneByEmail(email: string): Promise<User | undefined> {
+    return this.userRepo.findOne({ where: { email } });
   }
 
   async updateImagePath(id, path: string) {
@@ -170,5 +195,52 @@ export class UsersService {
     await this.userRepo.save(user);
 
     return await this.getUserDetails(id);
+  }
+
+  public async findNewDuoDetails(user: User, prevId?: number) {
+    const { accept_list, remove_list, decline_list, matched_list } = user.spams;
+
+    const al = accept_list ?? [];
+    const rl = remove_list ?? [];
+    const dl = decline_list ?? [];
+    const ml = matched_list ?? [];
+
+    // filter plus current
+    const filterList = [...new Set([...al, ...rl, ...dl, ...ml, user.id])];
+
+    // league filtering
+    const leagues = Object.values(LolLeague);
+    const currEnumIndex = leagues.indexOf(user.details.league);
+    let filteredLeagues = [];
+    if (currEnumIndex === 0) {
+      filteredLeagues = leagues.filter((_, i) => i <= currEnumIndex + 1);
+    } else if (currEnumIndex === leagues.length - 1) {
+      filteredLeagues = leagues.filter((_, i) => i >= currEnumIndex - 1);
+    } else {
+      filteredLeagues = leagues.filter((_, i) => i >= currEnumIndex - 1 && i <= currEnumIndex + 1);
+    }
+
+    if (prevId) {
+      return await this.userDetailsRepo.findOne({
+        where: {
+          user: Raw((alias) => `${alias} > ${prevId} AND ${alias} NOT IN (${filteredLeagues})`),
+          league: In(filteredLeagues),
+          server: user.details.server,
+        },
+        order: { id: 'ASC' },
+        relations: ['user'],
+      });
+    }
+
+    return await this.userDetailsRepo.findOne({
+      where: {
+        user: Not(In(filterList)),
+        league: In(filteredLeagues),
+        server: user.details.server,
+      },
+
+      order: { id: 'ASC' },
+      relations: ['user'],
+    });
   }
 }

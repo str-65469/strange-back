@@ -4,14 +4,41 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from 'src/database/entity/user.entity';
 
+interface FilterSpamProps {
+  user: User;
+  addedId: number;
+  list: 'accept_list' | 'decline_list' | 'matched_list' | 'remove_list';
+}
+
 @Injectable()
 export class MatchingSpamService {
   constructor(
     @InjectRepository(MatchingSpams)
     private readonly spamRepo: Repository<MatchingSpams>,
   ) {}
-  public async createEmptySpam(user: User) {
+
+  async createEmptySpam(user: User) {
     const spam = this.spamRepo.create({ user });
+
+    return await this.spamRepo.save(spam);
+  }
+
+  async update({ user, addedId, list }: FilterSpamProps) {
+    const spam = await this.spamRepo.findOne({ where: { user } });
+    let newList = [...spam[list], addedId];
+
+    if (
+      (list === 'accept_list' && newList.length > 800) ||
+      (list === 'decline_list' && newList.length > 800) ||
+      (list === 'matched_list' && newList.length > 300) ||
+      (list === 'remove_list' && newList.length > 500)
+    ) {
+      const tempList = newList.slice();
+      tempList.shift(); // remove oldest added item (e.g. first)
+      newList = tempList;
+    }
+
+    spam[list] = newList;
 
     return await this.spamRepo.save(spam);
   }

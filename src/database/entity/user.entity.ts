@@ -51,14 +51,14 @@ export default class User extends GeneralEntity {
   @OneToMany(() => MatchingLobby, (lobby) => lobby.likedUser)
   lobbyLikedUsers: MatchingLobby[];
 
-  @OneToMany(() => MatchingSpams, (spams) => spams.user)
-  spams: MatchingSpams[];
-
   @OneToMany(() => SuperLikePayment, (likes) => likes.user)
   superLikePayments: SuperLikePayment[];
 
   @OneToMany(() => UserBelongings, (belongings) => belongings.user)
   belongings: UserBelongings[];
+
+  @OneToOne(() => MatchingSpams, (spams) => spams.user)
+  spams: MatchingSpams;
 
   @OneToOne(() => UserDetails, (details) => details.user)
   details: UserDetails;
