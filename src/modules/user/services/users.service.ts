@@ -1,5 +1,5 @@
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
-import { HttpException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
+import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserRegisterCache } from '../../../database/entity/user_register_cache.entity';
 import { LolCredentials, LolCredentialsResponse } from '../schemas/lol_credentials';
 import { UserPasswordUpdateDto } from '../dto/user-update-password.dto';
@@ -12,7 +12,6 @@ import { catchError, map } from 'rxjs/operators';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
 import { genSalt, hash } from 'bcrypt';
-import { REQUEST } from '@nestjs/core';
 import { configs } from 'src/configs';
 import { In, Not, Raw, Repository } from 'typeorm';
 import { Request } from 'express';
@@ -20,25 +19,25 @@ import { UserDetails } from 'src/database/entity/user_details.entity';
 import User from 'src/database/entity/user.entity';
 import { Socket } from 'socket.io';
 import { AccessTokenPayload, JwtAcessService } from 'src/app/jwt/jwt-access.service';
-import * as cookie from 'cookie';
 import { LolLeague } from 'src/app/enum/lol_league.enum';
+import * as cookie from 'cookie';
 
 export type UserSpamDetailed = User & { details: UserDetails; spams: MatchingSpams };
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class UsersService {
   constructor(
     private readonly jwtAccessService: JwtAcessService,
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
-    @Inject(REQUEST) private readonly request: Request,
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(UserDetails) private readonly userDetailsRepo: Repository<UserDetails>,
     @InjectRepository(UserRegisterCache) private readonly registerCacheRepo: Repository<UserRegisterCache>,
   ) {}
 
-  userID() {
-    const accessToken = this.request.cookies?.access_token;
+  userID(request: Request) {
+    const accessToken = request.cookies?.access_token;
+    // const accessToken = this.request.cookies?.access_token;
 
     if (!accessToken) {
       throw new UnauthorizedException(configs.messages.exceptions.accessTokenMissing);
@@ -53,9 +52,7 @@ export class UsersService {
   }
 
   async getUserDetails(id?: number) {
-    const userId = id ?? this.userID();
-
-    return await this.userRepo.findOne(userId, {
+    return await this.userRepo.findOne(id, {
       relations: ['details'],
     });
   }
@@ -163,8 +160,7 @@ export class UsersService {
     return await this.userRepo.save(user);
   }
 
-  async updateUserProfile(data: UserProfileUpdateDto) {
-    const id = this.userID();
+  async updateUserProfile(id: number, data: UserProfileUpdateDto) {
     const { username, discord_name, main_champions, main_lane } = data;
 
     // update user username
@@ -182,8 +178,7 @@ export class UsersService {
     return await this.getUserDetails(id);
   }
 
-  async updateUserCredentials(data: UserPasswordUpdateDto): Promise<User> {
-    const id = this.userID();
+  async updateUserCredentials(id: number, data: UserPasswordUpdateDto): Promise<User> {
     const salt = await genSalt(12);
     const password = await hash(data.password, salt);
 

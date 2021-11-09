@@ -1,9 +1,9 @@
-import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UserSafeInterceptor } from '../interceptor/user_safe.interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from '../services/users.service';
 import { FileHelper } from 'src/app/helpers/file_helper';
-import { Express } from 'express';
+import { Express, Request } from 'express';
 import { diskStorage } from 'multer';
 
 @Controller('user/upload')
@@ -22,8 +22,8 @@ export class UserFileController {
     }),
     UserSafeInterceptor,
   )
-  async uploadProfileImage(@UploadedFile() file: Express.Multer.File) {
-    const id = this.userService.userID();
+  async uploadProfileImage(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
+    const id = this.userService.userID(req);
 
     return await this.userService.updateImagePath(id, file.filename);
   }

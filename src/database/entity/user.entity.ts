@@ -25,7 +25,7 @@ export default class User extends GeneralEntity {
   @Exclude({ toPlainOnly: true })
   secret?: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: false })
   @Exclude({ toPlainOnly: true })
   ip?: string;
 

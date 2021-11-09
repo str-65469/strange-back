@@ -8,7 +8,9 @@ export class UserSafeInterceptor implements NestInterceptor {
   intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((data) => {
-        data.full_image_path = data.img_path ? process.env.APP_URL + '/upload' + data.img_path : null;
+        if (data && data.img_path) {
+          data.full_image_path = data.img_path ? process.env.APP_URL + '/upload' + data.img_path : null;
+        }
 
         return classToPlain(data);
       }),

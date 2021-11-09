@@ -7,26 +7,6 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/modules/user/services/users.service';
 import User from 'src/database/entity/user.entity';
 
-//! change later
-export interface UserCombined {
-  id: any;
-  username: any;
-  img_path: any;
-  email: any;
-  discord_name: any;
-  league: any;
-  league_points: any;
-  level: any;
-  main_champions: any;
-  main_lane: any;
-  server: any;
-  summoner_name: any;
-  accept_list: any;
-  decline_list: any;
-  remove_list: any;
-  matched_list: any;
-}
-
 @Injectable()
 export class DuoFinderService {
   constructor(

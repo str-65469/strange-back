@@ -4,6 +4,8 @@ import { DuoFinderService } from './services/duo_finder.service';
 import { UsersService } from 'src/modules/user/services/users.service';
 import { Server, Socket } from 'socket.io';
 import { configs } from 'src/configs';
+import { UseInterceptors } from '@nestjs/common';
+import { UserSafeInterceptor } from '../user/interceptor/user_safe.interceptor';
 
 const { duomatchConnect, duomatchFind } = configs.socket;
 
@@ -14,6 +16,7 @@ export class DuoMatchGateway {
 
   constructor(private readonly duoFinderService: DuoFinderService, private readonly userService: UsersService) {}
 
+  @UseInterceptors(UserSafeInterceptor)
   @SubscribeMessage(duomatchConnect)
   public async handleDuoConnect(@ConnectedSocket() socket: Socket) {
     const { id, socket_id } = this.userService.userSocketPayload(socket);
