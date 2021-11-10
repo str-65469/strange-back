@@ -36,12 +36,16 @@ export class AuthController {
 
   @Post('/login')
   async login(@Body() body: UserLoginDto, @Res() res: Response) {
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
-
+    if (process.env.NODE_ENV === 'development') {
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+    } else {
+      res.clearCookie('access_token', { domain: process.env.COOKIE_DOMAIN });
+      res.clearCookie('refresh_token', { domain: process.env.COOKIE_DOMAIN });
+    }
     const user = await this.authService.validateUser(body);
-
     const token = this.jwtAcessService.generateAccessToken(user, user.socket_id);
+
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(user);
 
     await this.userService.saveUser(user, secret);
@@ -99,8 +103,13 @@ export class AuthController {
   @UseGuards(JwtRegisterAuthGuard)
   @Get('/register/confirm/')
   async registerVerify(@Query('id', ParseIntPipe) id: number, @Req() req: Request, @Res() res: Response) {
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+    if (process.env.NODE_ENV === 'development') {
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+    } else {
+      res.clearCookie('access_token', { domain: process.env.COOKIE_DOMAIN });
+      res.clearCookie('refresh_token', { domain: process.env.COOKIE_DOMAIN });
+    }
 
     // get data from cache
     const cachedData = await this.userRegisterCacheRepo.findOne(id);
@@ -158,8 +167,13 @@ export class AuthController {
   @UseGuards(JwtRefreshTokenAuthGuard)
   @Get('/refresh')
   public async refreshToken(@Req() req: Request, @Res() res: Response) {
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+    if (process.env.NODE_ENV === 'development') {
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+    } else {
+      res.clearCookie('access_token', { domain: process.env.COOKIE_DOMAIN });
+      res.clearCookie('refresh_token', { domain: process.env.COOKIE_DOMAIN });
+    }
 
     const cookies = req.cookies;
     const accessToken = cookies.access_token;

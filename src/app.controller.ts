@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, Not, Raw } from 'typeorm';
+import { In, Repository, Not, Raw, getRepository } from 'typeorm';
 import { AppService } from './app.service';
 import { ContactUsService } from './app/core/contact_us/contact_us.service';
 import { ContactUsDto } from './app/core/contact_us/dto/ContactUsDto';

@@ -75,7 +75,15 @@ export class UsersService {
     return await this.userRepo.findOne(id);
   }
 
-  async findOneByEmail(email: string): Promise<User | undefined> {
+  findOneForced(id: number): Promise<User> {
+    return this.userRepo.createQueryBuilder().where('id = :id', { id }).select('*').getRawOne();
+  }
+
+  async findOneByEmail(email: string, getPassword: boolean = false): Promise<User | undefined> {
+    if (getPassword) {
+      return this.userRepo.createQueryBuilder().where('email = :email', { email }).select('*').getRawOne();
+    }
+
     return this.userRepo.findOne({ where: { email } });
   }
 
@@ -183,7 +191,7 @@ export class UsersService {
     const password = await hash(data.password, salt);
 
     // update user
-    const user = await this.findOne(id);
+    const user = await this.findOneForced(id);
     user.password = password;
     user.email = data.email;
 
