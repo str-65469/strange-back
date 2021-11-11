@@ -4,7 +4,7 @@ import User from './user.entity';
 
 @Entity('matched_duos')
 export class MatchedDuos extends GeneralEntity {
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: false })
   is_favorite?: boolean;
 
   @ManyToOne(() => User, (user) => user.matchedDuoUsers)

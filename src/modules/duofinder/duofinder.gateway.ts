@@ -1,11 +1,12 @@
+import { DuofinderInterceptor } from './interceptors/duofinder.interceptor';
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, ConnectedSocket, MessageBody } from '@nestjs/websockets';
-import { DuoFinderResponseType, HandleDuoFindBody } from './schemas/responses';
 import { DuoFinderService } from './services/duo_finder.service';
 import { UsersService } from 'src/modules/user/services/users.service';
 import { Server, Socket } from 'socket.io';
 import { configs } from 'src/configs';
-import { UseInterceptors } from '@nestjs/common';
-import { UserSafeInterceptor } from '../user/interceptor/user_safe.interceptor';
+import { UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { DuoFinderResponseType } from 'src/app/shared/schemas/duofinder/duofinder';
+import { HandleDuoFindBody } from 'src/app/shared/schemas/duofinder/response';
 
 const { duomatchConnect, duomatchFind } = configs.socket;
 
@@ -16,7 +17,7 @@ export class DuoMatchGateway {
 
   constructor(private readonly duoFinderService: DuoFinderService, private readonly userService: UsersService) {}
 
-  @UseInterceptors(UserSafeInterceptor)
+  @UseInterceptors(ClassSerializerInterceptor)
   @SubscribeMessage(duomatchConnect)
   public async handleDuoConnect(@ConnectedSocket() socket: Socket) {
     const { id, socket_id } = this.userService.userSocketPayload(socket);
@@ -29,6 +30,7 @@ export class DuoMatchGateway {
     return await this.duoFinderService.initFirstMatch(user);
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @SubscribeMessage(duomatchFind)
   public async handleDuoFind(@MessageBody() data: HandleDuoFindBody, @ConnectedSocket() socket: Socket) {
     // if nobody was sent from front just return nothing (which means init didnt send any user)
@@ -38,7 +40,7 @@ export class DuoMatchGateway {
     }
 
     const payload = this.userService.userSocketPayload(socket);
-    const user = await this.userService.getUserDetails(payload.id);
+    const user = await this.userService.userSpamAndDetails(payload.id);
     const prevFound = await this.userService.getUserDetails(data.prevFound.id);
 
     // check accept/decline logic
@@ -52,14 +54,16 @@ export class DuoMatchGateway {
     if (!foundAnyone) {
       this.wss.sockets.in(payload.socket_id).emit('duo_match_finder', resp);
     } else {
-      const { userToMyself, myselfToUser } = foundAnyone;
-
       // send to myself
-      socket.emit('duo_match_finder', userToMyself); // send match found
+      socket.emit('duo_match_finder', {
+        type: DuoFinderResponseType.MATCH_FOUND,
+        found_duo: prevFound ?? {},
+        found_duo_details: prevFound.details ?? {},
+      }); // send match found
       socket.emit('duo_match_finder', resp); // send new match
 
       // send to user
-      this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', myselfToUser);
+      this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', foundAnyone);
     }
   }
 }

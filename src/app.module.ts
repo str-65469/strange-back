@@ -26,7 +26,6 @@ import { ResponseBody } from './app/shared/res/response_body';
 import { UserDetails } from './database/entity/user_details.entity';
 import { SocketModule } from './modules/duofinder/socket.module';
 import User from './database/entity/user.entity';
-import { UsersService } from './modules/user/services/users.service';
 
 @Module({
   imports: [

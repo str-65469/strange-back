@@ -12,6 +12,10 @@ export class UserSafeInterceptor implements NestInterceptor {
           data.full_image_path = data.img_path ? process.env.APP_URL + '/upload' + data.img_path : null;
         }
 
+        // console.log('====================');
+        // console.log(data);
+        // console.log(data && data.img_path);
+
         return classToPlain(data);
       }),
     );

@@ -1,10 +1,11 @@
+import { FileHelper } from 'src/app/helpers/file_helper';
 import { MatchingSpamService } from '../../../app/core/matching_spam/matchingspamservice.service';
 import { NotificationsService } from '../../../app/core/notifications/notifications.service';
 import { MatchedDuosService } from '../../../app/core/matched_duos/matchedduos.service';
 import { MatchingLobbyService } from '../../../app/core/matching_lobby/matchinglobby.service';
-import { DuoFinderResponseType, DuoFinderTransferTypes } from '../schemas/responses';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/modules/user/services/users.service';
+import { DuoFinderResponseType, DuoFinderTransferTypes } from 'src/app/shared/schemas/duofinder/duofinder';
 import User from 'src/database/entity/user.entity';
 
 @Injectable()
@@ -40,20 +41,26 @@ export class DuoFinderService {
       }
     }
 
-    const matchedUsers = await this.matchedDuosService.getMatcheds(user);
+    // const matchedUsers = await this.matchedDuosService.get(user);
     const notifications = await this.notificationService.all(user);
     const findDuoDetails = await this.userService.findNewDuoDetails(user);
+
+    if (!findDuoDetails) {
+      return {
+        type: DuoFinderResponseType.NOBODY_FOUND,
+        notifications: notifications ?? [],
+      };
+    }
 
     return {
       type: DuoFinderResponseType.DUO_FOUND,
       found_duo: findDuoDetails.user,
       found_duo_details: findDuoDetails ?? {},
-
-      matched_users: matchedUsers ?? [],
       notifications: notifications ?? [],
     };
   }
 
+  //   @UseInterceptors(DuofinderInterceptor)
   public async findDuo(user: User, prevFoundId: number) {
     // find new user (order must be like this)
     const findDuoDetails = await this.userService.findNewDuoDetails(user, prevFoundId);
@@ -62,10 +69,13 @@ export class DuoFinderService {
       return null;
     }
 
+    const found_duo = JSON.parse(JSON.stringify(findDuoDetails.user ?? {}));
+    found_duo.full_image_path = FileHelper.imagePath(found_duo.img_path);
+
     return {
       type: DuoFinderResponseType.DUO_FOUND,
       found_duo_details: findDuoDetails ?? {},
-      found_duo: findDuoDetails.user ?? {},
+      found_duo,
     };
   }
 
@@ -88,25 +98,17 @@ export class DuoFinderService {
         await this.spamService.update({ user: prevFound, addedId: user.id, list: 'matched_list' });
 
         // save notification for other guy (for me it will be rendered on screen)
-        const notification = await this.notificationService.save(prevFound, user);
+        const saved = await this.notificationService.save(prevFound, user);
+        const notification = await this.notificationService.findOne(saved.id);
+
+        const found_duo = JSON.parse(JSON.stringify(user.details ?? {}));
+        found_duo.full_image_path = FileHelper.imagePath(found_duo.img_path);
 
         return {
-          userToMyself: {
-            type: DuoFinderResponseType.MATCH_FOUND,
-            found_duo: prevFound ?? {},
-            found_duo_details: prevFound.details ?? {},
-          },
-          myselfToUser: {
-            type: DuoFinderResponseType.MATCH_FOUND_OTHER,
-            found_duo: user ?? {},
-            found_duo_details: user.details ?? {},
-            notification: {
-              ...user.details,
-              is_seen: notification.is_seen,
-              notification_id: notification.id,
-              username: user.username,
-            },
-          },
+          type: DuoFinderResponseType.MATCH_FOUND_OTHER,
+          found_duo_details: user.details ?? {},
+          found_duo,
+          notification,
         };
       } else {
         await this.spamService.update({ user: user, addedId: prevFound.id, list: 'accept_list' });

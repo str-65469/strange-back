@@ -213,6 +213,7 @@ export class UsersService {
 
     // league filtering
     const leagues = Object.values(LolLeague);
+
     const currEnumIndex = leagues.indexOf(user.details.league);
     let filteredLeagues = [];
     if (currEnumIndex === 0) {
@@ -226,7 +227,7 @@ export class UsersService {
     if (prevId) {
       return await this.userDetailsRepo.findOne({
         where: {
-          user: Raw((alias) => `${alias} > ${prevId} AND ${alias} NOT IN (${filteredLeagues})`),
+          user: Raw((alias) => `${alias} > ${prevId} AND ${alias} NOT IN (${filterList})`),
           league: In(filteredLeagues),
           server: user.details.server,
         },

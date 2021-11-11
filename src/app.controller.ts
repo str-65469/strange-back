@@ -1,6 +1,7 @@
+import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, Not, Raw, getRepository } from 'typeorm';
+import { In, Repository, Not, Raw, getRepository, MoreThan } from 'typeorm';
 import { AppService } from './app.service';
 import { ContactUsService } from './app/core/contact_us/contact_us.service';
 import { ContactUsDto } from './app/core/contact_us/dto/ContactUsDto';
@@ -35,6 +36,13 @@ export class AppController {
 
   @Get('/test')
   async test() {
+    return await getRepository(MatchedDuos)
+      .find({
+        where: { user: 1 },
+        relations: ['matchedUser'],
+      })
+      .then((matcheds) => matcheds.map((m) => m.matchedUser));
+
     return this.userDetalsRepo.findOne(1);
     return await this.userDetalsRepo.findOne({
       where: {

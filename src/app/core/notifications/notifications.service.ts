@@ -11,6 +11,13 @@ export class NotificationsService {
     private readonly notificationRepo: Repository<MatchedDuosNotifications>,
   ) {}
 
+  async findOne(id: number) {
+    return await this.notificationRepo.findOne({
+      where: { id },
+      relations: ['matchedUser'],
+    });
+  }
+
   async save(user: User, matchedUser: User) {
     const matched = this.notificationRepo.create({
       user,
@@ -40,6 +47,7 @@ export class NotificationsService {
   async all(user: User) {
     return await this.notificationRepo.find({
       where: { user },
+      relations: ['matchedUser'],
     });
   }
 }

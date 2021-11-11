@@ -10,10 +10,3 @@ export enum DuoFinderTransferTypes {
   ACCEPT = 'ACCEPT',
   DECLINE = 'DECLINE',
 }
-
-export interface HandleDuoFindBody {
-  prevFound: {
-    id: number;
-  };
-  type: DuoFinderTransferTypes;
-}
