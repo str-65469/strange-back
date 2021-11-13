@@ -12,6 +12,10 @@ export class UserDetailsServiceService {
     private readonly userDetailsRepo: Repository<UserDetails>,
   ) {}
 
+  async findBySummoner(summonerName: string) {
+    return this.userDetailsRepo.findOne({ where: { summoner_name: summonerName } });
+  }
+
   async saveUserDetailsByCachedData(userCached: UserRegisterCache, user: User): Promise<UserDetails> {
     const { server, summoner_name, league, league_number, league_points, level, win_rate } = userCached;
 

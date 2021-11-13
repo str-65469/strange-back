@@ -79,10 +79,10 @@ export class AuthController {
 
   @Post('/register')
   async register(@Body() body: UserRegisterDto) {
-    const { email, summoner_name, server } = body;
+    const { email, summoner_name, server, username } = body;
 
     // first check if user exists
-    await this.authService.userExists(email);
+    await this.authService.usernameEmailSummonerExists(email, username, summoner_name);
 
     // second check if user lol credentials is valid
     const checkedLolCreds = await this.userService.checkLolCredentialsValid(server, summoner_name);

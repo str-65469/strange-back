@@ -87,6 +87,10 @@ export class UsersService {
     return this.userRepo.findOne({ where: { email } });
   }
 
+  async findByEmailOrUsername(email: string, username: string): Promise<User | undefined> {
+    return this.userRepo.findOne({ where: [{ email }, { username }] });
+  }
+
   async updateImagePath(id, path: string) {
     const user = await this.userRepo.findOne(id);
 
