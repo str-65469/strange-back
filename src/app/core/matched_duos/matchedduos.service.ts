@@ -1,7 +1,7 @@
 import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan } from 'typeorm';
+import { Repository, MoreThan, LessThan } from 'typeorm';
 import User from 'src/database/entity/user.entity';
 
 @Injectable()
@@ -22,14 +22,16 @@ export class MatchedDuosService {
 
     if (lastId) {
       data = await this.matchedRepo.find({
-        where: { user, matchedUser: MoreThan(lastId) },
+        where: { user, matchedUser: LessThan(lastId) },
         take: 5,
+        order: { id: 'DESC' },
         relations: ['matchedUser', 'matchedUser.details'],
       });
     } else {
       data = await this.matchedRepo.find({
         where: { user },
         take: 5,
+        order: { id: 'DESC' },
         relations: ['matchedUser', 'matchedUser.details'],
       });
     }
