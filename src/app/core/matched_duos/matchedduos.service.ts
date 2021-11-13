@@ -1,11 +1,8 @@
-import { UserSafeInterceptor } from './../../../modules/user/interceptor/user_safe.interceptor';
 import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
-import { ClassSerializerInterceptor, Injectable, UseInterceptors } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
 import User from 'src/database/entity/user.entity';
-import { FileHelper } from 'src/app/helpers/file_helper';
-import { UserResponse } from 'src/modules/user/schemas/user.response';
 
 @Injectable()
 export class MatchedDuosService {
@@ -37,11 +34,6 @@ export class MatchedDuosService {
       });
     }
 
-    return data.map((el) => {
-      const user: UserResponse = el.matchedUser;
-      user.full_image_path = FileHelper.imagePath(el.matchedUser.img_path);
-
-      return user;
-    });
+    return data.map((m) => m.matchedUser);
   }
 }

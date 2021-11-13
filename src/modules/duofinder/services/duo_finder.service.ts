@@ -60,7 +60,6 @@ export class DuoFinderService {
     };
   }
 
-  //   @UseInterceptors(DuofinderInterceptor)
   public async findDuo(user: User, prevFoundId: number) {
     // find new user (order must be like this)
     const findDuoDetails = await this.userService.findNewDuoDetails(user, prevFoundId);
@@ -69,13 +68,10 @@ export class DuoFinderService {
       return null;
     }
 
-    const found_duo = JSON.parse(JSON.stringify(findDuoDetails.user ?? {}));
-    found_duo.full_image_path = FileHelper.imagePath(found_duo.img_path);
-
     return {
       type: DuoFinderResponseType.DUO_FOUND,
       found_duo_details: findDuoDetails ?? {},
-      found_duo,
+      found_duo: findDuoDetails.user,
     };
   }
 
@@ -101,13 +97,10 @@ export class DuoFinderService {
         const saved = await this.notificationService.save(prevFound, user);
         const notification = await this.notificationService.findOne(saved.id);
 
-        const found_duo = JSON.parse(JSON.stringify(user.details ?? {}));
-        found_duo.full_image_path = FileHelper.imagePath(found_duo.img_path);
-
         return {
           type: DuoFinderResponseType.MATCH_FOUND_OTHER,
           found_duo_details: user.details ?? {},
-          found_duo,
+          found_duo: user.details,
           notification,
         };
       } else {

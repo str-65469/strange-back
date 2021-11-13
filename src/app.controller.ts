@@ -1,3 +1,4 @@
+import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +12,7 @@ import { MatchingLobby } from './database/entity/matching_lobby.entity';
 import User from './database/entity/user.entity';
 import { UserDetails } from './database/entity/user_details.entity';
 import { JwtAcessTokenAuthGuard } from './modules/auth/guards/jwt-access.guard';
+import { MatchedDuosNotifications } from './database/entity/matched_duos_notifications.entity';
 
 @Controller()
 export class AppController {
@@ -90,6 +92,24 @@ export class AppController {
     // });
     // return userAll;
     // return { message: 'hello' };
+  }
+
+  @Get('/cleanall')
+  async cleanSpams() {
+    if (process.env.NODE_ENV === 'development') {
+      getRepository(MatchingSpams)
+        .createQueryBuilder()
+        .update()
+        .set({ accept_list: [], decline_list: [], remove_list: [], matched_list: [] })
+        .execute();
+
+      getRepository(MatchedDuos).createQueryBuilder().delete().where('id > 0').execute();
+      getRepository(MatchedDuosNotifications).createQueryBuilder().delete().where('id > 0').execute();
+      getRepository(MatchingLobby).createQueryBuilder().delete().where('id > 0').execute();
+      return 'cleaned';
+    } else {
+      return 'not so fast';
+    }
   }
 
   @Get('/relations')
