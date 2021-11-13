@@ -13,7 +13,7 @@ import { FileHelper } from 'src/app/helpers/file_helper';
 
 @Entity('users')
 export default class User extends GeneralEntity {
-  @Column() username: string;
+  @Column({ unique: true }) username: string;
   @Column() email: string;
   @Column({ nullable: true }) img_path?: string;
   @Column({ select: false }) password: string;
