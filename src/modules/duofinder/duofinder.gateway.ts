@@ -32,12 +32,6 @@ export class DuoMatchGateway {
 
   @SubscribeMessage(duomatchFind)
   public async handleDuoFind(@MessageBody() data: HandleDuoFindBody, @ConnectedSocket() socket: Socket) {
-    // if nobody was sent from front just return nothing (which means init didnt send any user)
-    if (data && data.prevFound && Object.values(data.prevFound).length == 0) {
-      socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
-      return;
-    }
-
     const payload = this.userService.userSocketPayload(socket);
     const user = await this.userService.userSpamAndDetails(payload.id);
     const prevFound = await this.userService.getUserDetails(data.prevFound.id);
@@ -46,7 +40,24 @@ export class DuoMatchGateway {
     const foundAnyone = await this.duoFinderService.acceptDeclineLogic(user, prevFound, data.type);
     const resp = await this.duoFinderService.findDuo(user, data.prevFound.id);
 
+    if (data && data.prevFound && Object.values(data.prevFound).length == 0) {
+      if (foundAnyone) {
+        // send to myself
+        foundAnyone.type = DuoFinderResponseType.MATCH_FOUND;
+        socket.emit('duo_match_finder', JSON.parse(serialize(foundAnyone)));
+      }
+
+      socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
+      return;
+    }
+
     if (!resp) {
+      if (foundAnyone) {
+        // send to myself
+        foundAnyone.type = DuoFinderResponseType.MATCH_FOUND;
+        socket.emit('duo_match_finder', JSON.parse(serialize(foundAnyone)));
+      }
+
       socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND }); //! if nobody was sent from front just return nothing (which means init didnt send any user)
       return;
     }
