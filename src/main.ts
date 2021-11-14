@@ -16,9 +16,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useStaticAssets(join(__dirname, '../..', 'upload'), {
-    prefix: '/upload',
-  });
+  app.useStaticAssets(join(__dirname, '../..', 'upload'), { prefix: '/upload' });
+  app.useStaticAssets(join(__dirname, '../..', 'static'), { prefix: '/static' });
 
   app.setViewEngine('hbs');
   const PORT = 4000;
