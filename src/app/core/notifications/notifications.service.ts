@@ -47,6 +47,7 @@ export class NotificationsService {
   async all(user: User) {
     return await this.notificationRepo.find({
       where: { user },
+      order: { id: 'DESC' },
       relations: ['matchedUser'],
     });
   }

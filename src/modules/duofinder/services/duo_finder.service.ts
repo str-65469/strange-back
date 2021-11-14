@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/modules/user/services/users.service';
 import { DuoFinderResponseType, DuoFinderTransferTypes } from 'src/app/shared/schemas/duofinder/duofinder';
 import User from 'src/database/entity/user.entity';
+import { serialize } from 'class-transformer';
 
 @Injectable()
 export class DuoFinderService {
@@ -100,7 +101,7 @@ export class DuoFinderService {
         return {
           type: DuoFinderResponseType.MATCH_FOUND_OTHER,
           found_duo_details: user.details ?? {},
-          found_duo: user.details,
+          found_duo: user,
           notification,
         };
       } else {

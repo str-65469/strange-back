@@ -1,4 +1,3 @@
-import { DuofinderInterceptor } from './interceptors/duofinder.interceptor';
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { DuoFinderService } from './services/duo_finder.service';
 import { UsersService } from 'src/modules/user/services/users.service';
@@ -7,6 +6,7 @@ import { configs } from 'src/configs';
 import { UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { DuoFinderResponseType } from 'src/app/shared/schemas/duofinder/duofinder';
 import { HandleDuoFindBody } from 'src/app/shared/schemas/duofinder/response';
+import { serialize } from 'class-transformer';
 
 const { duomatchConnect, duomatchFind } = configs.socket;
 
@@ -30,7 +30,6 @@ export class DuoMatchGateway {
     return await this.duoFinderService.initFirstMatch(user);
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @SubscribeMessage(duomatchFind)
   public async handleDuoFind(@MessageBody() data: HandleDuoFindBody, @ConnectedSocket() socket: Socket) {
     // if nobody was sent from front just return nothing (which means init didnt send any user)
@@ -51,19 +50,26 @@ export class DuoMatchGateway {
       socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND }); //! if nobody was sent from front just return nothing (which means init didnt send any user)
       return;
     }
-    if (!foundAnyone) {
-      this.wss.sockets.in(payload.socket_id).emit('duo_match_finder', resp);
-    } else {
-      // send to myself
-      socket.emit('duo_match_finder', {
-        type: DuoFinderResponseType.MATCH_FOUND,
-        found_duo: prevFound ?? {},
-        found_duo_details: prevFound.details ?? {},
-      }); // send match found
-      socket.emit('duo_match_finder', resp); // send new match
 
-      // send to user
-      this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', foundAnyone);
+    if (!foundAnyone) {
+      this.wss.sockets.in(payload.socket_id).emit('duo_match_finder', JSON.parse(serialize(resp)));
+      return;
     }
+
+    // send to myself
+    socket.emit(
+      'duo_match_finder',
+      JSON.parse(
+        serialize({
+          type: DuoFinderResponseType.MATCH_FOUND,
+          found_duo: prevFound ?? {},
+          found_duo_details: prevFound.details ?? {},
+        }),
+      ),
+    );
+    socket.emit('duo_match_finder', JSON.parse(serialize(resp)));
+
+    // send to user
+    this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', JSON.parse(serialize(foundAnyone)));
   }
 }
