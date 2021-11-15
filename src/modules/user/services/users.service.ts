@@ -110,6 +110,7 @@ export class UsersService {
       .pipe(
         map((res) => {
           const data: LolCredentials = res.data;
+          console.log(res.data);
 
           return {
             level: data.level,
@@ -117,6 +118,7 @@ export class UsersService {
             league_number: data.divisionNumber,
             league_points: data.leaguePoints,
             win_rate: data.winRatio,
+            profileImageId: data.profileImageId,
           };
         }),
         catchError((e) => {

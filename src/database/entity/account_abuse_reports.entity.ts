@@ -6,5 +6,5 @@ import { GeneralEntity } from '../entity_inheritance/general';
 export class AccountAbuseReport extends GeneralEntity {
   @Column() summoner_name: string;
   @Column({ type: 'enum', enum: LolServer }) server: LolServer;
-  @Column({ nullable: true }) image: string;
+  @Column({ nullable: true }) imageId: number;
 }

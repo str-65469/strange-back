@@ -9,6 +9,7 @@ export interface LolCredentials {
   wins: number;
   losses: number;
   winRatio: number;
+  profileImageId: number;
 }
 
 export interface LolCredentialsResponse {
@@ -17,4 +18,5 @@ export interface LolCredentialsResponse {
   league_number: number;
   league_points: number;
   win_rate: number;
+  profileImageId: number;
 }
