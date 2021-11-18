@@ -3,13 +3,15 @@ import { DuoFinderService } from './services/duo_finder.service';
 import { UsersService } from 'src/modules/user/services/users.service';
 import { Server, Socket } from 'socket.io';
 import { configs } from 'src/configs';
-import { UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { UseInterceptors, ClassSerializerInterceptor, UseGuards } from '@nestjs/common';
 import { DuoFinderResponseType } from 'src/app/shared/schemas/duofinder/duofinder';
 import { HandleDuoFindBody } from 'src/app/shared/schemas/duofinder/response';
 import { serialize } from 'class-transformer';
+import { SocketAccessGuard } from './guards/socketaccess.guard';
 
 const { duomatchConnect, duomatchFind } = configs.socket;
 
+@UseGuards(SocketAccessGuard)
 @WebSocketGateway()
 export class DuoMatchGateway {
   @WebSocketServer()

@@ -223,6 +223,14 @@ export class AuthController {
   }
 
   @UseGuards(JwtAcessTokenAuthGuard)
+  @Get('/access_token')
+  public async getAccessToken(@Req() request: Request) {
+    const cookies = request.cookies;
+
+    return cookies?.access_token;
+  }
+
+  @UseGuards(JwtAcessTokenAuthGuard)
   @Post('/logout')
   public async logout(@Res() res: Response) {
     if (process.env.NODE_ENV === 'development') {
