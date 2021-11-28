@@ -1,8 +1,8 @@
-import { SuperLikeServiceType } from '../../app/enum/superlike_servie_type.enum';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { PaymentType } from 'src/app/enum/payment_type.enum';
 import { GeneralEntity } from '../entity_inheritance/general';
 import User from './user.entity';
+import { SuperLikeServiceType } from 'src/app/enum/superlike_services';
 
 @Entity('superlike_payment')
 export class SuperLikePayment extends GeneralEntity {
