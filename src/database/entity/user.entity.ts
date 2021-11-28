@@ -55,8 +55,8 @@ export default class User extends GeneralEntity {
   @OneToMany(() => SuperLikePayment, (likes) => likes.user)
   superLikePayments: SuperLikePayment[];
 
-  @OneToMany(() => UserBelongings, (belongings) => belongings.user)
-  belongings: UserBelongings[];
+  @OneToOne(() => UserBelongings, (belongings) => belongings.user)
+  belongings: UserBelongings;
 
   @OneToOne(() => MatchingSpams, (spams) => spams.user)
   spams: MatchingSpams;
