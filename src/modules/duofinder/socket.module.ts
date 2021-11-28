@@ -1,5 +1,6 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { HttpModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { DuoMatchGateway } from './duofinder.gateway';
 import { DuoFinderService } from './services/duo_finder.service';

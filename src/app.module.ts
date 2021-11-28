@@ -1,3 +1,4 @@
+import { BillingModule } from './modules/billing/billing.module';
 import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
 import { MatchingLobbyService } from './app/core/matching_lobby/matchinglobby.service';
 import { ReportsService } from './app/core/reports/reports.service';
@@ -25,10 +26,21 @@ import { ContactUs } from './database/entity/contact_us.entity';
 import { ResponseBody } from './app/shared/res/response_body';
 import { UserDetails } from './database/entity/user_details.entity';
 import { SocketModule } from './modules/duofinder/socket.module';
+import { RouterModule } from '@nestjs/core';
+
 import User from './database/entity/user.entity';
 
 @Module({
   imports: [
+    BillingModule,
+
+    RouterModule.register([
+      {
+        path: 'billing',
+        module: BillingModule,
+      },
+    ]),
+
     SocketModule,
     MulterModule.register({ dest: './upload' }),
     ConfigModule.forRoot({ isGlobal: true }),

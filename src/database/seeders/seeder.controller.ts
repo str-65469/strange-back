@@ -10,6 +10,8 @@ import { LolMainLane } from 'src/app/enum/lol_main_lane.enum';
 import { LolLeague } from 'src/app/enum/lol_league.enum';
 import { UserDetails } from '../entity/user_details.entity';
 import { RandomGenerator } from 'src/app/helpers/random_generator';
+import { SuperLikeServices } from '../entity/superlike_services.entity';
+import { SuperLikeServiceType } from 'src/app/enum/superlike_services';
 
 const { EU_NORDIC_EAST, EU_NORDIC_WEST } = LolServer;
 const servers = [EU_NORDIC_WEST, EU_NORDIC_EAST];
@@ -20,6 +22,7 @@ export class SeederController {
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(UserDetails) private readonly userDetailsRepo: Repository<UserDetails>,
     @InjectRepository(MatchingSpams) private readonly spamRepo: Repository<MatchingSpams>,
+    @InjectRepository(SuperLikeServices) private readonly superLikeServiceRepo: Repository<SuperLikeServices>,
   ) {}
 
   @Get('/user')
@@ -56,5 +59,39 @@ export class SeederController {
 
       await this.spamRepo.save({ user: savedUser });
     }
+  }
+
+  @Get('/superlike')
+  async seedSuperlikeServices() {
+    const entities = await this.superLikeServiceRepo.find();
+
+    if (entities.length) {
+      await this.superLikeServiceRepo.delete(entities.map((el) => el.id));
+    }
+
+    await this.superLikeServiceRepo.save([
+      {
+        type: SuperLikeServiceType.STARTER,
+        amount: 1,
+        price: 0.9,
+        full_price: 1,
+      },
+      {
+        type: SuperLikeServiceType.MEDIUM,
+        amount: 3,
+        price: 2.15,
+        percent: 20,
+        full_price: 10000,
+      },
+      {
+        type: SuperLikeServiceType.ULTIMATE,
+        amount: 8,
+        price: 9.1,
+        percent: 10,
+        full_price: 10000,
+      },
+    ]);
+
+    return await this.superLikeServiceRepo.find();
   }
 }

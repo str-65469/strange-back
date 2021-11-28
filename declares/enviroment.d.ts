@@ -28,6 +28,9 @@ declare global {
 
       JWT_SECRET: string;
       JWT_REGISTER_CACHE_SECRET: string;
+
+      PAYPAL_CLIENT_ID: string;
+      PAYPAL_SECRET_ID: string;
     }
   }
 }
