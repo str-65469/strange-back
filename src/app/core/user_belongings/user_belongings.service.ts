@@ -17,6 +17,12 @@ export class UserBelongingsService {
     });
   }
 
+  create(user: User) {
+    const userBelonging = this.userBelongingsRepo.create({ user });
+
+    return this.userBelongingsRepo.save(userBelonging);
+  }
+
   async update(userId: number, amount: number) {
     const userBelonging = await this.userBelongingsRepo.findOneOrFail({
       where: {
@@ -26,11 +32,19 @@ export class UserBelongingsService {
 
     userBelonging.super_like = userBelonging.super_like + amount;
 
-    return await this.userBelongingsRepo.save(userBelonging);
+    return this.userBelongingsRepo.save(userBelonging);
   }
 
-  async create(user: User) {
-    const userBelonging = this.userBelongingsRepo.create({ user });
+  async decreaseSuperLike(userId: number, amount: number) {
+    const userBelonging = await this.userBelongingsRepo.findOneOrFail({
+      where: {
+        userId: userId,
+      },
+    });
+
+    if (userBelonging.super_like && userBelonging.super_like > 0) {
+      userBelonging.super_like = userBelonging.super_like - amount;
+    }
 
     return this.userBelongingsRepo.save(userBelonging);
   }

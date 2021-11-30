@@ -117,6 +117,9 @@ export class DuoMatchGateway {
 
     // superlike match
     if (foundAnyone.type === DuoFinderResponseType.MATCH_FOUND_OTHER_BY_SUPERLIKE) {
+      // decline superlike count of user
+      await this.userBelongingsService.decreaseSuperLike(user.id, 1);
+
       // send to myself
       socket.emit(
         'duo_match_finder',
