@@ -62,7 +62,7 @@ export class DuoMatchGateway {
     }
 
     // check accept/decline logic
-    const foundAnyone = await this.duoFinderService.acceptDeclineLogic(user, prevFound, data.type);
+    const foundAnyone = await this.duoFinderService.acceptDeclineLogic(user, prevFound, data.type); //! will be ingored on JUST_FIND_ANOTHER
     const foundNewMatch = await this.duoFinderService.findDuo(user, data.prevFound.id);
 
     if (data && data.prevFound && Object.values(data.prevFound).length == 0) {
@@ -71,6 +71,17 @@ export class DuoMatchGateway {
       }
 
       socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
+      return;
+    }
+
+    // just find anyone and send (must be here !!!)
+    if (data.type === DuoFinderTransferTypes.JUST_FIND_ANOTHER) {
+      if (foundNewMatch) {
+        socket.emit('duo_match_finder', JSON.parse(serialize(foundNewMatch)));
+      } else {
+        socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
+      }
+
       return;
     }
 

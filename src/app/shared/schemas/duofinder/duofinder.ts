@@ -14,4 +14,5 @@ export enum DuoFinderTransferTypes {
   ACCEPT = 'ACCEPT',
   DECLINE = 'DECLINE',
   SUPERLIKE = 'SUPERLIKE',
+  JUST_FIND_ANOTHER = 'JUST_FIND_ANOTHER',
 }
