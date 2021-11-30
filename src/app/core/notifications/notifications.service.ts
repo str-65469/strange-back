@@ -19,12 +19,12 @@ export class NotificationsService {
   }
 
   async save(user: User, matchedUser: User) {
-    const matched = this.notificationRepo.create({
+    const notification = this.notificationRepo.create({
       user,
       matchedUser,
     });
 
-    return await this.notificationRepo.save(matched);
+    return await this.notificationRepo.save(notification);
   }
 
   async delete(id: number): Promise<boolean> {

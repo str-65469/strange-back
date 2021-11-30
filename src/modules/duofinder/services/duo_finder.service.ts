@@ -109,9 +109,40 @@ export class DuoFinderService {
         await this.lobbyService.add(user, prevFound);
         return null;
       }
-    } else {
+    }
+
+    if (type === DuoFinderTransferTypes.DECLINE) {
       await this.spamService.update({ user: user, addedId: prevFound.id, list: 'decline_list' });
       return null;
+    }
+
+    if (type === DuoFinderTransferTypes.SUPERLIKE) {
+      // add both to matched (save both into matched table)
+      await this.matchedDuosService.save(user, prevFound);
+      await this.matchedDuosService.save(prevFound, user);
+
+      // update both matched list spam
+      await this.spamService.update({ user: user, addedId: prevFound.id, list: 'matched_list' });
+      await this.spamService.update({ user: prevFound, addedId: user.id, list: 'matched_list' });
+
+      // save notification for other guy (for me it will be rendered on screen)
+      const saved = await this.notificationService.save(prevFound, user);
+      const notification = await this.notificationService.findOne(saved.id); // by relation
+
+      // find if dude is in lobby and waiting for my accept (if somebody liked me already) (singular)
+      const waitingUser = await this.lobbyService.userWaiting(prevFound, user);
+
+      if (waitingUser) {
+        // remove from lobby
+        await this.lobbyService.remove(prevFound, user);
+      }
+
+      return {
+        type: DuoFinderResponseType.MATCH_FOUND_OTHER_BY_SUPERLIKE,
+        found_duo_details: user.details ?? {},
+        found_duo: user,
+        notification,
+      };
     }
   }
 }

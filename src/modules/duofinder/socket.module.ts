@@ -17,6 +17,8 @@ import { MatchingSpamService } from 'src/app/core/matching_spam/matchingspamserv
 import { NotificationsService } from 'src/app/core/notifications/notifications.service';
 import { JwtAcessService } from 'src/app/jwt/jwt-access.service';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
+import { UserBelongingsService } from 'src/app/core/user_belongings/user_belongings.service';
+import { UserBelongings } from 'src/database/entity/user_belongings.entity';
 
 @Module({
   imports: [
@@ -30,10 +32,11 @@ import { UserRegisterCache } from 'src/database/entity/user_register_cache.entit
       UserDetails,
       MatchedDuosNotifications,
       UserRegisterCache,
+      UserBelongings,
     ]),
   ],
-  controllers: [],
   providers: [
+    UserBelongingsService,
     JwtAcessService,
     DuoMatchGateway,
     DuoFinderService,
