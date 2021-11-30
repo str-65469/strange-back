@@ -13,8 +13,6 @@ export class AuthService {
     // find user
     const user = await this.userService.findOneByEmail(userCredentials.email, true);
 
-    console.log(user);
-
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }

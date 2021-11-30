@@ -8,9 +8,6 @@ dotenv.config();
 
 export const SENDER_ADDRESS = `"${process.env.APP_TITLE} 👻" <${process.env.MAIL_USER}>`;
 
-console.log(process.env.APP_TITLE);
-console.log(process.env.MAIL_USER);
-
 @Injectable()
 export class MailService {
   constructor(

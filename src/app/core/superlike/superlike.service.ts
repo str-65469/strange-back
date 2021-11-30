@@ -5,7 +5,7 @@ import { SuperLikeServices } from 'src/database/entity/superlike_services.entity
 import { SuperLikeServiceType } from 'src/app/enum/superlike_services';
 
 Injectable();
-export class SuperlikeServicesService {
+export class SuperlikeService {
   constructor(
     @InjectRepository(SuperLikeServices)
     private readonly superlikeServicesRepo: Repository<SuperLikeServices>,

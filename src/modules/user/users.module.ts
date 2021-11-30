@@ -20,6 +20,6 @@ import { UserFileController } from './controllers/user_files.controller';
   ],
   controllers: [UserController, UserFileController],
   providers: [UsersService, JwtAcessService],
-  exports: [UsersService],
+  exports: [UsersService, JwtAcessService],
 })
 export class UsersModule {}

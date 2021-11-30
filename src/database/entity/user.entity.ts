@@ -5,7 +5,7 @@ import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
 import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notifications.entity';
 import { AfterLoad, BeforeInsert, Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { GeneralEntity } from '../entity_inheritance/general';
-import UserBelongings from './user_belongings.entity';
+import { UserBelongings } from './user_belongings.entity';
 import { UserDetails } from './user_details.entity';
 import { genSalt, hash } from 'bcrypt';
 import { Exclude } from 'class-transformer';

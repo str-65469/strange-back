@@ -10,6 +10,6 @@ export class SuperLikePayment extends GeneralEntity {
   @Column({ type: 'enum', enum: SuperLikeServiceType }) like_service_type: SuperLikeServiceType;
   @Column({ type: 'enum', enum: PaymentType }) payment_type: PaymentType;
 
-  @ManyToOne(() => User, (user) => user.superLikePayments)
-  user: User;
+  @Column({ type: 'int', nullable: true }) userId: number;
+  @ManyToOne(() => User, (user) => user.superLikePayments) user: User;
 }

@@ -27,20 +27,14 @@ import { ResponseBody } from './app/shared/res/response_body';
 import { UserDetails } from './database/entity/user_details.entity';
 import { SocketModule } from './modules/duofinder/socket.module';
 import { RouterModule } from '@nestjs/core';
+import { SuperLikeController } from './app/controllers/superlike.controller';
+import { UserBelongings } from './database/entity/user_belongings.entity';
+import { UserBelongingsService } from './app/core/user_belongings/user_belongings.service';
 
 import User from './database/entity/user.entity';
 
 @Module({
   imports: [
-    BillingModule,
-
-    RouterModule.register([
-      {
-        path: 'billing',
-        module: BillingModule,
-      },
-    ]),
-
     SocketModule,
     MulterModule.register({ dest: './upload' }),
     ConfigModule.forRoot({ isGlobal: true }),
@@ -53,14 +47,26 @@ import User from './database/entity/user.entity';
       UserDetails,
       AccountAbuseReport,
       MatchingLobby,
+      UserBelongings,
     ]),
+
+    // defined modules
     UsersModule,
     AuthModule,
     MailModule,
     SeederModule,
+    BillingModule,
+
+    RouterModule.register([
+      {
+        path: 'billing',
+        module: BillingModule,
+      },
+    ]),
   ],
-  controllers: [MatchedDuosController, NotificationsController, AppController, ReportsController],
+  controllers: [MatchedDuosController, NotificationsController, AppController, ReportsController, SuperLikeController],
   providers: [
+    UserBelongingsService,
     MatchingLobbyService,
     MatchedDuosService,
     NotificationsService,

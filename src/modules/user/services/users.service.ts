@@ -53,7 +53,7 @@ export class UsersService {
 
   async getUserDetails(id?: number) {
     return await this.userRepo.findOne(id, {
-      relations: ['details'],
+      relations: ['details', 'belongings'],
     });
   }
 
@@ -115,7 +115,6 @@ export class UsersService {
       .pipe(
         map((res) => {
           const data: LolCredentials = res.data;
-          console.log(res.data);
 
           return {
             level: data.level,

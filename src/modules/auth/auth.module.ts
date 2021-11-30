@@ -12,16 +12,25 @@ import { JwtModule } from '@nestjs/jwt';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { UserRegisterCacheService } from '../user/services/user_register_cache.service';
 import { UserDetails } from 'src/database/entity/user_details.entity';
+import { UserBelongingsService } from 'src/app/core/user_belongings/user_belongings.service';
+import { UserBelongings } from 'src/database/entity/user_belongings.entity';
 
 @Module({
   imports: [
     UsersModule,
     MailModule,
     JwtModule.register({ secret: process.env.JWT_SECRET }),
-    TypeOrmModule.forFeature([UserRegisterCache, UserDetails, MatchingSpams]),
+    TypeOrmModule.forFeature([UserRegisterCache, UserDetails, MatchingSpams, UserBelongings]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAcessService, UserDetailsServiceService, UserRegisterCacheService, MatchingSpamService],
+  providers: [
+    AuthService,
+    JwtAcessService,
+    UserDetailsServiceService,
+    UserRegisterCacheService,
+    MatchingSpamService,
+    UserBelongingsService,
+  ],
   exports: [AuthService, JwtAcessService],
 })
 export class AuthModule {}

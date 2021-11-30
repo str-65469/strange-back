@@ -17,6 +17,7 @@ import { UserRegisterCache } from 'src/database/entity/user_register_cache.entit
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtRefreshTokenAuthGuard } from './guards/jwt-refresh.guard';
 import { JwtAcessTokenAuthGuard } from './guards/jwt-access.guard';
+import { UserBelongingsService } from 'src/app/core/user_belongings/user_belongings.service';
 
 @Controller('/auth')
 export class AuthController {
@@ -29,6 +30,7 @@ export class AuthController {
     private readonly userDetailsService: UserDetailsServiceService,
     private readonly userRegisterCacheService: UserRegisterCacheService,
     private readonly matchingSpamService: MatchingSpamService,
+    private readonly userBelongingsService: UserBelongingsService,
 
     @InjectRepository(UserRegisterCache)
     private readonly userRegisterCacheRepo: Repository<UserRegisterCache>,
@@ -135,6 +137,9 @@ export class AuthController {
 
     // create user spam filter
     await this.matchingSpamService.createEmptySpam(user);
+
+    // create user belonging containing 0 super like
+    await this.userBelongingsService.create(user);
 
     // send httpOnly access_token cookie
     if (process.env.NODE_ENV === 'development') {

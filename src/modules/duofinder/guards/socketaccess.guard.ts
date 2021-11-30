@@ -12,8 +12,6 @@ export class SocketAccessGuard implements CanActivate {
       throw new WsException('Token missing');
     }
 
-    //TODO validate token here
-    console.log(token);
     return true;
   }
 }
