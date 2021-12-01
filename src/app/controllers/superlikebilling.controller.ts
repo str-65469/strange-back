@@ -10,6 +10,10 @@ import { Request } from 'express';
 import * as paypal from '@paypal/checkout-server-sdk';
 import { UserBelongingsService } from '../core/user_belongings/user_belongings.service';
 
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('superlike')
 export class SuperLikeBillingController {
@@ -62,6 +66,8 @@ export class SuperLikeBillingController {
         id: order.result.id,
       };
     } catch (error) {
+      console.log(error);
+
       throw new HttpException('something went wrong', HttpStatus.EXPECTATION_FAILED);
     }
   }
