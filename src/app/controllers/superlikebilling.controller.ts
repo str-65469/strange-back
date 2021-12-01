@@ -29,7 +29,12 @@ export class SuperLikeBillingController {
   public async createOrder(@Param('type', ParseIntPipe) type: SuperLikeServiceType) {
     const packet = await this.superLikeService.findByType(type);
 
+    console.log(process.env.NODE_ENV);
+    console.log(process.env.PAYPAL_CLIENT_ID);
+    console.log(process.env.PAYPAL_SECRET_ID);
+
     const Enviroment = process.env.NODE_ENV === 'production' ? paypal.core.LiveEnvironment : paypal.core.SandboxEnvironment;
+
     const paypalClient = new paypal.core.PayPalHttpClient(
       new Enviroment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_SECRET_ID),
     );
