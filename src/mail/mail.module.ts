@@ -1,4 +1,3 @@
-import { ConfigModule } from '@nestjs/config';
 import { RegisterMailCheckService } from './services/register_check.service';
 import { Module } from '@nestjs/common';
 import { MailService } from './mail.service';

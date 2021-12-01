@@ -8,8 +8,10 @@ import { UserProfileUpdateDto } from '../dto/user-update.dto';
 import { UserRegisterDto } from '../dto/user-register.dto';
 import { LolServer } from '../../../app/enum/lol_server.enum';
 import { InjectRepository } from '@nestjs/typeorm';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
+
 import { HttpService } from '@nestjs/axios';
+
 import { JwtService } from '@nestjs/jwt';
 import { genSalt, hash } from 'bcrypt';
 import { configs } from 'src/configs';
@@ -23,6 +25,8 @@ import { LolLeague } from 'src/app/enum/lol_league.enum';
 import * as cookie from 'cookie';
 
 export type UserSpamDetailed = User & { details: UserDetails; spams: MatchingSpams };
+
+// require('dotenv').config();
 
 @Injectable()
 export class UsersService {
@@ -105,6 +109,9 @@ export class UsersService {
   }
 
   async checkLolCredentialsValid(server: LolServer, summoner_name: string) {
+    console.log(server);
+    console.log(summoner_name);
+
     return await this.httpService
       .get('/api/summoner_profile', {
         params: {
@@ -116,6 +123,9 @@ export class UsersService {
         map((res) => {
           const data: LolCredentials = res.data;
 
+          console.log('=================1');
+          console.log(data);
+
           return {
             level: data.level,
             league: data.division,
@@ -126,6 +136,10 @@ export class UsersService {
           };
         }),
         catchError((e) => {
+          console.log('=================2');
+          console.log(e);
+          //   console.log(e);
+          //   throw new HttpException(e.response.data, e.response.status);
           throw new HttpException('Check your division or summoner name please', e?.response?.status);
         }),
       );

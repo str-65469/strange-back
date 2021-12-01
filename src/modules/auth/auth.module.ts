@@ -18,7 +18,7 @@ import { UserBelongings } from 'src/database/entity/user_belongings.entity';
 @Module({
   imports: [
     UsersModule,
-    MailModule,
+    // MailModule,
     JwtModule.register({ secret: process.env.JWT_SECRET }),
     TypeOrmModule.forFeature([UserRegisterCache, UserDetails, MatchingSpams, UserBelongings]),
   ],
