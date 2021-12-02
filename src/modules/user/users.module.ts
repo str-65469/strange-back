@@ -11,6 +11,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { UserFileController } from './controllers/user_files.controller';
 import { HttpModule } from '@nestjs/axios';
 import { MailModule } from 'src/mail/mail.module';
+import { CookieService } from 'src/app/core/cookie.service';
 
 @Module({
   imports: [
@@ -19,15 +20,9 @@ import { MailModule } from 'src/mail/mail.module';
     JwtModule.register({ secret: process.env.JWT_REGISTER_CACHE_SECRET }),
     MulterModule.register({ dest: './upload' }),
     HttpModule.register({ baseURL: process.env.CHECKED_SERVER_URL, timeout: 10000 }), // 10 sec
-    // HttpModule.registerAsync({
-    //   useFactory: () => ({
-    //     baseURL: process.env.CHECKED_SERVER_URL,
-    //     timeout: 10000,
-    //   }),
-    // }), // 10 sec
   ],
   controllers: [UserController, UserFileController],
-  providers: [UsersService, JwtAcessService],
-  exports: [UsersService, JwtAcessService, HttpModule, MailModule],
+  providers: [UsersService, JwtAcessService, CookieService],
+  exports: [UsersService, JwtAcessService, CookieService, HttpModule, MailModule],
 })
 export class UsersModule {}

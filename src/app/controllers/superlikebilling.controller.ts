@@ -94,6 +94,8 @@ export class SuperLikeBillingController {
     const request = new paypal.orders.OrdersCaptureRequest(orderId);
     request.requestBody({});
 
+    console.log('starting');
+
     try {
       const capture = await paypalClient.execute(request);
 
@@ -120,6 +122,8 @@ export class SuperLikeBillingController {
         increasedSuperLike,
       };
     } catch (error) {
+      console.log(error);
+
       throw new HttpException('something went wrong', HttpStatus.EXPECTATION_FAILED);
     }
   }

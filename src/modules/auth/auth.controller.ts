@@ -18,10 +18,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { JwtRefreshTokenAuthGuard } from './guards/jwt-refresh.guard';
 import { JwtAcessTokenAuthGuard } from './guards/jwt-access.guard';
 import { UserBelongingsService } from 'src/app/core/user_belongings/user_belongings.service';
+import { CookieService } from 'src/app/core/cookie.service';
 
 @Controller('/auth')
 export class AuthController {
   constructor(
+    private readonly cookieService: CookieService,
     private readonly authService: AuthService,
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
@@ -38,44 +40,16 @@ export class AuthController {
 
   @Post('/login')
   async login(@Body() body: UserLoginDto, @Res() res: Response) {
-    if (process.env.NODE_ENV === 'development') {
-      res.clearCookie('access_token');
-      res.clearCookie('refresh_token');
-    } else {
-      res.clearCookie('access_token', { domain: process.env.COOKIE_DOMAIN });
-      res.clearCookie('refresh_token', { domain: process.env.COOKIE_DOMAIN });
-    }
+    this.cookieService.clearCookie(res);
+
     const user = await this.authService.validateUser(body);
-    const token = this.jwtAcessService.generateAccessToken(user, user.socket_id);
+    const accessToken = this.jwtAcessService.generateAccessToken(user, user.socket_id);
 
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(user);
 
     await this.userService.saveUser(user, secret);
 
-    if (process.env.NODE_ENV === 'development') {
-      res.cookie('access_token', token, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-      });
-
-      res.cookie('refresh_token', refreshToken, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-      });
-    } else {
-      res.cookie('access_token', token, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-        domain: process.env.COOKIE_DOMAIN,
-      });
-
-      res.cookie('refresh_token', refreshToken, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-        domain: process.env.COOKIE_DOMAIN,
-      });
-    }
-
+    this.cookieService.createCookie(res, accessToken, refreshToken);
     return res.send(user);
   }
 
@@ -105,13 +79,7 @@ export class AuthController {
   @UseGuards(JwtRegisterAuthGuard)
   @Get('/register/confirm/')
   async registerVerify(@Query('id', ParseIntPipe) id: number, @Req() req: Request, @Res() res: Response) {
-    if (process.env.NODE_ENV === 'development') {
-      res.clearCookie('access_token');
-      res.clearCookie('refresh_token');
-    } else {
-      res.clearCookie('access_token', { domain: process.env.COOKIE_DOMAIN });
-      res.clearCookie('refresh_token', { domain: process.env.COOKIE_DOMAIN });
-    }
+    this.cookieService.clearCookie(res);
 
     // get data from cache
     const cachedData = await this.userRegisterCacheRepo.findOne(id);
@@ -142,29 +110,7 @@ export class AuthController {
     await this.userBelongingsService.create(user);
 
     // send httpOnly access_token cookie
-    if (process.env.NODE_ENV === 'development') {
-      res.cookie('access_token', accessToken, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-      });
-
-      res.cookie('refresh_token', refreshToken, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-      });
-    } else {
-      res.cookie('access_token', accessToken, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-        domain: process.env.COOKIE_DOMAIN,
-      });
-
-      res.cookie('refresh_token', refreshToken, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-        domain: process.env.COOKIE_DOMAIN,
-      });
-    }
+    this.cookieService.createCookie(res, accessToken, refreshToken);
 
     return res.redirect(`${process.env.DASHBOARD_URL}/profile`);
   }
@@ -172,13 +118,7 @@ export class AuthController {
   @UseGuards(JwtRefreshTokenAuthGuard)
   @Get('/refresh')
   public async refreshToken(@Req() req: Request, @Res() res: Response) {
-    if (process.env.NODE_ENV === 'development') {
-      res.clearCookie('access_token');
-      res.clearCookie('refresh_token');
-    } else {
-      res.clearCookie('access_token', { domain: process.env.COOKIE_DOMAIN });
-      res.clearCookie('refresh_token', { domain: process.env.COOKIE_DOMAIN });
-    }
+    this.cookieService.clearCookie(res);
 
     const cookies = req.cookies;
     const accessToken = cookies.access_token;
@@ -194,29 +134,7 @@ export class AuthController {
     // update user secret
     await this.userService.saveUser(user, secret);
 
-    if (process.env.NODE_ENV === 'development') {
-      res.cookie('access_token', accessTokenNew, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-      });
-
-      res.cookie('refresh_token', refreshToken, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-      });
-    } else {
-      res.cookie('access_token', accessTokenNew, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-        domain: process.env.COOKIE_DOMAIN,
-      });
-
-      res.cookie('refresh_token', refreshToken, {
-        expires: new Date(new Date().getTime() + 86409000), // this cookie never expires
-        httpOnly: true,
-        domain: process.env.COOKIE_DOMAIN,
-      });
-    }
+    this.cookieService.createCookie(res, accessTokenNew, refreshToken);
 
     return res.send({ message: 'token refresh successful' });
   }
@@ -238,13 +156,7 @@ export class AuthController {
   @UseGuards(JwtAcessTokenAuthGuard)
   @Post('/logout')
   public async logout(@Res() res: Response) {
-    if (process.env.NODE_ENV === 'development') {
-      res.clearCookie('access_token');
-      res.clearCookie('refresh_token');
-    } else {
-      res.clearCookie('access_token', { domain: process.env.COOKIE_DOMAIN });
-      res.clearCookie('refresh_token', { domain: process.env.COOKIE_DOMAIN });
-    }
+    this.cookieService.clearCookie(res);
 
     return res.send({ message: 'logout successful' });
   }
