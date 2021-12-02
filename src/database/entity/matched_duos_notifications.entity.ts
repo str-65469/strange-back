@@ -7,6 +7,12 @@ export class MatchedDuosNotifications extends GeneralEntity {
   @Column({ default: false, type: 'boolean' })
   is_seen: boolean;
 
+  @Column({ default: false, type: 'boolean' })
+  is_hidden_seen: boolean;
+
+  @Column({ type: 'int', nullable: true })
+  userId: number;
+
   @ManyToOne(() => User, (user) => user.notificationUsers)
   user: User;
 

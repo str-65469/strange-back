@@ -16,13 +16,12 @@ import { HandleDuoFindBody } from 'src/app/shared/schemas/duofinder/response';
 import { serialize } from 'class-transformer';
 import { SocketAccessGuard } from './guards/socketaccess.guard';
 import { UserBelongingsService } from 'src/app/core/user_belongings/user_belongings.service';
-import { GeneralException } from 'src/app/exceptions/general.exception';
 
 const { duomatchConnect, duomatchFind } = configs.socket;
 
 @UseGuards(SocketAccessGuard)
 @WebSocketGateway()
-export class DuoMatchGateway {
+export class SocketGateway {
   @WebSocketServer()
   private wss: Server;
 

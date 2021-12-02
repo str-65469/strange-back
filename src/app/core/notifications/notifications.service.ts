@@ -44,6 +44,10 @@ export class NotificationsService {
     return res.affected > 0;
   }
 
+  updateAllHiddenSeen(userId: number) {
+    return this.notificationRepo.update({ userId }, { is_hidden_seen: true });
+  }
+
   async all(user: User) {
     return await this.notificationRepo.find({
       where: { user },
