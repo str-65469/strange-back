@@ -96,20 +96,16 @@ export class AppController {
 
   @Get('/cleanall')
   async cleanSpams() {
-    if (process.env.NODE_ENV === 'development') {
-      getRepository(MatchingSpams)
-        .createQueryBuilder()
-        .update()
-        .set({ accept_list: [], decline_list: [], remove_list: [], matched_list: [] })
-        .execute();
+    getRepository(MatchingSpams)
+      .createQueryBuilder()
+      .update()
+      .set({ accept_list: [], decline_list: [], remove_list: [], matched_list: [] })
+      .execute();
 
-      getRepository(MatchedDuos).createQueryBuilder().delete().where('id > 0').execute();
-      getRepository(MatchedDuosNotifications).createQueryBuilder().delete().where('id > 0').execute();
-      getRepository(MatchingLobby).createQueryBuilder().delete().where('id > 0').execute();
-      return 'cleaned';
-    } else {
-      return 'not so fast';
-    }
+    getRepository(MatchedDuos).createQueryBuilder().delete().where('id > 0').execute();
+    getRepository(MatchedDuosNotifications).createQueryBuilder().delete().where('id > 0').execute();
+    getRepository(MatchingLobby).createQueryBuilder().delete().where('id > 0').execute();
+    return 'cleaned';
   }
 
   @Get('/relations')
