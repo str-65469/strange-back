@@ -83,7 +83,9 @@ export class SocketGateway {
     }
 
     if (!foundNewMatch) {
-      if (foundAnyone) {
+      // regular match
+      if (foundAnyone.type === DuoFinderResponseType.MATCH_FOUND_OTHER) {
+        // send to myself
         socket.emit(
           'duo_match_finder',
           JSON.parse(
@@ -94,13 +96,27 @@ export class SocketGateway {
             }),
           ),
         );
-        this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', JSON.parse(serialize(foundAnyone))); // send to user
-      }
-      // if nobody was sent from front just return nothing (which means init didnt send any user)
-      else {
-        socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
       }
 
+      // superlike match
+      if (foundAnyone.type === DuoFinderResponseType.MATCH_FOUND_OTHER_BY_SUPERLIKE) {
+        // decline superlike count of user
+        await this.userBelongingsService.decreaseSuperLike(user.id, 1);
+
+        // send to myself
+        socket.emit(
+          'duo_match_finder',
+          JSON.parse(
+            serialize({
+              type: DuoFinderResponseType.MATCH_FOUND_BY_SUPERLIKE,
+              found_duo: prevFound ?? {},
+              found_duo_details: prevFound.details ?? {},
+            }),
+          ),
+        );
+      }
+
+      this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', JSON.parse(serialize(foundAnyone))); // send to user
       return;
     }
 
