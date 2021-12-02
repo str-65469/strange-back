@@ -37,6 +37,8 @@ export class SocketGateway {
     const { id, socket_id } = this.userService.userSocketPayload(socket);
     const user = await this.userService.userSpamAndDetails(id);
 
+    console.log('joined' + socket_id);
+
     // join to user specific id
     socket.join(socket_id);
 
@@ -65,10 +67,6 @@ export class SocketGateway {
     const foundNewMatch = await this.duoFinderService.findDuo(user, data.prevFound.id);
 
     if (data && data.prevFound && Object.values(data.prevFound).length == 0) {
-      if (foundAnyone) {
-        socket.emit('duo_match_finder', JSON.parse(serialize(foundAnyone)));
-      }
-
       socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
       return;
     }
@@ -86,11 +84,23 @@ export class SocketGateway {
 
     if (!foundNewMatch) {
       if (foundAnyone) {
-        socket.emit('duo_match_finder', JSON.parse(serialize(foundAnyone)));
+        socket.emit(
+          'duo_match_finder',
+          JSON.parse(
+            serialize({
+              type: DuoFinderResponseType.MATCH_FOUND,
+              found_duo: prevFound ?? {},
+              found_duo_details: prevFound.details ?? {},
+            }),
+          ),
+        );
+        this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', JSON.parse(serialize(foundAnyone))); // send to user
+      }
+      // if nobody was sent from front just return nothing (which means init didnt send any user)
+      else {
+        socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
       }
 
-      // if nobody was sent from front just return nothing (which means init didnt send any user)
-      socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
       return;
     }
 
