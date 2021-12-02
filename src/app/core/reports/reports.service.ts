@@ -10,7 +10,12 @@ export class ReportsService {
 
   public async save(data: AccountAbuseReportDto, imageId: number) {
     const { server, summonerName } = data;
-    const report = this.reportRepo.create({ server, summoner_name: summonerName, imageId });
+    const report = this.reportRepo.create({
+      server,
+      summoner_name: summonerName,
+      imagePath: '/something',
+      email: 'test@test.com',
+    });
 
     return await this.reportRepo.save(report);
   }
