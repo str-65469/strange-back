@@ -7,12 +7,8 @@ import { SuperlikePaymentService } from '../core/superlike/superlike_payment.ser
 import { PaymentType } from '../enum/payment_type.enum';
 import { UsersService } from 'src/modules/user/services/users.service';
 import { Request } from 'express';
-import * as paypal from '@paypal/checkout-server-sdk';
 import { UserBelongingsService } from '../core/user_belongings/user_belongings.service';
-
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import * as paypal from '@paypal/checkout-server-sdk';
 
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('superlike')
@@ -73,7 +69,13 @@ export class SuperLikeBillingController {
     } catch (error) {
       console.log(error);
 
-      throw new HttpException('something went wrong', HttpStatus.EXPECTATION_FAILED);
+      throw new HttpException(
+        {
+          error,
+          msg: 'something went wrong',
+        },
+        HttpStatus.EXPECTATION_FAILED,
+      );
     }
   }
 
@@ -104,27 +106,27 @@ export class SuperLikeBillingController {
 
       const captureID = capture?.result?.purchase_units[0]?.payments?.captures[0]?.id;
 
-      const savedPaypalPaymentDetail = await this.paypalPaymentDetailsService.save(userId, captureID, capture); // save capture id
-      const increasedSuperLike = await this.userBelongingsService.update(userId, packet.amount); // increase superlike for user
-
-      // save payment detail
-      const savedPaymentDetail = await this.superlikePaymentService.create({
+      // save capture id, increase superlike for user, save payment detail
+      await this.paypalPaymentDetailsService.save(userId, captureID, capture);
+      await this.userBelongingsService.update(userId, packet.amount);
+      await this.superlikePaymentService.create({
         amount: packet.amount,
         like_service_type: type,
         payment_type: PaymentType.PAYPAL,
         userId,
       });
 
-      return {
-        msg: 'successfull payment',
-        savedPaypalPaymentDetail,
-        savedPaymentDetail,
-        increasedSuperLike,
-      };
+      return { msg: 'successfull payment' };
     } catch (error) {
       console.log(error);
 
-      throw new HttpException('something went wrong', HttpStatus.EXPECTATION_FAILED);
+      throw new HttpException(
+        {
+          error,
+          msg: 'something went wrong',
+        },
+        HttpStatus.EXPECTATION_FAILED,
+      );
     }
   }
 }

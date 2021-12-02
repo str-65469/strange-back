@@ -4,8 +4,8 @@ import { JwtAcessTokenAuthGuard } from 'src/modules/auth/guards/jwt-access.guard
 import { UsersService } from 'src/modules/user/services/users.service';
 import { Request } from 'express';
 
-@Controller('notifications')
 @UseGuards(JwtAcessTokenAuthGuard)
+@Controller('notifications')
 export class NotificationsController {
   constructor(private readonly notificationService: NotificationsService, private readonly userService: UsersService) {}
 
