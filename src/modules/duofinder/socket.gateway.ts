@@ -117,6 +117,7 @@ export class SocketGateway {
           );
         }
 
+        socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND }); // not found must go
         this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', JSON.parse(serialize(foundAnyone))); // send to user
       }
       // if nobody was sent from front just return nothing (which means init didnt send any user)
