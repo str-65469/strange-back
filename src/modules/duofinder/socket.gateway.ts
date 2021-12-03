@@ -68,7 +68,6 @@ export class SocketGateway {
     }
 
     if (data.prevFound.id === user.id) {
-      socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
       return;
     }
 
