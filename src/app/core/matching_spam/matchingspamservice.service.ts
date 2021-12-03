@@ -25,21 +25,23 @@ export class MatchingSpamService {
 
   async update({ user, addedId, list }: FilterSpamProps, pop?: boolean) {
     const spam = await this.spamRepo.findOne({ where: { user } });
-    let newList = [...spam[list], addedId];
-    let firstElement: null | number = null;
+
+    let newList = spam[list];
+
+    // checking if not exists
+    if (!spam[list].includes(addedId)) {
+      newList = [...spam[list], addedId];
+    }
 
     if (pop && list === 'decline_list') {
       const tempList = newList.slice();
-      firstElement = tempList[0]; // get first element before slice
       tempList.shift(); // remove first item from array (e.g. oldest)
       newList = tempList;
     }
 
     spam[list] = newList;
 
-    await this.spamRepo.save(spam);
-
-    return firstElement;
+    return this.spamRepo.save(spam);
   }
   //   async update({ user, addedId, list }: FilterSpamProps) {
   //     const spam = await this.spamRepo.findOne({ where: { user } });

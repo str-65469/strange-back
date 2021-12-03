@@ -9,6 +9,17 @@ export class MatchedDuosService {
   constructor(@InjectRepository(MatchedDuos) private readonly matchedRepo: Repository<MatchedDuos>) {}
 
   async save(user: User, matchedUser: User) {
+    const existed = await this.matchedRepo.findOne({
+      where: {
+        user,
+        matchedUser,
+      },
+    });
+
+    if (existed) {
+      return;
+    }
+
     const matched = this.matchedRepo.create({
       user,
       matchedUser,

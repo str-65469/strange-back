@@ -19,12 +19,23 @@ export class NotificationsService {
   }
 
   async save(user: User, matchedUser: User) {
+    const existed = await this.notificationRepo.findOne({
+      where: {
+        user,
+        matchedUser,
+      },
+    });
+
+    if (existed) {
+      return;
+    }
+
     const notification = this.notificationRepo.create({
       user,
       matchedUser,
     });
 
-    return await this.notificationRepo.save(notification);
+    return this.notificationRepo.save(notification);
   }
 
   async delete(id: number): Promise<boolean> {
