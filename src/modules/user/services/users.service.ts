@@ -248,18 +248,6 @@ export class UsersService {
       filteredLeagues = leagues.filter((_, i) => i >= currEnumIndex - 1 && i <= currEnumIndex + 1);
     }
 
-    if (prevId) {
-      return await this.userDetailsRepo.findOne({
-        where: {
-          user: Raw((alias) => `${alias} > ${prevId} AND ${alias} NOT IN (${filterList})`),
-          league: In(filteredLeagues),
-          server: user.details.server,
-        },
-        order: { id: 'ASC' },
-        relations: ['user'],
-      });
-    }
-
     return await this.userDetailsRepo.findOne({
       where: {
         user: Not(In(filterList)),
@@ -267,8 +255,31 @@ export class UsersService {
         server: user.details.server,
       },
 
-      order: { id: 'ASC' },
+      order: { id: 'ASC', created_at: 'DESC' },
       relations: ['user'],
     });
+
+    // if (prevId) {
+    //   return await this.userDetailsRepo.findOne({
+    //     where: {
+    //       user: Raw((alias) => `${alias} > ${prevId} AND ${alias} NOT IN (${filterList})`),
+    //       league: In(filteredLeagues),
+    //       server: user.details.server,
+    //     },
+    //     order: { id: 'ASC' },
+    //     relations: ['user'],
+    //   });
+    // }
+
+    // return await this.userDetailsRepo.findOne({
+    //   where: {
+    //     user: Not(In(filterList)),
+    //     league: In(filteredLeagues),
+    //     server: user.details.server,
+    //   },
+
+    //   order: { id: 'ASC' },
+    //   relations: ['user'],
+    // });
   }
 }
