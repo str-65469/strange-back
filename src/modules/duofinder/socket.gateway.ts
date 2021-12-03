@@ -62,6 +62,16 @@ export class SocketGateway {
       }
     }
 
+    if (data && data.prevFound && Object.values(data.prevFound).length == 0) {
+      socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
+      return;
+    }
+
+    if (data.prevFound.id === user.id) {
+      socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
+      return;
+    }
+
     // check accept/decline logic
     const foundAnyone = await this.duoFinderService.acceptDeclineLogic(user, prevFound, data.type); //! will be ingored on JUST_FIND_ANOTHER
 
@@ -69,11 +79,6 @@ export class SocketGateway {
     const userRenewed = await this.userService.userSpamAndDetails(user.id);
 
     const foundNewMatch = await this.duoFinderService.findDuo(userRenewed, data.prevFound.id);
-
-    if (data && data.prevFound && Object.values(data.prevFound).length == 0) {
-      socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });
-      return;
-    }
 
     // just find anyone and send (must be here !!!)
     if (data.type === DuoFinderTransferTypes.JUST_FIND_ANOTHER) {
