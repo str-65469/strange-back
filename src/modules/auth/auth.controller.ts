@@ -44,10 +44,9 @@ export class AuthController {
 
     const user = await this.authService.validateUser(body);
     const accessToken = this.jwtAcessService.generateAccessToken(user, user.socket_id);
+    const { refreshToken } = this.jwtAcessService.generateRefreshToken(user, user.secret);
 
-    const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(user);
-
-    await this.userService.saveUser(user, secret);
+    // await this.userService.saveUser(user, secret);
 
     this.cookieService.createCookie(res, accessToken, refreshToken);
     return res.send(user);
@@ -129,10 +128,10 @@ export class AuthController {
 
     // generate access_token and refresh token and new secret
     const accessTokenNew = this.jwtAcessService.generateAccessToken(user, user.socket_id);
-    const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(user);
+    const { refreshToken } = this.jwtAcessService.generateRefreshToken(user, user.secret);
 
     // update user secret
-    await this.userService.saveUser(user, secret);
+    // await this.userService.saveUser(user, secret);
 
     this.cookieService.createCookie(res, accessTokenNew, refreshToken);
 

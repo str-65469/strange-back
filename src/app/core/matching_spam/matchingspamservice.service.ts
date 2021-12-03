@@ -23,23 +23,41 @@ export class MatchingSpamService {
     return await this.spamRepo.save(spam);
   }
 
-  async update({ user, addedId, list }: FilterSpamProps) {
+  async update({ user, addedId, list }: FilterSpamProps, pop?: boolean) {
     const spam = await this.spamRepo.findOne({ where: { user } });
     let newList = [...spam[list], addedId];
+    let firstElement: null | number = null;
 
-    if (
-      (list === 'accept_list' && newList.length > 800) ||
-      (list === 'decline_list' && newList.length > 800) ||
-      (list === 'matched_list' && newList.length > 300) ||
-      (list === 'remove_list' && newList.length > 500)
-    ) {
+    if (pop && list === 'decline_list') {
       const tempList = newList.slice();
-      tempList.shift(); // remove oldest added item (e.g. first)
+      firstElement = tempList[0]; // get first element before slice
+      tempList.shift(); // remove first item from array (e.g. oldest)
       newList = tempList;
     }
 
     spam[list] = newList;
 
-    return await this.spamRepo.save(spam);
+    await this.spamRepo.save(spam);
+
+    return firstElement;
   }
+  //   async update({ user, addedId, list }: FilterSpamProps) {
+  //     const spam = await this.spamRepo.findOne({ where: { user } });
+  //     let newList = [...spam[list], addedId];
+
+  //     if (
+  // 		(list === 'decline_list' && newList.length > 2) ||
+  // 		(list === 'accept_list' && newList.length > 800) ||
+  //       (list === 'matched_list' && newList.length > 300) ||
+  //       (list === 'remove_list' && newList.length > 500)
+  //     ) {
+  //       const tempList = newList.slice();
+  //       tempList.shift(); // remove oldest added item (e.g. first)
+  //       newList = tempList;
+  //     }
+
+  //     spam[list] = newList;
+
+  //     return await this.spamRepo.save(spam);
+  //   }
 }

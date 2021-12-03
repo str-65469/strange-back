@@ -64,7 +64,11 @@ export class SocketGateway {
 
     // check accept/decline logic
     const foundAnyone = await this.duoFinderService.acceptDeclineLogic(user, prevFound, data.type); //! will be ingored on JUST_FIND_ANOTHER
-    const foundNewMatch = await this.duoFinderService.findDuo(user, data.prevFound.id);
+
+    // new spam
+    const userRenewed = await this.userService.userSpamAndDetails(user.id);
+
+    const foundNewMatch = await this.duoFinderService.findDuo(userRenewed, data.prevFound.id);
 
     if (data && data.prevFound && Object.values(data.prevFound).length == 0) {
       socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND });

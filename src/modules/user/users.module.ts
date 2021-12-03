@@ -12,17 +12,19 @@ import { UserFileController } from './controllers/user_files.controller';
 import { HttpModule } from '@nestjs/axios';
 import { MailModule } from 'src/mail/mail.module';
 import { CookieService } from 'src/app/core/cookie.service';
+import { MatchingSpamService } from 'src/app/core/matching_spam/matchingspamservice.service';
+import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 
 @Module({
   imports: [
     MailModule,
-    TypeOrmModule.forFeature([User, UserDetails, UserRegisterCache]),
+    TypeOrmModule.forFeature([User, UserDetails, UserRegisterCache, MatchingSpams]),
     JwtModule.register({ secret: process.env.JWT_REGISTER_CACHE_SECRET }),
     MulterModule.register({ dest: './upload' }),
     HttpModule.register({ baseURL: process.env.CHECKED_SERVER_URL, timeout: 10000 }), // 10 sec
   ],
   controllers: [UserController, UserFileController],
-  providers: [UsersService, JwtAcessService, CookieService],
-  exports: [UsersService, JwtAcessService, CookieService, HttpModule, MailModule],
+  providers: [UsersService, JwtAcessService, CookieService, MatchingSpamService],
+  exports: [UsersService, JwtAcessService, CookieService, HttpModule, MailModule, MatchingSpamService],
 })
 export class UsersModule {}

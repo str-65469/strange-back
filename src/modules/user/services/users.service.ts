@@ -8,32 +8,28 @@ import { UserProfileUpdateDto } from '../dto/user-update.dto';
 import { UserRegisterDto } from '../dto/user-register.dto';
 import { LolServer } from '../../../app/enum/lol_server.enum';
 import { InjectRepository } from '@nestjs/typeorm';
-import { catchError, map, tap } from 'rxjs/operators';
-
+import { catchError, map } from 'rxjs/operators';
 import { HttpService } from '@nestjs/axios';
-
 import { JwtService } from '@nestjs/jwt';
 import { genSalt, hash } from 'bcrypt';
 import { configs } from 'src/configs';
-import { In, Not, Raw, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { Request } from 'express';
 import { UserDetails } from 'src/database/entity/user_details.entity';
-import User from 'src/database/entity/user.entity';
 import { Socket } from 'socket.io';
-import { AccessTokenPayload, JwtAcessService } from 'src/app/jwt/jwt-access.service';
+import { AccessTokenPayload } from 'src/app/jwt/jwt-access.service';
 import { LolLeague } from 'src/app/enum/lol_league.enum';
-import * as cookie from 'cookie';
+import { MatchingSpamService } from 'src/app/core/matching_spam/matchingspamservice.service';
+import User from 'src/database/entity/user.entity';
 
 export type UserSpamDetailed = User & { details: UserDetails; spams: MatchingSpams };
-
-// require('dotenv').config();
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly jwtAccessService: JwtAcessService,
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
+    private readonly spamService: MatchingSpamService,
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(UserDetails) private readonly userDetailsRepo: Repository<UserDetails>,
     @InjectRepository(UserRegisterCache) private readonly registerCacheRepo: Repository<UserRegisterCache>,
@@ -233,7 +229,7 @@ export class UsersService {
     const ml = matched_list ?? [];
 
     // filter plus current
-    const filterList = [...new Set([...al, ...rl, ...dl, ...ml, user.id])];
+    let filterList = [...new Set([...al, ...rl, ...dl, ...ml, user.id])];
 
     // league filtering
     const leagues = Object.values(LolLeague);
@@ -248,16 +244,73 @@ export class UsersService {
       filteredLeagues = leagues.filter((_, i) => i >= currEnumIndex - 1 && i <= currEnumIndex + 1);
     }
 
-    return await this.userDetailsRepo.findOne({
+    return this.userDetailsRepo.findOne({
       where: {
-        user: Not(In(filterList)),
+        user: Not(In(prevId ? [...filterList, prevId] : filterList)),
         league: In(filteredLeagues),
         server: user.details.server,
       },
 
-      order: { id: 'ASC', created_at: 'DESC' },
+      order: { created_at: 'DESC' },
       relations: ['user'],
     });
+
+    const userDetail = await this.userDetailsRepo.findOne({
+      where: {
+        user: Not(In(prevId ? [...filterList, prevId] : filterList)),
+        league: In(filteredLeagues),
+        server: user.details.server,
+      },
+
+      order: { created_at: 'DESC' },
+      relations: ['user'],
+    });
+
+    // console.log('============');
+    // console.log('from up');
+
+    // console.log(userDetail?.id);
+    // console.log(prevId);
+    // console.log(prevId ? [...filterList, prevId] : filterList);
+
+    if (!userDetail) {
+      // update decline list and pop
+      if (prevId) {
+        const id = await this.spamService.update({ user: user, addedId: prevId, list: 'decline_list' }, true);
+
+        console.log('from decline 1');
+        console.log(id);
+
+        return this.userDetailsRepo.findOne({
+          where: {
+            user: id,
+          },
+          relations: ['user'],
+        });
+      }
+
+      // find users from/via decline list
+      const declinedDetail = await this.userDetailsRepo.findOne({
+        where: {
+          user: In(decline_list),
+        },
+
+        order: { created_at: 'ASC' },
+        relations: ['user'],
+      });
+
+      //   console.log('from decline 2');
+      //   console.log(declinedDetail.id);
+
+      return declinedDetail;
+    }
+
+    // update decline list but not pop
+    if (prevId) {
+      await this.spamService.update({ user: user, addedId: prevId, list: 'decline_list' });
+    }
+
+    return userDetail;
 
     // if (prevId) {
     //   return await this.userDetailsRepo.findOne({

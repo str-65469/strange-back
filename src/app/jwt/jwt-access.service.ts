@@ -41,8 +41,8 @@ export class JwtAcessService {
     });
   }
 
-  public generateRefreshToken(user: User | UserRegisterCache): RefreshTokenResponse {
-    const secret = RandomGenerator.randomString();
+  public generateRefreshToken(user: User | UserRegisterCache, userSecret?: string): RefreshTokenResponse {
+    const secret = userSecret ?? RandomGenerator.randomString();
     const payload = { id: user.id, username: user.username };
 
     const refreshToken = this.jwtService.sign(payload, {
