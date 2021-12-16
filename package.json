@@ -21,12 +21,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "pretypeorm": "(rm ormconfig.json || :) && ts-node -r tsconfig-paths/register src/scripts/write-typeorm-config.ts",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migrate:generate": "yarn run typeorm -- migration:generate -n",
+    "migrate:generate": "yarn run typeorm migration:generate -n Main",
     "migrate:run": "yarn run typeorm -- migration:run",
-    "migrate:down": "yarn run typeorm -- migration:down",
-    "migratemain": "yarn run typeorm migration:generate -n Main",
-    "clean": "rimraf src/database/migrations/*",
-    "migrate": "yarn run clean && yarn run migratemain && yarn run migrate:run"
+    "migrate:down": "yarn run typeorm -- migration:down"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.0",
