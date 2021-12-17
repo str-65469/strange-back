@@ -46,13 +46,15 @@
     "faker": "^5.5.3",
     "handlebars": "^4.7.7",
     "hbs": "^4.1.2",
+    "nestjs-command": "^3.1.0",
     "nodemailer": "^6.6.5",
     "passport": "^0.4.1",
     "pg": "^8.7.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7",
-    "typeorm": "^0.2.37"
+    "typeorm": "^0.2.37",
+    "yargs": "^17.3.0"
   },
   "devDependencies": {
     "@nestjs/axios": "^0.0.3",
@@ -70,6 +72,7 @@
     "@types/passport-jwt": "^3.0.6",
     "@types/socket.io": "^3.0.2",
     "@types/supertest": "^2.0.10",
+    "@types/yargs": "^17.0.7",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "eslint": "^7.22.0",
