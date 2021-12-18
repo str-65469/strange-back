@@ -1,17 +1,18 @@
-import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
-import { SeederController } from './seeder.controller';
-import User from '../entity/user.entity';
-import { UserDetails } from '../entity/user_details.entity';
-import { SuperLikeServices } from '../entity/superlike_services.entity';
-
-//TODO gadacvale es stili da gamoiyene es https://www.npmjs.com/package/nestjs-seeder
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { CommandModule } from 'nestjs-command';
+import { configService } from '../../config.service';
+import { SeederProvider } from './seeder.provider';
+import { TestService } from './services/test_service/test_service.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserDetails, MatchingSpams, SuperLikeServices])],
-  controllers: [SeederController],
-  providers: [],
-  exports: [],
+  imports: [
+    CommandModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
+  ],
+  controllers: [],
+  providers: [SeederProvider, TestService],
 })
 export class SeederModule {}

@@ -24,7 +24,7 @@
     "migrate:generate": "yarn run typeorm migration:generate -n Main",
     "migrate:run": "yarn run typeorm -- migration:run",
     "migrate:down": "yarn run typeorm -- migration:down",
-    "seed": "yarn run ts-node src/database/seeders/seed.ts"
+    "seed": "yarn run ts-node src/database/seeders/seeder.bootstrap.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.0",
