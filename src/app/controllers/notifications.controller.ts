@@ -1,7 +1,7 @@
 import { Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards } from '@nestjs/common';
-import { JwtAcessTokenAuthGuard } from 'src/app/security/auth/jwt-access.guard';
+import { JwtAcessTokenAuthGuard } from 'src/app/security/auth/jwt_access.guard';
 import { Request } from 'express';
-import { NotificationsService } from '../services/core/notifications/notifications.service';
+import { NotificationsService } from '../services/core/notifications.service';
 import { UsersService } from '../services/core/user/users.service';
 
 @UseGuards(JwtAcessTokenAuthGuard)

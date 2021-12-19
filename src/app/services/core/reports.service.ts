@@ -1,4 +1,4 @@
-import { AccountAbuseReportDto } from './dto/account_abues.dto';
+import { AccountAbuseReportDto } from '../../common/request/account_abues.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountAbuseReport } from 'src/database/entity/account_abuse_reports.entity';

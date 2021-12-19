@@ -3,10 +3,7 @@ import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserRegisterCache } from '../../../../database/entity/user_register_cache.entity';
 import { LolCredentials, LolCredentialsResponse } from '../../../common/schemas/lol_credentials';
-import { UserPasswordUpdateDto } from './dto/user-update-password.dto';
 import { RandomGenerator } from 'src/app/utils/random_generator';
-import { UserProfileUpdateDto } from './dto/user-update.dto';
-import { UserRegisterDto } from './dto/user-register.dto';
 import { LolServer } from '../../../common/enum/lol_server.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { catchError, map } from 'rxjs/operators';
@@ -19,8 +16,10 @@ import { Request } from 'express';
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import { Socket } from 'socket.io';
 import { LolLeague } from 'src/app/common/enum/lol_league.enum';
-import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
-import { AccessTokenPayload } from 'src/app/services/common/jwt-access.service';
+import { AccessTokenPayload } from 'src/app/services/common/jwt_access.service';
+import { UserRegisterDto } from 'src/app/common/request/user/user_register.dto';
+import { UserProfileUpdateDto } from 'src/app/common/request/user/user_update.dto';
+import { UserPasswordUpdateDto } from 'src/app/common/request/user/user_update_password.dto';
 
 export type UserSpamDetailed = User & { details: UserDetails; spams: MatchingSpams };
 
@@ -29,7 +28,6 @@ export class UsersService {
   constructor(
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
-    private readonly spamService: MatchingSpamService,
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(UserDetails) private readonly userDetailsRepo: Repository<UserDetails>,
     @InjectRepository(UserRegisterCache) private readonly registerCacheRepo: Repository<UserRegisterCache>,
@@ -246,85 +244,5 @@ export class UsersService {
       order: { created_at: 'DESC' },
       relations: ['user'],
     });
-
-    const userDetail = await this.userDetailsRepo.findOne({
-      where: {
-        user: Not(In(prevId ? [...filterList, prevId] : filterList)),
-        league: In(filteredLeagues),
-        server: user.details.server,
-      },
-
-      order: { created_at: 'DESC' },
-      relations: ['user'],
-    });
-
-    // console.log('============');
-    // console.log('from up');
-
-    // console.log(userDetail?.id);
-    // console.log(prevId);
-    // console.log(prevId ? [...filterList, prevId] : filterList);
-
-    if (!userDetail) {
-      // update decline list and pop
-      if (prevId) {
-        const id = await this.spamService.update({ user: user, addedId: prevId, list: 'decline_list' }, true);
-
-        console.log('from decline 1');
-        console.log(id);
-
-        return this.userDetailsRepo.findOne({
-          where: {
-            user: id,
-          },
-          relations: ['user'],
-        });
-      }
-
-      // find users from/via decline list
-      const declinedDetail = await this.userDetailsRepo.findOne({
-        where: {
-          user: In(decline_list),
-        },
-
-        order: { created_at: 'ASC' },
-        relations: ['user'],
-      });
-
-      //   console.log('from decline 2');
-      //   console.log(declinedDetail.id);
-
-      return declinedDetail;
-    }
-
-    // update decline list but not pop
-    if (prevId) {
-      await this.spamService.update({ user: user, addedId: prevId, list: 'decline_list' });
-    }
-
-    return userDetail;
-
-    // if (prevId) {
-    //   return await this.userDetailsRepo.findOne({
-    //     where: {
-    //       user: Raw((alias) => `${alias} > ${prevId} AND ${alias} NOT IN (${filterList})`),
-    //       league: In(filteredLeagues),
-    //       server: user.details.server,
-    //     },
-    //     order: { id: 'ASC' },
-    //     relations: ['user'],
-    //   });
-    // }
-
-    // return await this.userDetailsRepo.findOne({
-    //   where: {
-    //     user: Not(In(filterList)),
-    //     league: In(filteredLeagues),
-    //     server: user.details.server,
-    //   },
-
-    //   order: { id: 'ASC' },
-    //   relations: ['user'],
-    // });
   }
 }

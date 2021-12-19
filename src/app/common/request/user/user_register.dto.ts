@@ -1,5 +1,5 @@
-import { LolServer } from '../../../../common/enum/lol_server.enum';
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { LolServer } from '../../enum/lol_server.enum';
 
 export class UserRegisterDto {
   @IsNotEmpty()

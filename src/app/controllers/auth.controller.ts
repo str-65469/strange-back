@@ -16,21 +16,21 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
 import { AuthService } from '../services/core/auth/auth.service';
-import { JwtAcessService } from '../services/common/jwt-access.service';
+import { JwtAcessService } from '../services/common/jwt_access.service';
 import { MailService } from 'src/app/mail/mail.service';
-import { JwtRegisterAuthGuard } from '../security/guards/jwt-register.guard';
+import { JwtRegisterAuthGuard } from '../security/guards/jwt_register.guard';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtAcessTokenAuthGuard } from '../security/auth/jwt-access.guard';
+import { JwtAcessTokenAuthGuard } from '../security/auth/jwt_access.guard';
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
 import { CookieService } from 'src/app/services/common/cookie.service';
-import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
-import { UserLoginDto } from '../services/core/user/dto/user-login.dto';
-import { UserRegisterDto } from '../services/core/user/dto/user-register.dto';
+import { MatchingSpamService } from 'src/app/services/core/matcheds/matching_spam.service';
+import { UserLoginDto } from '../common/request/user/user_login.dto';
 import { UsersService } from '../services/core/user/users.service';
 import { UserDetailsServiceService } from '../services/core/user/user_details.service';
 import { UserRegisterCacheService } from '../services/core/user/user_register_cache.service';
-import { JwtRefreshTokenAuthGuard } from '../security/auth/jwt-refresh.guard';
+import { JwtRefreshTokenAuthGuard } from '../security/auth/jwt_refresh.guard';
+import { UserRegisterDto } from '../common/request/user/user_register.dto';
 
 @Controller('/auth')
 export class AuthController {

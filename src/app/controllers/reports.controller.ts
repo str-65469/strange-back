@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { map } from 'rxjs';
-import { AccountAbuseReportDto } from '../services/core/reports/dto/account_abues.dto';
-import { ReportsService } from '../services/core/reports/reports.service';
+import { AccountAbuseReportDto } from '../common/request/account_abues.dto';
+import { ReportsService } from '../services/core/reports.service';
 import { UsersService } from '../services/core/user/users.service';
 
 @Controller('reports')

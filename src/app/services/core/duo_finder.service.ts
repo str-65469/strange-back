@@ -1,11 +1,11 @@
 import User from 'src/database/entity/user.entity';
 import { Injectable } from '@nestjs/common';
-import { MatchingLobbyService } from 'src/app/services/core/matcheds/matchinglobby.service';
-import { MatchedDuosService } from 'src/app/services/core/matcheds/matchedduos.service';
-import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
-import { NotificationsService } from 'src/app/services/core/notifications/notifications.service';
+import { MatchingLobbyService } from 'src/app/services/core/matcheds/matching_lobby.service';
+import { MatchingSpamService } from 'src/app/services/core/matcheds/matching_spam.service';
 import { DuoFinderResponseType, DuoFinderTransferTypes } from 'src/app/common/enum/duofinder/duofinder';
-import { UsersService } from '../user/users.service';
+import { UsersService } from './user/users.service';
+import { NotificationsService } from './notifications.service';
+import { MatchedDuosService } from './matcheds/matched_duos.service';
 
 @Injectable()
 export class DuoFinderService {

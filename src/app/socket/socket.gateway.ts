@@ -6,7 +6,7 @@ import {
   MessageBody,
   WsException,
 } from '@nestjs/websockets';
-import { DuoFinderService } from '../services/core/duofinder/duo_finder.service';
+import { DuoFinderService } from '../services/core/duo_finder.service';
 import { Server, Socket } from 'socket.io';
 import { configs } from 'src/configs/config';
 import { UseInterceptors, ClassSerializerInterceptor, UseGuards } from '@nestjs/common';

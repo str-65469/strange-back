@@ -6,11 +6,11 @@ import { UserRegisterCache } from 'src/database/entity/user_register_cache.entit
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
 import { UserBelongings } from 'src/database/entity/user_belongings.entity';
-import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
+import { MatchingSpamService } from 'src/app/services/core/matcheds/matching_spam.service';
 import { UserDetailsServiceService } from 'src/app/services/core/user/user_details.service';
 import { UserRegisterCacheService } from 'src/app/services/core/user/user_register_cache.service';
 import { AuthController } from '../controllers/auth.controller';
-import { JwtAcessService } from '../services/common/jwt-access.service';
+import { JwtAcessService } from '../services/common/jwt_access.service';
 import { AuthService } from '../services/core/auth/auth.service';
 import { UsersModule } from './users.module';
 

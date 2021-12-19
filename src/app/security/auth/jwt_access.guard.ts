@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Res }
 import { Observable } from 'rxjs';
 import { configs } from 'src/configs/config';
 import { CookieService } from 'src/app/services/common/cookie.service';
-import { JwtAcessService } from 'src/app/services/common/jwt-access.service';
+import { JwtAcessService } from 'src/app/services/common/jwt_access.service';
 
 @Injectable()
 export class JwtAcessTokenAuthGuard implements CanActivate {

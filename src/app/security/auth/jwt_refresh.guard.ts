@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, NotFo
 import { JwtService } from '@nestjs/jwt';
 import { configs } from 'src/configs/config';
 import { CookieService } from 'src/app/services/common/cookie.service';
-import { JwtAcessService } from 'src/app/services/common/jwt-access.service';
+import { JwtAcessService } from 'src/app/services/common/jwt_access.service';
 import { UsersService } from 'src/app/services/core/user/users.service';
 
 @Injectable()
