@@ -62,14 +62,6 @@ export class UsersService {
     const accessTokenDecoded = this.jwtService.decode(token) as AccessTokenPayload;
 
     return accessTokenDecoded;
-
-    // const headerCookies = socket.handshake.headers.cookie;
-    // const cookies = cookie.parse(headerCookies);
-    // const token = cookies?.access_token;
-    // this.jwtAccessService.validateToken({ token, secret: process.env.JWT_SECRET });
-    // const accessTokenDecoded = this.jwtService.decode(token) as AccessTokenPayload;
-
-    // return accessTokenDecoded;
   }
 
   async userSpamAndDetails(id: number) {

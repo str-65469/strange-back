@@ -3,7 +3,7 @@ import { SuperLikeBillingController } from '../controllers/superlikebilling.cont
 import { SuperlikeService } from 'src/app/services/core/superlike/superlike.service';
 import { SuperLikeServices } from 'src/database/entity/superlike_services.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './user/users.module';
+import { UsersModule } from './users.module';
 import { SuperLikePayment } from 'src/database/entity/superlike_payment.entity';
 import { SuperlikePaymentService } from 'src/app/services/core/superlike/superlike_payment.service';
 import { PaypalPaymentDetailsService } from 'src/app/services/core/paypal/paypal_payment_details.service';

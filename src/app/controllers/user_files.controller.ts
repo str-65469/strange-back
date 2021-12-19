@@ -1,5 +1,5 @@
 import { Controller, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { UserSafeInterceptor } from '../modules/user/interceptor/user_safe.interceptor';
+import { UserSafeInterceptor } from '../security/interceptors/user_safe.interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileHelper } from 'src/app/utils/file_helper';
 import { Express, Request } from 'express';

@@ -8,7 +8,7 @@ import { MessageCode } from 'src/app/common/enum/exceptions/general_exception.en
 import { GeneralException } from 'src/app/common/exceptions/general.exception';
 import { configs } from 'src/configs/config';
 
-export interface RefreshTokenResponse {
+interface RefreshTokenResponse {
   secret: string;
   refreshToken: string;
 }

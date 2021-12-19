@@ -2,7 +2,8 @@ import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SuperLikePayment } from 'src/database/entity/superlike_payment.entity';
-import { SuperlikePaymentCreateProps } from './props/superlike.prop';
+import { PaymentType } from 'src/app/common/enum/payment_type.enum';
+import { SuperLikeServiceType } from 'src/app/common/enum/superlike_services';
 
 Injectable();
 export class SuperlikePaymentService {
@@ -11,9 +12,12 @@ export class SuperlikePaymentService {
     private readonly superlikePaymentRepo: Repository<SuperLikePayment>,
   ) {}
 
-  create(props: SuperlikePaymentCreateProps): Promise<SuperLikePayment> {
-    const { amount, like_service_type, payment_type, userId } = props;
-
+  create(
+    amount: number,
+    like_service_type: SuperLikeServiceType,
+    payment_type: PaymentType,
+    userId: number,
+  ): Promise<SuperLikePayment> {
     const superLikePayment = this.superlikePaymentRepo.create({
       amount,
       userId,

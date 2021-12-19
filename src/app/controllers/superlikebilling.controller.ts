@@ -4,7 +4,7 @@ import { Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Req, U
 import { PaypalPaymentDetailsService } from '../services/core/paypal/paypal_payment_details.service';
 import { SuperlikeService } from 'src/app/services/core/superlike/superlike.service';
 import { SuperLikeServiceType } from 'src/app/common/enum/superlike_services';
-import { JwtAcessTokenAuthGuard } from 'src/app/modules/auth/guards/jwt-access.guard';
+import { JwtAcessTokenAuthGuard } from 'src/app/security/auth/jwt-access.guard';
 import { PaymentType } from '../common/enum/payment_type.enum';
 import { SuperlikePaymentService } from '../services/core/superlike/superlike_payment.service';
 import { UserBelongingsService } from '../services/core/user/user_belongings.service';
@@ -109,12 +109,7 @@ export class SuperLikeBillingController {
       // save capture id, increase superlike for user, save payment detail
       await this.paypalPaymentDetailsService.save(userId, captureID, capture);
       await this.userBelongingsService.update(userId, packet.amount);
-      await this.superlikePaymentService.create({
-        amount: packet.amount,
-        like_service_type: type,
-        payment_type: PaymentType.PAYPAL,
-        userId,
-      });
+      await this.superlikePaymentService.create(packet.amount, type, PaymentType.PAYPAL, userId);
 
       return { msg: 'successfull payment' };
     } catch (error) {

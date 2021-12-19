@@ -14,8 +14,7 @@ import { AppController } from '../controllers/app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeormConfig } from '../../configs/typeorm';
-import { UsersModule } from './user/users.module';
-import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users.module';
 import { MailModule } from '../mail/mail.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ContactUs } from '../../database/entity/contact_us.entity';
@@ -30,6 +29,7 @@ import { MatchingLobbyService } from '../services/core/matcheds/matchinglobby.se
 import { NotificationsService } from '../services/core/notifications/notifications.service';
 import { ReportsService } from '../services/core/reports/reports.service';
 import { UserBelongingsService } from '../services/core/user/user_belongings.service';
+import { AuthModule } from './auth.module';
 
 @Module({
   imports: [
