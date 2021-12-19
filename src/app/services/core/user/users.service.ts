@@ -82,7 +82,7 @@ export class UsersService {
     return this.userRepo.findOne({ where: { email } });
   }
 
-  async findByEmailOrUsername(email: string, username: string): Promise<User | undefined> {
+  findByEmailOrUsername(email: string, username: string) {
     return this.userRepo.findOne({ where: [{ email }, { username }] });
   }
 
@@ -122,8 +122,8 @@ export class UsersService {
           };
         }),
         catchError((e) => {
-          console.log('=================2');
-          console.log(e);
+          //   console.log('=================2');
+          //   console.log(e);
           //   console.log(e);
           //   throw new HttpException(e.response.data, e.response.status);
           throw new HttpException('Check your division or summoner name please', e?.response?.status);
@@ -135,7 +135,8 @@ export class UsersService {
     const { email, password, server, summoner_name, username } = body;
     const { league, league_number, league_points, level, win_rate } = details;
 
-    const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '30m' });
+    const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '1m' });
+    // const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '30m' });
 
     const d1 = new Date();
     const d2 = new Date(d1);

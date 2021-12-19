@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import User from 'src/database/entity/user.entity';
+import { LolServer } from 'src/app/common/enum/lol_server.enum';
 
 @Injectable()
 export class UserDetailsServiceService {
@@ -12,8 +13,8 @@ export class UserDetailsServiceService {
     private readonly userDetailsRepo: Repository<UserDetails>,
   ) {}
 
-  async findBySummoner(summonerName: string) {
-    return this.userDetailsRepo.findOne({ where: { summoner_name: summonerName } });
+  async findBySummonerAndServer(server: LolServer, summonerName: string) {
+    return this.userDetailsRepo.findOne({ where: { summoner_name: summonerName, server } });
   }
 
   async saveUserDetailsByCachedData(userCached: UserRegisterCache, user: User): Promise<UserDetails> {

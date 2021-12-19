@@ -1,16 +1,4 @@
-import {
-  Controller,
-  Post,
-  Res,
-  Body,
-  Get,
-  Query,
-  ParseIntPipe,
-  UseGuards,
-  HttpException,
-  HttpStatus,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Res, Body, Get, Query, ParseIntPipe, UseGuards, Req, UseFilters } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -31,6 +19,7 @@ import { UserDetailsServiceService } from '../services/core/user/user_details.se
 import { UserRegisterCacheService } from '../services/core/user/user_register_cache.service';
 import { JwtRefreshTokenAuthGuard } from '../security/auth/jwt_refresh.guard';
 import { UserRegisterDto } from '../common/request/user/user_register.dto';
+import { RegisterCacheExceptionFilter } from '../common/exceptions/register_cache.excpetion.filter';
 
 @Controller('/auth')
 export class AuthController {
@@ -68,11 +57,19 @@ export class AuthController {
   async register(@Body() body: UserRegisterDto) {
     const { email, summoner_name, server, username } = body;
 
-    // first check if user exists
-    await this.authService.usernameEmailSummonerExists(email, username, summoner_name);
+    // first checking if email or username already in register cache
+    await this.authService.usernameEmailExists(email, username);
 
-    // second check if user lol credentials is valid
+    // second checking if email and username already in user (avoid lot of api request, will become fourth after riot production key)
+    await this.authService.usernameEmailExists(email, username, { inCache: true });
+
+    // fourth checking if server and summoner_name is already in use in user details
+    await this.authService.summonerNameAndServerExists(server, summoner_name);
+
+    // third checking if lol credentials is valid
     const checkedLolCreds = await this.userService.checkLolCredentialsValid(server, summoner_name);
+
+    console.log(checkedLolCreds);
 
     return checkedLolCreds.pipe(
       map(async (res) => {
@@ -88,16 +85,13 @@ export class AuthController {
   }
 
   @UseGuards(JwtRegisterAuthGuard)
+  @UseFilters(RegisterCacheExceptionFilter)
   @Get('/register/confirm/')
   async registerVerify(@Query('id', ParseIntPipe) id: number, @Req() req: Request, @Res() res: Response) {
     this.cookieService.clearCookie(res);
 
     // get data from cache
-    const cachedData = await this.userRegisterCacheRepo.findOne(id);
-
-    if (!cachedData) {
-      throw new HttpException('Cached information not found', HttpStatus.BAD_REQUEST);
-    }
+    const cachedData = await this.authService.retrieveCachedData(id);
 
     // generate refresh token and new secret
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(cachedData);
@@ -120,7 +114,7 @@ export class AuthController {
     // create user belonging containing 0 super like
     await this.userBelongingsService.create(user);
 
-    // send httpOnly access_token cookie
+    // send httpOnly access_token, refresh_token cookie
     this.cookieService.createCookie(res, accessToken, refreshToken);
 
     return res.redirect(`${process.env.DASHBOARD_URL}/profile`);

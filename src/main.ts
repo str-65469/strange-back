@@ -5,6 +5,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
+/**
+ * I delete all register cache
+ * II run yarn migrate:generate
+ * III check last generated file
+ * IV run yarn migrate:run
+ * V
+ */
+
 NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
   const port = 4000;
 

@@ -7,10 +7,18 @@ import { Repository } from 'typeorm';
 export class UserRegisterCacheService {
   constructor(
     @InjectRepository(UserRegisterCache)
-    private readonly userDetailsRepo: Repository<UserRegisterCache>,
+    private readonly userRegisterCacheRepo: Repository<UserRegisterCache>,
   ) {}
 
   async delete(id) {
-    return await this.userDetailsRepo.delete(id);
+    return await this.userRegisterCacheRepo.delete(id);
+  }
+
+  findByEmailOrUsername(email: string, username: string) {
+    return this.userRegisterCacheRepo.findOne({ where: [{ email }, { username }] });
+  }
+
+  async findOne(id: number) {
+    return this.userRegisterCacheRepo.findOne(id);
   }
 }

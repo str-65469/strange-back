@@ -8,7 +8,7 @@ import User from './user.entity';
 
 @Entity()
 export class UserDetails extends GeneralEntity {
-  @Column({ nullable: true, unique: true }) summoner_name?: string;
+  @Column({ nullable: true }) summoner_name?: string;
   @Column({ nullable: true }) discord_name?: string;
   @Column({ nullable: true }) level?: number;
   @Column({ nullable: true }) league_points?: number;
