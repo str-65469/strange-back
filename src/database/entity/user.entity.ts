@@ -9,7 +9,7 @@ import { UserBelongings } from './user_belongings.entity';
 import { UserDetails } from './user_details.entity';
 import { genSalt, hash } from 'bcrypt';
 import { Exclude } from 'class-transformer';
-import { FileHelper } from 'src/app/helpers/file_helper';
+import { FileHelper } from 'src/app/utils/file_helper';
 
 @Entity('users')
 export default class User extends GeneralEntity {

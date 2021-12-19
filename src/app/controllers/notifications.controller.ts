@@ -1,8 +1,8 @@
-import { NotificationsService } from './notifications.service';
 import { Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtAcessTokenAuthGuard } from 'src/modules/auth/guards/jwt-access.guard';
 import { UsersService } from 'src/modules/user/services/users.service';
 import { Request } from 'express';
+import { NotificationsService } from '../services/core/notifications/notifications.service';
 
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('notifications')

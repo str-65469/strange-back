@@ -1,4 +1,4 @@
-import { RandomGenerator } from '../helpers/random_generator';
+import { RandomGenerator } from '../../utils/random_generator';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { JwtService } from '@nestjs/jwt';
 import { HttpStatus, Injectable } from '@nestjs/common';

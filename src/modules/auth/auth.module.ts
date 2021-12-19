@@ -1,9 +1,7 @@
-import { MatchingSpamService } from '../../app/core/matching_spam/matchingspamservice.service';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { UserDetailsServiceService } from '../user/services/user_details.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MailModule } from '../../mail/mail.module';
-import { JwtAcessService } from '../../app/jwt/jwt-access.service';
+import { JwtAcessService } from '../../app/services/common/jwt-access.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../user/users.module';
@@ -12,13 +10,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { UserRegisterCacheService } from '../user/services/user_register_cache.service';
 import { UserDetails } from 'src/database/entity/user_details.entity';
-import { UserBelongingsService } from 'src/app/core/user_belongings/user_belongings.service';
+import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
 import { UserBelongings } from 'src/database/entity/user_belongings.entity';
+import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
 
 @Module({
   imports: [
     UsersModule,
-    // MailModule,
     JwtModule.register({ secret: process.env.JWT_SECRET }),
     TypeOrmModule.forFeature([UserRegisterCache, UserDetails, MatchingSpams, UserBelongings]),
   ],

@@ -1,5 +1,5 @@
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
-import { JwtAcessService } from '../../app/jwt/jwt-access.service';
+import { JwtAcessService } from '../../app/services/common/jwt-access.service';
 import { UserController } from './controllers/user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
@@ -11,9 +11,9 @@ import { MulterModule } from '@nestjs/platform-express';
 import { UserFileController } from './controllers/user_files.controller';
 import { HttpModule } from '@nestjs/axios';
 import { MailModule } from 'src/mail/mail.module';
-import { CookieService } from 'src/app/core/cookie.service';
-import { MatchingSpamService } from 'src/app/core/matching_spam/matchingspamservice.service';
+import { CookieService } from 'src/app/services/common/cookie.service';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
+import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
 
 @Module({
   imports: [

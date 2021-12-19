@@ -1,15 +1,26 @@
 import { map } from 'rxjs/operators';
-import { MatchingSpamService } from '../../app/core/matching_spam/matchingspamservice.service';
 import { UserRegisterCacheService } from '../user/services/user_register_cache.service';
 import { UserDetailsServiceService } from '../user/services/user_details.service';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { UserRegisterDto } from '../user/dto/user-register.dto';
 import { UserLoginDto } from '../user/dto/user-login.dto';
-import { Controller, Post, Res, Body, Get, Query, ParseIntPipe, UseGuards, HttpException, HttpStatus, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Res,
+  Body,
+  Get,
+  Query,
+  ParseIntPipe,
+  UseGuards,
+  HttpException,
+  HttpStatus,
+  Req,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
-import { JwtAcessService } from '../../app/jwt/jwt-access.service';
+import { JwtAcessService } from '../../app/services/common/jwt-access.service';
 import { UsersService } from '../user/services/users.service';
 import { MailService } from 'src/mail/mail.service';
 import { JwtRegisterAuthGuard } from './guards/jwt-register.guard';
@@ -17,8 +28,9 @@ import { UserRegisterCache } from 'src/database/entity/user_register_cache.entit
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtRefreshTokenAuthGuard } from './guards/jwt-refresh.guard';
 import { JwtAcessTokenAuthGuard } from './guards/jwt-access.guard';
-import { UserBelongingsService } from 'src/app/core/user_belongings/user_belongings.service';
-import { CookieService } from 'src/app/core/cookie.service';
+import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
+import { CookieService } from 'src/app/services/common/cookie.service';
+import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
 
 @Controller('/auth')
 export class AuthController {

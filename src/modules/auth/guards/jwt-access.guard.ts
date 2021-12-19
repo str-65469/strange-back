@@ -1,9 +1,9 @@
-import { JwtAcessService } from '../../../app/jwt/jwt-access.service';
+import { JwtAcessService } from '../../../app/services/common/jwt-access.service';
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Res } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { configs } from 'src/configs';
 import { Response } from 'express';
-import { CookieService } from 'src/app/core/cookie.service';
+import { CookieService } from 'src/app/services/common/cookie.service';
 
 @Injectable()
 export class JwtAcessTokenAuthGuard implements CanActivate {

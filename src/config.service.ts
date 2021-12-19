@@ -4,31 +4,40 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export class ConfigService {
-  constructor(private env: { [k: string]: string | undefined }) {}
+  private static _instance: TypeOrmModuleOptions;
 
-  private getValue(key: string, throwOnMissing = true): string {
-    const value = this.env[key];
+  private constructor(private env: { [k: string]: string | undefined }) {}
 
-    if (!value && throwOnMissing) {
-      throw new Error(`config error - missing env.${key}`);
+  public static get instance(): TypeOrmModuleOptions {
+    if (!this._instance) {
+      this._instance = new this(process.env)
+        .ensureValues(['POSTGRES_HOST', 'POSTGRES_PORT', 'POSTGRES_USERNAME', 'POSTGRES_PASSWORD', 'POSTGRES_DATABASE'])
+        .getTypeOrmConfig();
     }
 
-    return value;
+    return this._instance;
   }
 
   public ensureValues(keys: string[]) {
-    keys.forEach((k) => this.getValue(k, true));
+    keys.forEach((key) => {
+      const value = this.env[key];
+
+      if (!value) {
+        throw new Error(`config error - missing env.${key}`);
+      }
+    });
+
     return this;
   }
 
   public getTypeOrmConfig(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      host: this.getValue('POSTGRES_HOST'),
-      port: parseInt(this.getValue('POSTGRES_PORT')),
-      username: this.getValue('POSTGRES_USERNAME'),
-      password: this.getValue('POSTGRES_PASSWORD'),
-      database: this.getValue('POSTGRES_DATABASE'),
+      host: process.env.POSTGRES_HOST,
+      port: parseInt(process.env.POSTGRES_PORT),
+      username: process.env.POSTGRES_USERNAME,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DATABASE,
 
       //   logging: true, // true
       logging: false, // true
@@ -45,12 +54,12 @@ export class ConfigService {
   }
 }
 
-const configService = new ConfigService(process.env).ensureValues([
-  'POSTGRES_HOST',
-  'POSTGRES_PORT',
-  'POSTGRES_USERNAME',
-  'POSTGRES_PASSWORD',
-  'POSTGRES_DATABASE',
-]);
+// const configService = new ConfigService(process.env).ensureValues([
+//   'POSTGRES_HOST',
+//   'POSTGRES_PORT',
+//   'POSTGRES_USERNAME',
+//   'POSTGRES_PASSWORD',
+//   'POSTGRES_DATABASE',
+// ]);
 
-export { configService };
+// export { configService };

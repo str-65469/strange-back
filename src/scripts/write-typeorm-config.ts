@@ -1,7 +1,7 @@
 import fs = require('fs');
-import { configService } from '../config.service';
+import { ConfigService } from 'src/config.service';
 
 fs.writeFileSync(
   'ormconfig.json',
-  JSON.stringify(configService.getTypeOrmConfig(), null, 2), // last parameter can be changed based on how you want the file indented
+  JSON.stringify(ConfigService.instance, null, 2), // last parameter can be changed based on how you want the file indented
 );

@@ -5,8 +5,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
+  const port = 4000;
 
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
@@ -15,22 +15,16 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
-
   app.useStaticAssets(join(__dirname, '../..', 'upload'), { prefix: '/upload' });
   app.useStaticAssets(join(__dirname, '../..', 'static'), { prefix: '/static' });
-
   app.setViewEngine('hbs');
-  const PORT = 4000;
 
-  await app.listen(PORT);
-
-  console.log({ DEBUG_MODE: process.env.NODE_ENV, PORT: PORT });
-}
-bootstrap();
+  await app.listen(port);
+  console.log({ DEBUG_MODE: process.env.NODE_ENV, PORT: port });
+});
 
 /**
  *!		| socket refresh token
- *
  *TODO	| remove crypto not used anywhere
  *TODO	| use some date library like moment.js
  *TODO 	| add custom exception in every exception

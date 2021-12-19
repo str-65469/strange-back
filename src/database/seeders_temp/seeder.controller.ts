@@ -9,7 +9,7 @@ import * as faker from 'faker';
 import { LolMainLane } from 'src/app/enum/lol_main_lane.enum';
 import { LolLeague } from 'src/app/enum/lol_league.enum';
 import { UserDetails } from '../entity/user_details.entity';
-import { RandomGenerator } from 'src/app/helpers/random_generator';
+import { RandomGenerator } from 'src/app/utils/random_generator';
 import { SuperLikeServices } from '../entity/superlike_services.entity';
 import { SuperLikeServiceType } from 'src/app/enum/superlike_services';
 

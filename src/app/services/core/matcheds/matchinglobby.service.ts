@@ -1,4 +1,3 @@
-import { UserSpamDetailed } from './../../../modules/user/services/users.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';

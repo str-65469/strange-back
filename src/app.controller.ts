@@ -6,11 +6,11 @@ import { Body, Controller, Get, NotFoundException, Post, UseGuards } from '@nest
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AppService } from './app.service';
-import { ContactUsService } from './app/core/contact_us/contact_us.service';
-import { ContactUsDto } from './app/core/contact_us/dto/ContactUsDto';
 import { MatchingLobby } from './database/entity/matching_lobby.entity';
 import { UserDetails } from './database/entity/user_details.entity';
 import { JwtAcessTokenAuthGuard } from './modules/auth/guards/jwt-access.guard';
+import { ContactUsService } from './app/services/core/contact_us/contact_us.service';
+import { ContactUsDto } from './app/services/core/contact_us/dto/ContactUsDto';
 
 @Controller()
 export class AppController {

@@ -1,9 +1,9 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, NotFoundException } from '@nestjs/common';
-import { JwtAcessService } from '../../../app/jwt/jwt-access.service';
+import { JwtAcessService } from '../../../app/services/common/jwt-access.service';
 import { UsersService } from '../../user/services/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { configs } from 'src/configs';
-import { CookieService } from 'src/app/core/cookie.service';
+import { CookieService } from 'src/app/services/common/cookie.service';
 
 @Injectable()
 export class JwtRefreshTokenAuthGuard implements CanActivate {

@@ -11,11 +11,11 @@ import { UsersService } from 'src/modules/user/services/users.service';
 import { Server, Socket } from 'socket.io';
 import { configs } from 'src/configs';
 import { UseInterceptors, ClassSerializerInterceptor, UseGuards, HttpStatus } from '@nestjs/common';
-import { DuoFinderResponseType, DuoFinderTransferTypes } from 'src/app/shared/schemas/duofinder/duofinder';
-import { HandleDuoFindBody } from 'src/app/shared/schemas/duofinder/response';
+import { DuoFinderResponseType, DuoFinderTransferTypes } from 'src/app/common/schemas/duofinder/duofinder';
+import { HandleDuoFindBody } from 'src/app/common/schemas/duofinder/response';
 import { serialize } from 'class-transformer';
 import { SocketAccessGuard } from './guards/socketaccess.guard';
-import { UserBelongingsService } from 'src/app/core/user_belongings/user_belongings.service';
+import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
 
 const { duomatchConnect, duomatchFind } = configs.socket;
 

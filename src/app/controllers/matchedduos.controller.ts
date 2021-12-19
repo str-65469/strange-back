@@ -1,8 +1,8 @@
-import { UsersService } from '../../../modules/user/services/users.service';
-import { MatchedDuosService } from './matchedduos.service';
+import { UsersService } from '../../modules/user/services/users.service';
 import { ClassSerializerInterceptor, Controller, Get, Query, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtAcessTokenAuthGuard } from 'src/modules/auth/guards/jwt-access.guard';
 import { Request } from 'express';
+import { MatchedDuosService } from '../services/core/matcheds/matchedduos.service';
 
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('matcheds')
