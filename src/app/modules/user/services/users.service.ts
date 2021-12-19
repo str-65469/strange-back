@@ -1,13 +1,13 @@
 import User from 'src/database/entity/user.entity';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserRegisterCache } from '../../../database/entity/user_register_cache.entity';
+import { UserRegisterCache } from '../../../../database/entity/user_register_cache.entity';
 import { LolCredentials, LolCredentialsResponse } from '../schemas/lol_credentials';
 import { UserPasswordUpdateDto } from '../dto/user-update-password.dto';
 import { RandomGenerator } from 'src/app/utils/random_generator';
 import { UserProfileUpdateDto } from '../dto/user-update.dto';
 import { UserRegisterDto } from '../dto/user-register.dto';
-import { LolServer } from '../../../app/enum/lol_server.enum';
+import { LolServer } from '../../../enum/lol_server.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { catchError, map } from 'rxjs/operators';
 import { HttpService } from '@nestjs/axios';

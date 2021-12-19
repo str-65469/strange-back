@@ -1,4 +1,4 @@
-import { UserRegisterCache } from '../../../database/entity/user_register_cache.entity';
+import { UserRegisterCache } from '../../../../database/entity/user_register_cache.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';

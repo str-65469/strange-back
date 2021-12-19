@@ -1,6 +1,6 @@
 import User from 'src/database/entity/user.entity';
 import { Injectable } from '@nestjs/common';
-import { UsersService } from 'src/modules/user/services/users.service';
+import { UsersService } from 'src/app/modules/user/services/users.service';
 import { DuoFinderResponseType, DuoFinderTransferTypes } from 'src/app/common/schemas/duofinder/duofinder';
 import { MatchingLobbyService } from 'src/app/services/core/matcheds/matchinglobby.service';
 import { MatchedDuosService } from 'src/app/services/core/matcheds/matchedduos.service';

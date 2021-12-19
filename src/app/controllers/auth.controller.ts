@@ -1,10 +1,10 @@
 import { map } from 'rxjs/operators';
-import { UserRegisterCacheService } from '../user/services/user_register_cache.service';
-import { UserDetailsServiceService } from '../user/services/user_details.service';
+import { UserRegisterCacheService } from '../modules/user/services/user_register_cache.service';
+import { UserDetailsServiceService } from '../modules/user/services/user_details.service';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { UserRegisterDto } from '../user/dto/user-register.dto';
-import { UserLoginDto } from '../user/dto/user-login.dto';
+import { UserRegisterDto } from '../modules/user/dto/user-register.dto';
+import { UserLoginDto } from '../modules/user/dto/user-login.dto';
 import {
   Controller,
   Post,
@@ -19,15 +19,15 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
-import { JwtAcessService } from '../../app/services/common/jwt-access.service';
-import { UsersService } from '../user/services/users.service';
+import { AuthService } from '../modules/auth/auth.service';
+import { JwtAcessService } from '../services/common/jwt-access.service';
+import { UsersService } from '../modules/user/services/users.service';
 import { MailService } from 'src/mail/mail.service';
-import { JwtRegisterAuthGuard } from './guards/jwt-register.guard';
+import { JwtRegisterAuthGuard } from '../modules/auth/guards/jwt-register.guard';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtRefreshTokenAuthGuard } from './guards/jwt-refresh.guard';
-import { JwtAcessTokenAuthGuard } from './guards/jwt-access.guard';
+import { JwtRefreshTokenAuthGuard } from '../modules/auth/guards/jwt-refresh.guard';
+import { JwtAcessTokenAuthGuard } from '../modules/auth/guards/jwt-access.guard';
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
 import { CookieService } from 'src/app/services/common/cookie.service';
 import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';

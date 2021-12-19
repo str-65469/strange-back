@@ -10,7 +10,7 @@ import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notifications.entity';
-import { UsersService } from 'src/modules/user/services/users.service';
+import { UsersService } from 'src/app/modules/user/services/users.service';
 import { NotificationsService } from 'src/app/services/core/notifications/notifications.service';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';

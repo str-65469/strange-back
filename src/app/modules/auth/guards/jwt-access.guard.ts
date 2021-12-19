@@ -1,4 +1,4 @@
-import { JwtAcessService } from '../../../app/services/common/jwt-access.service';
+import { JwtAcessService } from '../../../services/common/jwt-access.service';
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Res } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { configs } from 'src/configs';

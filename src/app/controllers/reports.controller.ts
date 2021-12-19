@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { UsersService } from 'src/modules/user/services/users.service';
+import { UsersService } from 'src/app/modules/user/services/users.service';
 import { map } from 'rxjs';
 import { AccountAbuseReportDto } from '../services/core/reports/dto/account_abues.dto';
 import { ReportsService } from '../services/core/reports/reports.service';

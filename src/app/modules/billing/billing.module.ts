@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SuperLikeBillingController } from '../../app/controllers/superlikebilling.controller';
+import { SuperLikeBillingController } from '../../controllers/superlikebilling.controller';
 import { SuperlikeService } from 'src/app/services/core/superlike/superlike.service';
 import { SuperLikeServices } from 'src/database/entity/superlike_services.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';

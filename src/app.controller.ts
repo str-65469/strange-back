@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { AppService } from './app.service';
 import { MatchingLobby } from './database/entity/matching_lobby.entity';
 import { UserDetails } from './database/entity/user_details.entity';
-import { JwtAcessTokenAuthGuard } from './modules/auth/guards/jwt-access.guard';
+import { JwtAcessTokenAuthGuard } from './app/modules/auth/guards/jwt-access.guard';
 import { ContactUsService } from './app/services/core/contact_us/contact_us.service';
 import { ContactUsDto } from './app/services/core/contact_us/dto/ContactUsDto';
 

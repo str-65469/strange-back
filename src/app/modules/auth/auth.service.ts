@@ -1,4 +1,4 @@
-import { UserDetailsServiceService } from './../user/services/user_details.service';
+import { UserDetailsServiceService } from '../user/services/user_details.service';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserLoginDto } from '../user/dto/user-login.dto';
 import { UsersService } from '../user/services/users.service';

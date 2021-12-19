@@ -2,9 +2,9 @@ import { Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Req, U
 import { PaypalPaymentDetailsService } from '../services/core/paypal/paypal_payment_details.service';
 import { SuperlikeService } from 'src/app/services/core/superlike/superlike.service';
 import { SuperLikeServiceType } from 'src/app/enum/superlike_services';
-import { JwtAcessTokenAuthGuard } from 'src/modules/auth/guards/jwt-access.guard';
+import { JwtAcessTokenAuthGuard } from 'src/app/modules/auth/guards/jwt-access.guard';
 import { PaymentType } from '../enum/payment_type.enum';
-import { UsersService } from 'src/modules/user/services/users.service';
+import { UsersService } from 'src/app/modules/user/services/users.service';
 import { Request } from 'express';
 import * as paypal from '@paypal/checkout-server-sdk';
 import { SuperlikePaymentService } from '../services/core/superlike/superlike_payment.service';

@@ -1,7 +1,7 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
-import { JwtAcessTokenAuthGuard } from 'src/modules/auth/guards/jwt-access.guard';
-import { UsersService } from 'src/modules/user/services/users.service';
+import { JwtAcessTokenAuthGuard } from 'src/app/modules/auth/guards/jwt-access.guard';
+import { UsersService } from 'src/app/modules/user/services/users.service';
 import { UserBelongingsService } from '../services/core/user/user_belongings.service';
 
 @UseGuards(JwtAcessTokenAuthGuard)
