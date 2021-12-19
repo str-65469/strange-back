@@ -1,13 +1,13 @@
+import { TestService } from './services/test_service/test_service.service';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommandModule } from 'nestjs-command';
-import { ConfigService } from 'src/config.service';
 import { SeederProvider } from './seeder.provider';
-import { TestService } from './services/test_service/test_service.service';
+import { TypeormConfig } from '../../configs/typeorm';
 
 @Module({
-  imports: [CommandModule, ConfigModule.forRoot({ isGlobal: true }), TypeOrmModule.forRoot(ConfigService.instance)],
+  imports: [CommandModule, ConfigModule.forRoot({ isGlobal: true }), TypeOrmModule.forRoot(TypeormConfig.instance)],
   controllers: [],
   providers: [SeederProvider, TestService],
 })

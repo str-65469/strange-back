@@ -1,10 +1,10 @@
+import { Request } from 'express';
 import { Body, Controller, Get, UseGuards, UseInterceptors, Post, Put, Req } from '@nestjs/common';
 import { JwtAcessTokenAuthGuard } from 'src/app/modules/auth/guards/jwt-access.guard';
-import { UserPasswordUpdateDto } from 'src/app/modules/user/dto/user-update-password.dto';
-import { UserProfileUpdateDto } from 'src/app/modules/user/dto/user-update.dto';
 import { UserSafeInterceptor } from 'src/app/modules/user/interceptor/user_safe.interceptor';
-import { UsersService } from 'src/app/modules/user/services/users.service';
-import { Request } from 'express';
+import { UserPasswordUpdateDto } from '../services/core/user/dto/user-update-password.dto';
+import { UserProfileUpdateDto } from '../services/core/user/dto/user-update.dto';
+import { UsersService } from '../services/core/user/users.service';
 
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('user')

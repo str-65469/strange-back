@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-export class ConfigService {
+export class TypeormConfig {
   private static _instance: TypeOrmModuleOptions;
 
   private constructor(private env: { [k: string]: string | undefined }) {}
@@ -53,13 +53,3 @@ export class ConfigService {
     };
   }
 }
-
-// const configService = new ConfigService(process.env).ensureValues([
-//   'POSTGRES_HOST',
-//   'POSTGRES_PORT',
-//   'POSTGRES_USERNAME',
-//   'POSTGRES_PASSWORD',
-//   'POSTGRES_DATABASE',
-// ]);
-
-// export { configService };

@@ -1,4 +1,4 @@
-import { DuoFinderResponseInit } from 'src/app/common/schemas/duofinder/response';
+import { DuoFinderResponseInit } from 'src/app/common/schemas/response';
 import { Injectable, NestInterceptor, CallHandler } from '@nestjs/common';
 import { classToPlain } from 'class-transformer';
 import { Observable } from 'rxjs';

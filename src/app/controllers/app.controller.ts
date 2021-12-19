@@ -1,34 +1,18 @@
 import * as chProccess from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
-import User from './database/entity/user.entity';
-import { Body, Controller, Get, NotFoundException, Post, UseGuards } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { AppService } from './app.service';
-import { MatchingLobby } from './database/entity/matching_lobby.entity';
-import { UserDetails } from './database/entity/user_details.entity';
-import { JwtAcessTokenAuthGuard } from './app/modules/auth/guards/jwt-access.guard';
-import { ContactUsService } from './app/services/core/contact_us/contact_us.service';
-import { ContactUsDto } from './app/services/core/contact_us/dto/ContactUsDto';
+import { Body, Controller, Get, NotFoundException, Post } from '@nestjs/common';
+import { getRepository } from 'typeorm';
+import { MatchingLobby } from '../../database/entity/matching_lobby.entity';
+import { ContactUsService } from '../services/core/contact_us/contact_us.service';
+import { ContactUsDto } from '../services/core/contact_us/dto/ContactUsDto';
+import { MatchedDuos } from '../../database/entity/matched_duos.entity';
+import { MatchedDuosNotifications } from '../../database/entity/matched_duos_notifications.entity';
+import { MatchingSpams } from '../../database/entity/matching_spams.entity';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly contactUsService: ContactUsService,
-
-    // for test
-    @InjectRepository(User) private readonly userRepo: Repository<User>,
-    @InjectRepository(UserDetails) private readonly userDetalsRepo: Repository<UserDetails>,
-    @InjectRepository(MatchingLobby) private readonly lobbyRepo: Repository<MatchingLobby>,
-  ) {}
-
-  @UseGuards(JwtAcessTokenAuthGuard)
-  @Get('protected')
-  getHello() {
-    return this.appService.getHello();
-  }
+  constructor(private readonly contactUsService: ContactUsService) {}
 
   @Post('/contact_us')
   async contactUs(@Body() body: ContactUsDto) {
@@ -37,6 +21,10 @@ export class AppController {
 
   @Get('/replace')
   async replace() {
+    if (process.env.NODE_ENV !== 'development') {
+      return 'not so fast';
+    }
+
     const isExactMatch = (str, match) => {
       const escapeRegExpMatch = match.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
       return new RegExp(`\\b${escapeRegExpMatch}\\b`).test(str);
@@ -94,8 +82,12 @@ export class AppController {
     }
   }
 
-  @Get('/test')
+  @Get('/bash')
   async test() {
+    if (process.env.NODE_ENV !== 'development') {
+      return 'not so fast';
+    }
+
     const automatePath = path.join(__dirname, '../../', '/automates/test.sh');
 
     chProccess.exec(`sh ${automatePath}`, (error, stdout, stderr) => {
@@ -109,21 +101,21 @@ export class AppController {
     return `sh ${automatePath}`;
   }
 
-  //   @Get('/cleanall')
-  //   async cleanSpams() {
-  //     if (process.env.NODE_ENV === 'development') {
-  //       getRepository(MatchingSpams)
-  //         .createQueryBuilder()
-  //         .update()
-  //         .set({ accept_list: [], decline_list: [], remove_list: [], matched_list: [] })
-  //         .execute();
+  @Get('/cleanall')
+  async cleanSpams() {
+    if (process.env.NODE_ENV !== 'development') {
+      return 'not so fast';
+    }
 
-  //       getRepository(MatchedDuos).createQueryBuilder().delete().where('id > 0').execute();
-  //       getRepository(MatchedDuosNotifications).createQueryBuilder().delete().where('id > 0').execute();
-  //       getRepository(MatchingLobby).createQueryBuilder().delete().where('id > 0').execute();
-  //       return 'cleaned';
-  //     }
+    getRepository(MatchingSpams)
+      .createQueryBuilder()
+      .update()
+      .set({ accept_list: [], decline_list: [], remove_list: [], matched_list: [] })
+      .execute();
 
-  //     return 'not so fast';
-  //   }
+    getRepository(MatchedDuos).createQueryBuilder().delete().where('id > 0').execute();
+    getRepository(MatchedDuosNotifications).createQueryBuilder().delete().where('id > 0').execute();
+    getRepository(MatchingLobby).createQueryBuilder().delete().where('id > 0').execute();
+    return 'cleaned';
+  }
 }

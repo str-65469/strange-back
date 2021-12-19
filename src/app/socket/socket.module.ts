@@ -4,13 +4,12 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { SocketGateway } from './socket.gateway';
-import { DuoFinderService } from './services/duo_finder.service';
+import { DuoFinderService } from '../services/core/duofinder/duo_finder.service';
 import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
 import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notifications.entity';
-import { UsersService } from 'src/app/modules/user/services/users.service';
 import { NotificationsService } from 'src/app/services/core/notifications/notifications.service';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
@@ -19,6 +18,7 @@ import { MatchingLobbyService } from 'src/app/services/core/matcheds/matchinglob
 import { MatchedDuosService } from 'src/app/services/core/matcheds/matchedduos.service';
 import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
 import { JwtAcessService } from 'src/app/services/common/jwt-access.service';
+import { UsersService } from '../services/core/user/users.service';
 
 @Module({
   imports: [

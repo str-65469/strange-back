@@ -3,17 +3,17 @@ import { UserRegisterCache } from 'src/database/entity/user_register_cache.entit
 import { JwtAcessService } from '../../services/common/jwt-access.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
-import { UsersService } from './services/users.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { UserFileController } from '../../controllers/user_files.controller';
 import { HttpModule } from '@nestjs/axios';
-import { MailModule } from 'src/mail/mail.module';
+import { MailModule } from 'src/app/mail/mail.module';
 import { CookieService } from 'src/app/services/common/cookie.service';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
 import { UserController } from 'src/app/controllers/user.controller';
+import { UsersService } from 'src/app/services/core/user/users.service';
 
 @Module({
   imports: [

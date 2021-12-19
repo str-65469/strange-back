@@ -1,10 +1,3 @@
-import { map } from 'rxjs/operators';
-import { UserRegisterCacheService } from '../modules/user/services/user_register_cache.service';
-import { UserDetailsServiceService } from '../modules/user/services/user_details.service';
-import { Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
-import { UserRegisterDto } from '../modules/user/dto/user-register.dto';
-import { UserLoginDto } from '../modules/user/dto/user-login.dto';
 import {
   Controller,
   Post,
@@ -18,11 +11,13 @@ import {
   HttpStatus,
   Req,
 } from '@nestjs/common';
+import { map } from 'rxjs/operators';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
-import { AuthService } from '../modules/auth/auth.service';
+import { AuthService } from '../services/core/auth/auth.service';
 import { JwtAcessService } from '../services/common/jwt-access.service';
-import { UsersService } from '../modules/user/services/users.service';
-import { MailService } from 'src/mail/mail.service';
+import { MailService } from 'src/app/mail/mail.service';
 import { JwtRegisterAuthGuard } from '../modules/auth/guards/jwt-register.guard';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -31,6 +26,11 @@ import { JwtAcessTokenAuthGuard } from '../modules/auth/guards/jwt-access.guard'
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
 import { CookieService } from 'src/app/services/common/cookie.service';
 import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
+import { UserLoginDto } from '../services/core/user/dto/user-login.dto';
+import { UserRegisterDto } from '../services/core/user/dto/user-register.dto';
+import { UsersService } from '../services/core/user/users.service';
+import { UserDetailsServiceService } from '../services/core/user/user_details.service';
+import { UserRegisterCacheService } from '../services/core/user/user_register_cache.service';
 
 @Controller('/auth')
 export class AuthController {

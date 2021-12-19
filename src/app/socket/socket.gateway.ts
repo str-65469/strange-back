@@ -6,16 +6,16 @@ import {
   MessageBody,
   WsException,
 } from '@nestjs/websockets';
-import { DuoFinderService } from './services/duo_finder.service';
-import { UsersService } from 'src/app/modules/user/services/users.service';
+import { DuoFinderService } from '../services/core/duofinder/duo_finder.service';
 import { Server, Socket } from 'socket.io';
-import { configs } from 'src/configs';
-import { UseInterceptors, ClassSerializerInterceptor, UseGuards, HttpStatus } from '@nestjs/common';
-import { DuoFinderResponseType, DuoFinderTransferTypes } from 'src/app/common/schemas/duofinder/duofinder';
-import { HandleDuoFindBody } from 'src/app/common/schemas/duofinder/response';
+import { configs } from 'src/configs/config';
+import { UseInterceptors, ClassSerializerInterceptor, UseGuards } from '@nestjs/common';
 import { serialize } from 'class-transformer';
 import { SocketAccessGuard } from './guards/socketaccess.guard';
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
+import { DuoFinderResponseType, DuoFinderTransferTypes } from '../enum/duofinder/duofinder';
+import { HandleDuoFindBody } from '../common/schemas/response';
+import { UsersService } from '../services/core/user/users.service';
 
 const { duomatchConnect, duomatchFind } = configs.socket;
 

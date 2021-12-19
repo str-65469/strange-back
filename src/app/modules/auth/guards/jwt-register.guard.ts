@@ -1,6 +1,6 @@
+import * as jwt from 'jsonwebtoken';
 import { ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as jwt from 'jsonwebtoken';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { Repository } from 'typeorm';
 

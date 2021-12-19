@@ -1,4 +1,4 @@
-import { DuoFinderResponseType, DuoFinderTransferTypes } from './duofinder';
+import { DuoFinderResponseType, DuoFinderTransferTypes } from '../../enum/duofinder/duofinder';
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import User from 'src/database/entity/user.entity';
 

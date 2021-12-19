@@ -1,14 +1,13 @@
-import { RegisterMailCheckService } from './services/register_check.service';
-import { Module } from '@nestjs/common';
-import { MailService } from './mail.service';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { join } from 'path';
+import * as path from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { RegisterMailCheckService } from './services/register_check.service';
 import { ContactUsMailService } from './services/contact_us.service';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { MailService } from './mail.service';
+import { Module } from '@nestjs/common';
 
 @Module({
   imports: [
-    // ConfigModule.forRoot(),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',
@@ -22,7 +21,7 @@ import { ContactUsMailService } from './services/contact_us.service';
         },
       },
       template: {
-        dir: join(__dirname, '../../mail/templates'),
+        dir: path.join(__dirname, '../../../../public/mail/templates'),
         adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
         options: { strict: true },
       },

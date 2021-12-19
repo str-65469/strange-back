@@ -1,9 +1,9 @@
-import { UserDetailsServiceService } from '../user/services/user_details.service';
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserLoginDto } from '../user/dto/user-login.dto';
-import { UsersService } from '../user/services/users.service';
 import * as bcrypt from 'bcrypt';
 import User from 'src/database/entity/user.entity';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { UserLoginDto } from 'src/app/services/core/user/dto/user-login.dto';
+import { UsersService } from 'src/app/services/core/user/users.service';
+import { UserDetailsServiceService } from 'src/app/services/core/user/user_details.service';
 
 @Injectable()
 export class AuthService {
