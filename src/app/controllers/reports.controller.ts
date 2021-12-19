@@ -24,7 +24,7 @@ export class ReportsController {
 
         const randomPicture = validPictures[Math.floor(Math.random() * validPictures.length)];
 
-        const url = `${process.env.APP_URL}/static/abuse_images/${randomPicture}.jpg`;
+        const url = `${process.env.APP_URL}/public/static/abuse_images/${randomPicture}.jpg`;
 
         await this.reportSerice.save(data, randomPicture);
 

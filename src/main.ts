@@ -16,7 +16,8 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
     credentials: true,
   });
   app.useStaticAssets(join(__dirname, '../..', 'upload'), { prefix: '/upload' });
-  app.useStaticAssets(join(__dirname, '../..', 'static'), { prefix: '/static' });
+  app.useStaticAssets(join(__dirname, '../..', 'public'), { prefix: '/public' });
+  //   app.useStaticAssets(join(__dirname, '../..', 'static'), { prefix: '/static' });
   app.setViewEngine('hbs');
 
   await app.listen(port);
