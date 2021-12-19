@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ContactUseMessageTypes } from 'src/app/enum/contact_us_message_type.enum';
+import { ContactUseMessageTypes } from 'src/app/common/enum/contact_us_message_type.enum';
 
 export class ContactUsDto {
   @IsNotEmpty()

@@ -1,7 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { ContactUs } from 'src/database/entity/contact_us.entity';
-import { ContactUseMessageTypes } from 'src/app/enum/contact_us_message_type.enum';
+import { ContactUseMessageTypes } from 'src/app/common/enum/contact_us_message_type.enum';
 
 export interface ContactUsMailProps {
   email: string;

@@ -1,5 +1,5 @@
-import { PaymentType } from 'src/app/enum/payment_type.enum';
-import { SuperLikeServiceType } from 'src/app/enum/superlike_services';
+import { PaymentType } from 'src/app/common/enum/payment_type.enum';
+import { SuperLikeServiceType } from 'src/app/common/enum/superlike_services';
 
 export interface SuperlikePaymentCreateProps {
   amount: number;

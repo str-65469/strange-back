@@ -4,7 +4,7 @@ import { RandomGenerator } from '../../utils/random_generator';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { JwtService } from '@nestjs/jwt';
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { MessageCode } from 'src/app/enum/exceptions/general_exception.enum';
+import { MessageCode } from 'src/app/common/enum/exceptions/general_exception.enum';
 import { GeneralException } from 'src/app/common/exceptions/general.exception';
 import { configs } from 'src/configs/config';
 

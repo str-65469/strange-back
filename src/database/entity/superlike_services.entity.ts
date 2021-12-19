@@ -1,4 +1,4 @@
-import { SuperLikeServiceType } from 'src/app/enum/superlike_services';
+import { SuperLikeServiceType } from 'src/app/common/enum/superlike_services';
 import { Column, Entity } from 'typeorm';
 import { GeneralEntity } from '../entity_inheritance/general';
 

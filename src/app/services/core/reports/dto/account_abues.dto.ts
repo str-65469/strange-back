@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { LolServer } from 'src/app/enum/lol_server.enum';
+import { LolServer } from 'src/app/common/enum/lol_server.enum';
 
 export class AccountAbuseReportDto {
   @IsString()

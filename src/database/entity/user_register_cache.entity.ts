@@ -1,6 +1,6 @@
-import { LolLeague } from 'src/app/enum/lol_league.enum';
+import { LolLeague } from 'src/app/common/enum/lol_league.enum';
 import { Column, Entity } from 'typeorm';
-import { LolServer } from '../../app/enum/lol_server.enum';
+import { LolServer } from '../../app/common/enum/lol_server.enum';
 import { GeneralEntity } from '../entity_inheritance/general';
 
 @Entity('user_register_cache')

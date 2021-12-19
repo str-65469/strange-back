@@ -1,6 +1,12 @@
-import { ResponseStatusCode } from '../../enum/status_code';
+import { ResponseStatusCode } from '../enum/status_code';
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { JsonResponse } from './res.interface';
+
+interface JsonResponse {
+  message?: string;
+  data?: any;
+  statusCode?: HttpStatus;
+  responseCode?: ResponseStatusCode;
+}
 
 @Injectable()
 export class ResponseBody {

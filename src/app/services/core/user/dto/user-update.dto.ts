@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
-import { LolMainLane } from 'src/app/enum/lol_main_lane.enum';
-import { LolChampions } from 'src/app/enum/lol_champions.enum';
+import { LolMainLane } from 'src/app/common/enum/lol_main_lane.enum';
+import { LolChampions } from 'src/app/common/enum/lol_champions.enum';
 
 export class UserProfileUpdateDto {
   @IsNotEmpty({ message: 'Username is required' })

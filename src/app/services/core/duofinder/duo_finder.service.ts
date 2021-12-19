@@ -4,7 +4,7 @@ import { MatchingLobbyService } from 'src/app/services/core/matcheds/matchinglob
 import { MatchedDuosService } from 'src/app/services/core/matcheds/matchedduos.service';
 import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
 import { NotificationsService } from 'src/app/services/core/notifications/notifications.service';
-import { DuoFinderResponseType, DuoFinderTransferTypes } from 'src/app/enum/duofinder/duofinder';
+import { DuoFinderResponseType, DuoFinderTransferTypes } from 'src/app/common/enum/duofinder/duofinder';
 import { UsersService } from '../user/users.service';
 
 @Injectable()

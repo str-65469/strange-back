@@ -1,4 +1,4 @@
-import { LolLeague } from 'src/app/enum/lol_league.enum';
+import { LolLeague } from 'src/app/common/enum/lol_league.enum';
 
 export interface LolCredentials {
   level: number;

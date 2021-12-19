@@ -1,17 +1,17 @@
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
-import { LolChampions } from '../../app/enum/lol_champions.enum';
-import { LolServer } from '../../app/enum/lol_server.enum';
+import { LolChampions } from '../../app/common/enum/lol_champions.enum';
+import { LolServer } from '../../app/common/enum/lol_server.enum';
 import { Controller, Get, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import User from '../entity/user.entity';
 import * as faker from 'faker';
-import { LolMainLane } from 'src/app/enum/lol_main_lane.enum';
-import { LolLeague } from 'src/app/enum/lol_league.enum';
+import { LolMainLane } from 'src/app/common/enum/lol_main_lane.enum';
+import { LolLeague } from 'src/app/common/enum/lol_league.enum';
 import { UserDetails } from '../entity/user_details.entity';
 import { RandomGenerator } from 'src/app/utils/random_generator';
 import { SuperLikeServices } from '../entity/superlike_services.entity';
-import { SuperLikeServiceType } from 'src/app/enum/superlike_services';
+import { SuperLikeServiceType } from 'src/app/common/enum/superlike_services';
 
 const { EU_NORDIC_EAST, EU_NORDIC_WEST } = LolServer;
 const servers = [EU_NORDIC_WEST, EU_NORDIC_EAST];

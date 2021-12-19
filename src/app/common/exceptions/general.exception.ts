@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { MessageCode } from 'src/app/enum/exceptions/general_exception.enum';
+import { MessageCode } from 'src/app/common/enum/exceptions/general_exception.enum';
 
 interface GeneralExceptonProps {
   message: string;

@@ -1,3 +1,4 @@
+import * as path from 'path';
 import User from '../../database/entity/user.entity';
 import { BillingModule } from './billing.module';
 import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
@@ -18,7 +19,6 @@ import { AuthModule } from './auth/auth.module';
 import { MailModule } from '../mail/mail.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ContactUs } from '../../database/entity/contact_us.entity';
-import { ResponseBody } from '../common/res/response_body';
 import { UserDetails } from '../../database/entity/user_details.entity';
 import { SocketModule } from '../socket/socket.module';
 import { RouterModule } from '@nestjs/core';
@@ -30,7 +30,6 @@ import { MatchingLobbyService } from '../services/core/matcheds/matchinglobby.se
 import { NotificationsService } from '../services/core/notifications/notifications.service';
 import { ReportsService } from '../services/core/reports/reports.service';
 import { UserBelongingsService } from '../services/core/user/user_belongings.service';
-import * as path from 'path';
 
 @Module({
   imports: [
@@ -71,7 +70,6 @@ import * as path from 'path';
     NotificationsService,
     ContactUsService,
     ReportsService,
-    ResponseBody,
   ],
   exports: [],
 })

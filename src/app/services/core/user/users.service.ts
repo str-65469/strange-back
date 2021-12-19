@@ -7,7 +7,7 @@ import { UserPasswordUpdateDto } from './dto/user-update-password.dto';
 import { RandomGenerator } from 'src/app/utils/random_generator';
 import { UserProfileUpdateDto } from './dto/user-update.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
-import { LolServer } from '../../../enum/lol_server.enum';
+import { LolServer } from '../../../common/enum/lol_server.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { catchError, map } from 'rxjs/operators';
 import { HttpService } from '@nestjs/axios';
@@ -18,7 +18,7 @@ import { In, Not, Repository } from 'typeorm';
 import { Request } from 'express';
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import { Socket } from 'socket.io';
-import { LolLeague } from 'src/app/enum/lol_league.enum';
+import { LolLeague } from 'src/app/common/enum/lol_league.enum';
 import { MatchingSpamService } from 'src/app/services/core/matcheds/matchingspamservice.service';
 import { AccessTokenPayload } from 'src/app/services/common/jwt-access.service';
 
