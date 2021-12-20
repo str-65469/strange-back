@@ -11,7 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { configs } from 'src/configs/config';
 import { UseInterceptors, ClassSerializerInterceptor, UseGuards } from '@nestjs/common';
 import { serialize } from 'class-transformer';
-import { SocketAccessGuard } from '../security/guards/socketaccess.guard';
+import { SocketAccessGuard } from '../security/guards/socket_access.guard';
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
 import { DuoFinderResponseType, DuoFinderTransferTypes } from '../common/enum/duofinder/duofinder';
 import { HandleDuoFindBody } from '../common/schemas/response';

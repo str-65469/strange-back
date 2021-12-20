@@ -5,6 +5,8 @@ export default {
     expires_in: '15m',
   },
 
+  user_register_token: '30m',
+
   refresh_token: {
     // expires_in: '1m',
     // expires_in: '2m',

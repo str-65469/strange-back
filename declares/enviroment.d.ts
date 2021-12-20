@@ -8,6 +8,7 @@ declare global {
       APP_TITLE: string;
       APP_URL: string;
       DASHBOARD_URL: string;
+      MARKUP_URL: string;
       CHECKED_SERVER_URL: string;
 
       COOKIE_DOMAIN: string;

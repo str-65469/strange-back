@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { Body, Controller, Get, UseGuards, UseInterceptors, Post, Put, Req } from '@nestjs/common';
-import { JwtAcessTokenAuthGuard } from 'src/app/security/auth/jwt_access.guard';
+import { JwtAcessTokenAuthGuard } from 'src/app/security/guards/jwt_access.guard';
 import { UsersService } from '../services/core/user/users.service';
 import { UserSafeInterceptor } from '../security/interceptors/user_safe.interceptor';
 import { UserPasswordUpdateDto } from '../common/request/user/user_update_password.dto';

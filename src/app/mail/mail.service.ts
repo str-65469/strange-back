@@ -23,7 +23,7 @@ export class MailService {
       username,
     };
 
-    return await this.registerMailService.sendConfirmationEmail(userCached, properties);
+    return this.registerMailService.sendConfirmationEmail(userCached, properties);
   }
 
   async sendContactEmail(contactUsObj: ContactUs) {
@@ -33,6 +33,6 @@ export class MailService {
       message: contactUsObj?.message,
     };
 
-    return await this.contactUsMailService.sendConfirmationEmail(contactUsObj, mailTemplateProps);
+    return this.contactUsMailService.sendConfirmationEmail(contactUsObj, mailTemplateProps);
   }
 }

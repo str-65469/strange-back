@@ -6,11 +6,14 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
 /**
- * I delete all register cache
- * II run yarn migrate:generate
- * III check last generated file
- * IV run yarn migrate:run
- * V
+ *!	In this order
+ ** run: yarn (for new packages)
+ ** add new env variables
+ ** delete all register cache
+ ** run: yarn migrate:generate
+ ** check last generated file before runnning
+ ** run: yarn migrate:run
+ *
  */
 
 NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
@@ -27,6 +30,7 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
   app.useStaticAssets(join(__dirname, '../..', 'public'), { prefix: '/public' });
   //   app.useStaticAssets(join(__dirname, '../..', 'static'), { prefix: '/static' });
   app.setViewEngine('hbs');
+  app.set('trust proxy', 1);
 
   await app.listen(port);
   console.log({ DEBUG_MODE: process.env.NODE_ENV, PORT: port });

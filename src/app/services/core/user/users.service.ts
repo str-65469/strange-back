@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import User from 'src/database/entity/user.entity';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
@@ -6,10 +7,8 @@ import { LolCredentials, LolCredentialsResponse } from '../../../common/schemas/
 import { RandomGenerator } from 'src/app/utils/random_generator';
 import { LolServer } from '../../../common/enum/lol_server.enum';
 import { InjectRepository } from '@nestjs/typeorm';
-import { catchError, map } from 'rxjs/operators';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
-import { genSalt, hash } from 'bcrypt';
 import { configs } from 'src/configs/config';
 import { In, Not, Repository } from 'typeorm';
 import { Request } from 'express';
@@ -20,6 +19,7 @@ import { AccessTokenPayload } from 'src/app/services/common/jwt_access.service';
 import { UserRegisterDto } from 'src/app/common/request/user/user_register.dto';
 import { UserProfileUpdateDto } from 'src/app/common/request/user/user_update.dto';
 import { UserPasswordUpdateDto } from 'src/app/common/request/user/user_update_password.dto';
+import tokens from 'src/configs/addons/tokens';
 
 export type UserSpamDetailed = User & { details: UserDetails; spams: MatchingSpams };
 
@@ -95,56 +95,43 @@ export class UsersService {
   }
 
   async checkLolCredentialsValid(server: LolServer, summoner_name: string) {
-    console.log(server);
-    console.log(summoner_name);
-
-    return await this.httpService
-      .get('/api/summoner_profile', {
+    return this.httpService.axiosRef
+      .get<LolCredentials>('/api/summoner_profile', {
         params: {
           server,
           summonerName: summoner_name,
         },
       })
-      .pipe(
-        map((res) => {
-          const data: LolCredentials = res.data;
+      .then((res) => {
+        const { level, profileImageId } = res.data;
 
-          console.log('=================1');
-          console.log(data);
-
-          return {
-            level: data.level,
-            league: data.division,
-            league_number: data.divisionNumber,
-            league_points: data.leaguePoints,
-            win_rate: data.winRatio,
-            profileImageId: data.profileImageId,
-          };
-        }),
-        catchError((e) => {
-          //   console.log('=================2');
-          //   console.log(e);
-          //   console.log(e);
-          //   throw new HttpException(e.response.data, e.response.status);
-          throw new HttpException('Check your division or summoner name please', e?.response?.status);
-        }),
-      );
+        return {
+          level,
+          profileImageId,
+          league: res.data.division,
+          league_number: res.data.divisionNumber,
+          league_points: res.data.leaguePoints,
+          win_rate: res.data.winRatio,
+        };
+      })
+      .catch((err) => {
+        throw new HttpException('Check your division or summoner name please', err?.response?.status);
+      });
   }
 
   async cacheUserRegister(body: UserRegisterDto, details: LolCredentialsResponse): Promise<UserRegisterCache> {
     const { email, password, server, summoner_name, username } = body;
     const { league, league_number, league_points, level, win_rate } = details;
-
-    const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '1m' });
-    // const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: '30m' });
+    const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: tokens.user_register_token });
 
     const d1 = new Date();
     const d2 = new Date(d1);
     d2.setMinutes(d1.getMinutes() + 30);
 
+    const pass = bcrypt.hashSync(password, bcrypt.genSaltSync(12));
+
     return await this.registerCacheRepo.save({
       email,
-      password,
       server,
       summoner_name,
       username,
@@ -153,6 +140,7 @@ export class UsersService {
       league_points,
       level,
       win_rate,
+      password: pass,
       secret_token: secret,
       expiry_date: d2,
     });
@@ -198,8 +186,7 @@ export class UsersService {
   }
 
   async updateUserCredentials(id: number, data: UserPasswordUpdateDto): Promise<User> {
-    const salt = await genSalt(12);
-    const password = await hash(data.password, salt);
+    const password = bcrypt.hashSync(data.password, bcrypt.genSaltSync(12));
 
     // update user
     const user = await this.findOneForced(id);

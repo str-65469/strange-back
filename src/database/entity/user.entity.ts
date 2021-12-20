@@ -3,11 +3,10 @@ import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
 import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
 import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notifications.entity';
-import { AfterLoad, BeforeInsert, Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import { AfterLoad, Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { GeneralEntity } from '../entity_inheritance/general';
 import { UserBelongings } from './user_belongings.entity';
 import { UserDetails } from './user_details.entity';
-import { genSalt, hash } from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { FileHelper } from 'src/app/utils/file_helper';
 
@@ -63,12 +62,6 @@ export default class User extends GeneralEntity {
 
   @OneToOne(() => UserDetails, (details) => details.user)
   details: UserDetails;
-
-  @BeforeInsert()
-  async hashPassword(): Promise<void> {
-    const salt = await genSalt(12);
-    this.password = await hash(this.password, salt);
-  }
 
   full_image_path?: string;
 

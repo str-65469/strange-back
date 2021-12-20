@@ -15,21 +15,32 @@ export class ReportsController {
     // second check if user lol credentials is valid
     const checkedLolCreds = await this.userService.checkLolCredentialsValid(server, summonerName);
 
-    return checkedLolCreds.pipe(
-      map(async (res) => {
-        const picturesArr = [123, 200, 400];
-        const userPictureId = res.profileImageId;
+    const picturesArr = [123, 200, 400];
+    const userPictureId = checkedLolCreds.profileImageId;
+    const validPictures = picturesArr.filter((el) => el !== userPictureId);
+    const randomPicture = validPictures[Math.floor(Math.random() * validPictures.length)];
 
-        const validPictures = picturesArr.filter((el) => el !== userPictureId);
+    const url = `${process.env.APP_URL}/public/static/abuse_images/${randomPicture}.jpg`;
 
-        const randomPicture = validPictures[Math.floor(Math.random() * validPictures.length)];
+    await this.reportSerice.save(data, randomPicture);
 
-        const url = `${process.env.APP_URL}/public/static/abuse_images/${randomPicture}.jpg`;
+    return url;
 
-        await this.reportSerice.save(data, randomPicture);
+    // return checkedLolCreds.pipe(
+    //   map(async (res) => {
+    //     const picturesArr = [123, 200, 400];
+    //     const userPictureId = res.profileImageId;
 
-        return url;
-      }),
-    );
+    //     const validPictures = picturesArr.filter((el) => el !== userPictureId);
+
+    //     const randomPicture = validPictures[Math.floor(Math.random() * validPictures.length)];
+
+    //     const url = `${process.env.APP_URL}/public/static/abuse_images/${randomPicture}.jpg`;
+
+    //     await this.reportSerice.save(data, randomPicture);
+
+    //     return url;
+    //   }),
+    // );
   }
 }

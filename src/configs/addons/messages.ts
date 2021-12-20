@@ -8,5 +8,8 @@ export default {
 
     refreshTokenExpired: 'refresh token has been expired',
     refreshTokenMissing: 'refresh token is missing',
+
+    registerTokenExpired: 'register token has been expired',
+    registerTokenMissing: 'register token is missing',
   },
 };

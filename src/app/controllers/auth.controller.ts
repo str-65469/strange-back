@@ -1,5 +1,16 @@
-import { Controller, Post, Res, Body, Get, Query, ParseIntPipe, UseGuards, Req, UseFilters } from '@nestjs/common';
-import { map } from 'rxjs/operators';
+import {
+  Controller,
+  Post,
+  Res,
+  Body,
+  Get,
+  Query,
+  ParseIntPipe,
+  UseGuards,
+  Req,
+  UseFilters,
+  BadRequestException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
@@ -9,7 +20,7 @@ import { MailService } from 'src/app/mail/mail.service';
 import { JwtRegisterAuthGuard } from '../security/guards/jwt_register.guard';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtAcessTokenAuthGuard } from '../security/auth/jwt_access.guard';
+import { JwtAcessTokenAuthGuard } from '../security/guards/jwt_access.guard';
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
 import { CookieService } from 'src/app/services/common/cookie.service';
 import { MatchingSpamService } from 'src/app/services/core/matcheds/matching_spam.service';
@@ -17,9 +28,10 @@ import { UserLoginDto } from '../common/request/user/user_login.dto';
 import { UsersService } from '../services/core/user/users.service';
 import { UserDetailsServiceService } from '../services/core/user/user_details.service';
 import { UserRegisterCacheService } from '../services/core/user/user_register_cache.service';
-import { JwtRefreshTokenAuthGuard } from '../security/auth/jwt_refresh.guard';
 import { UserRegisterDto } from '../common/request/user/user_register.dto';
 import { RegisterCacheExceptionFilter } from '../common/exceptions/register_cache.excpetion.filter';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { JwtRefreshTokenAuthGuard } from '../security/guards/jwt_refresh.guard';
 
 @Controller('/auth')
 export class AuthController {
@@ -34,9 +46,6 @@ export class AuthController {
     private readonly userRegisterCacheService: UserRegisterCacheService,
     private readonly matchingSpamService: MatchingSpamService,
     private readonly userBelongingsService: UserBelongingsService,
-
-    @InjectRepository(UserRegisterCache)
-    private readonly userRegisterCacheRepo: Repository<UserRegisterCache>,
   ) {}
 
   @Post('/login')
@@ -47,12 +56,12 @@ export class AuthController {
     const accessToken = this.jwtAcessService.generateAccessToken(user, user.socket_id);
     const { refreshToken } = this.jwtAcessService.generateRefreshToken(user, user.secret);
 
-    // await this.userService.saveUser(user, secret);
-
     this.cookieService.createCookie(res, accessToken, refreshToken);
+
     return res.send(user);
   }
 
+  @UseGuards(ThrottlerGuard)
   @Post('/register')
   async register(@Body() body: UserRegisterDto) {
     const { email, summoner_name, server, username } = body;
@@ -69,19 +78,15 @@ export class AuthController {
     // third checking if lol credentials is valid
     const checkedLolCreds = await this.userService.checkLolCredentialsValid(server, summoner_name);
 
-    console.log(checkedLolCreds);
+    // third cache into database
+    const userCached = await this.userService.cacheUserRegister(body, checkedLolCreds).catch((err) => {
+      throw new BadRequestException('User already in cache', err?.response?.status);
+    });
 
-    return checkedLolCreds.pipe(
-      map(async (res) => {
-        // third cache into database
-        const userCached = await this.userService.cacheUserRegister(body, res);
+    // send to mail
+    this.mailServie.sendUserConfirmation(userCached);
 
-        // send to mail
-        this.mailServie.sendUserConfirmation(userCached);
-
-        return { checkedLolCreds, check: true };
-      }),
-    );
+    return { checkedLolCreds, check: true };
   }
 
   @UseGuards(JwtRegisterAuthGuard)
@@ -135,9 +140,6 @@ export class AuthController {
     // generate access_token and refresh token and new secret
     const accessTokenNew = this.jwtAcessService.generateAccessToken(user, user.socket_id);
     const { refreshToken } = this.jwtAcessService.generateRefreshToken(user, user.secret);
-
-    // update user secret
-    // await this.userService.saveUser(user, secret);
 
     this.cookieService.createCookie(res, accessTokenNew, refreshToken);
 

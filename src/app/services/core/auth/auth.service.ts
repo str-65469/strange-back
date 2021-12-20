@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import User from 'src/database/entity/user.entity';
-import { BadRequestException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/app/services/core/user/users.service';
 import { UserDetailsServiceService } from 'src/app/services/core/user/user_details.service';
 import { UserLoginDto } from 'src/app/common/request/user/user_login.dto';
@@ -32,7 +32,7 @@ export class AuthService {
     return user;
   }
 
-  async usernameEmailExists(email: string, username: string, opts?: { inCache: boolean }): Promise<void> {
+  async usernameEmailExists(email: string, username: string, opts?: { inCache: boolean }) {
     let user = null;
 
     if (opts?.inCache) {
@@ -50,12 +50,12 @@ export class AuthService {
         throw new BadRequestException('Username already in use');
       }
     }
+
+    return user;
   }
 
   async summonerNameAndServerExists(server: LolServer, summonerName: string) {
     const userDetails = await this.userDetailsService.findBySummonerAndServer(server, summonerName);
-
-    console.log(userDetails);
 
     if (userDetails) {
       throw new BadRequestException('Summoner name already in user');
@@ -66,7 +66,7 @@ export class AuthService {
     const cachedData = await this.userRegisterCacheService.findOne(id);
 
     if (!cachedData) {
-      throw new HttpException('Cached information not found', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Cached information not found');
     }
 
     return cachedData;
