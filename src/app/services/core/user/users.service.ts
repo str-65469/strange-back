@@ -191,7 +191,6 @@ export class UsersService {
     // update user
     const user = await this.findOneForced(id);
     user.password = password;
-    user.email = data.email;
 
     await this.userRepo.save(user);
 

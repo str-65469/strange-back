@@ -6,8 +6,9 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
 /**
- *!	In this order
+ *!	In this order steps
  ** run: yarn (for new packages)
+ **	upload 11.24.1 folder inside public/static
  ** add new env variables
  ** delete all register cache
  ** run: yarn migrate:generate

@@ -28,4 +28,12 @@ export class FileHelper {
 
     callback(null, fileName);
   }
+
+  public static profileImage(progileImageId: number) {
+    return `${process.env.APP_URL}/public/static/11.24.1/img/profileicon/${progileImageId}.png`;
+  }
+
+  public static profileImagePath(progileImageId: number) {
+    return `/public/static/11.24.1/img/profileicon/${progileImageId}.png`;
+  }
 }
