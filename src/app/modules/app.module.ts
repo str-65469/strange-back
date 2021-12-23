@@ -30,9 +30,11 @@ import { NotificationsService } from '../services/core/notifications.service';
 import { ReportsService } from '../services/core/reports.service';
 import { UserBelongingsService } from '../services/core/user/user_belongings.service';
 import { AuthModule } from './auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
+    JwtModule.register({}),
     SocketModule,
     MulterModule.register({ dest: path.join(__dirname, '../../../../', 'upload') }),
     ConfigModule.forRoot({ isGlobal: true }),

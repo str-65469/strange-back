@@ -13,7 +13,7 @@ export class RegisterCacheExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
 
     if (status === HttpStatus.UNAUTHORIZED) {
-      return response.status(status).redirect(`${process.env.MARKUP_URL}/time_elapsed`);
+      return response.status(status).redirect(`${process.env.MARKUP_URL}/registration_timeout`);
     }
 
     return response.status(status).redirect(`${process.env.MARKUP_URL}/not_found`);

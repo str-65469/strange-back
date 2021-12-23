@@ -11,15 +11,12 @@ import {
   UseFilters,
   BadRequestException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
 import { AuthService } from '../services/core/auth/auth.service';
 import { JwtAcessService } from '../services/common/jwt_access.service';
 import { MailService } from 'src/app/mail/mail.service';
 import { JwtRegisterAuthGuard } from '../security/guards/jwt_register.guard';
-import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { JwtAcessTokenAuthGuard } from '../security/guards/jwt_access.guard';
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
 import { CookieService } from 'src/app/services/common/cookie.service';
@@ -30,8 +27,13 @@ import { UserDetailsServiceService } from '../services/core/user/user_details.se
 import { UserRegisterCacheService } from '../services/core/user/user_register_cache.service';
 import { UserRegisterDto } from '../common/request/user/user_register.dto';
 import { RegisterCacheExceptionFilter } from '../common/exceptions/register_cache.excpetion.filter';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtRefreshTokenAuthGuard } from '../security/guards/jwt_refresh.guard';
+import { ForgotPasswordRequest, JwtForgotPasswordAuthGuard } from '../security/guards/jwt_forgot_password.guard';
+import { ForgotPasswordRequestDto } from '../common/request/forgot_password/forgot_password.dto';
+import { ForgotPasswordConfirmRequestDto } from '../common/request/forgot_password/forgot_password_confirm.dto';
+import { v4 } from 'uuid';
+import { classToPlain } from 'class-transformer';
 
 @Controller('/auth')
 export class AuthController {
@@ -58,7 +60,7 @@ export class AuthController {
 
     this.cookieService.createCookie(res, accessToken, refreshToken);
 
-    return res.send(user);
+    return res.send(classToPlain(user));
   }
 
   @UseGuards(ThrottlerGuard)
@@ -96,7 +98,7 @@ export class AuthController {
     this.cookieService.clearCookie(res);
 
     // get data from cache
-    const cachedData = await this.authService.retrieveCachedData(id);
+    const cachedData = await this.authService.retrieveRegisterCachedData(id);
 
     // generate refresh token and new secret
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(cachedData);
@@ -166,5 +168,69 @@ export class AuthController {
     this.cookieService.clearCookie(res);
 
     return res.send({ message: 'logout successful' });
+  }
+
+  @UseGuards(ThrottlerGuard)
+  @Post('/forgot-password')
+  public async forgotPassword(@Body() body: ForgotPasswordRequestDto) {
+    const { email, summoner_name } = body;
+
+    // first checking if email already in forgot password cache
+    await this.authService.emailExists(email, { inForgotPasswordCache: true });
+
+    // check if email exists in users and fetch user details as well
+    const userWithDetails = await this.authService.emailExists(email);
+
+    // check if sommoner name and server is correct
+    if (userWithDetails.details.summoner_name !== summoner_name) {
+      throw new BadRequestException('summoner name is incorrect');
+    }
+
+    // first save dto data to database
+    const uuid = v4();
+
+    const unfinishedCachedData = await this.authService.userForgotPasswordCacheService.save(
+      userWithDetails.id,
+      email,
+      summoner_name,
+      uuid,
+    );
+
+    // generate secret,token and update newly dsaved cache
+    const { token, secret } = this.jwtAcessService.generateForgotPasswordToken(unfinishedCachedData.id);
+    await this.authService.userForgotPasswordCacheService.update(unfinishedCachedData.id, token, secret);
+
+    // send uuid to mail
+    await this.mailServie.sendForgotPasswordUUID(userWithDetails.email, uuid, userWithDetails.details.summoner_name);
+
+    return {
+      token,
+      msg: 'uuid code sent',
+    };
+  }
+
+  @UseGuards(ThrottlerGuard, JwtForgotPasswordAuthGuard)
+  @Throttle(5) // minimal throttle for password update in minute
+  @Post('/forgot-password/confirm')
+  public async forgotPasswordUpdate(@Body() body: ForgotPasswordConfirmRequestDto, @Req() req: ForgotPasswordRequest) {
+    //(!!!) no need for email checkup token checkup and cache checkup happens inside guard, uuid is validate as well from dto
+    const { uuid, new_password } = body;
+    const forgotPasswordCache = req.forgotPasswordCache;
+
+    // validate if uuid is correct
+    if (uuid !== forgotPasswordCache.uuid) {
+      throw new BadRequestException('uuid is incorrect');
+    }
+
+    // delete from cache
+    await this.authService.userForgotPasswordCacheService.delete(forgotPasswordCache.id);
+
+    // update password
+    await this.userService.updatePassword(forgotPasswordCache.user_id, new_password);
+
+    // return response
+    return {
+      msg: 'updated password successfully',
+    };
   }
 }

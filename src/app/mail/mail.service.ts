@@ -4,6 +4,7 @@ import { UserRegisterCache } from 'src/database/entity/user_register_cache.entit
 import { ContactUsMailProps, ContactUsMailService } from './services/contact_us.service';
 import { RegisterMailCheckService } from './services/register_check.service';
 import * as dotenv from 'dotenv';
+import { ForgotPasswordMailService } from './services/forgot_password.service';
 dotenv.config();
 
 export const SENDER_ADDRESS = `"${process.env.APP_TITLE} 👻" <${process.env.MAIL_USER}>`;
@@ -13,6 +14,7 @@ export class MailService {
   constructor(
     @Inject('RegisterMailCheck') private readonly registerMailService: RegisterMailCheckService,
     @Inject('ContactUsMail') private readonly contactUsMailService: ContactUsMailService,
+    @Inject('ForgotPasswordMail') private readonly forgotPasswordMailService: ForgotPasswordMailService,
   ) {}
 
   async sendUserConfirmation(userCached: UserRegisterCache) {
@@ -24,6 +26,15 @@ export class MailService {
     };
 
     return this.registerMailService.sendConfirmationEmail(userCached, properties);
+  }
+
+  async sendForgotPasswordUUID(email: string, uuid: string, username: string) {
+    const properties = {
+      uuid,
+      username,
+    };
+
+    return this.forgotPasswordMailService.sendConfirmationEmail(email, properties);
   }
 
   async sendContactEmail(contactUsObj: ContactUs) {

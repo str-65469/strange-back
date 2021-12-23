@@ -5,6 +5,7 @@ import { ContactUsMailService } from './services/contact_us.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailService } from './mail.service';
 import { Module } from '@nestjs/common';
+import { ForgotPasswordMailService } from './services/forgot_password.service';
 
 @Module({
   imports: [
@@ -36,6 +37,10 @@ import { Module } from '@nestjs/common';
     {
       provide: 'ContactUsMail',
       useClass: ContactUsMailService,
+    },
+    {
+      provide: 'ForgotPasswordMail',
+      useClass: ForgotPasswordMailService,
     },
   ],
   exports: [MailService],

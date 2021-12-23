@@ -14,13 +14,15 @@ import { JwtAcessService } from '../services/common/jwt_access.service';
 import { AuthService } from '../services/core/auth/auth.service';
 import { UsersModule } from './users.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { UserForgotPasswordCacheService } from '../services/core/user/user_forgot_password.service';
+import { ForgotPasswordCache } from 'src/database/entity/forgot_password_cache.entity';
 
 @Module({
   imports: [
     UsersModule,
     ThrottlerModule.forRoot({ ttl: 60, limit: 10 }), // 10 request every minute
     JwtModule.register({ secret: process.env.JWT_SECRET }),
-    TypeOrmModule.forFeature([UserRegisterCache, UserDetails, MatchingSpams, UserBelongings]),
+    TypeOrmModule.forFeature([UserRegisterCache, UserDetails, MatchingSpams, UserBelongings, ForgotPasswordCache]),
   ],
   controllers: [AuthController],
   providers: [
@@ -30,6 +32,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     UserRegisterCacheService,
     MatchingSpamService,
     UserBelongingsService,
+    UserForgotPasswordCacheService,
   ],
   exports: [AuthService, JwtAcessService],
 })

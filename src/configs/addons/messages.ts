@@ -11,5 +11,8 @@ export default {
 
     registerTokenExpired: 'register token has been expired',
     registerTokenMissing: 'register token is missing',
+
+    forgotPasswordTokenExpired: 'forgot password token has been expired',
+    forgotPasswordTokenMissing: 'forgot password token is missing',
   },
 };

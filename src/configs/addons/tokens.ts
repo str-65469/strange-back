@@ -6,6 +6,7 @@ export default {
   },
 
   user_register_token: '30m',
+  user_forgot_password: '10m',
 
   refresh_token: {
     // expires_in: '1m',

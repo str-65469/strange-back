@@ -15,7 +15,10 @@ export default class User extends GeneralEntity {
   @Column({ unique: true }) username: string;
   @Column() email: string;
   @Column({ nullable: true }) img_path?: string;
-  @Column({ select: false }) password: string;
+
+  @Column({ select: false })
+  @Exclude({ toPlainOnly: true })
+  password: string;
 
   @Column()
   @Exclude({ toPlainOnly: true })

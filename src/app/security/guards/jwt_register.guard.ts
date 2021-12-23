@@ -29,7 +29,7 @@ export class JwtRegisterAuthGuard {
     console.log(secret);
 
     // first check if in register cache
-    const cachedData = await this.authService.retrieveCachedData(id);
+    const cachedData = await this.authService.retrieveRegisterCachedData(id);
 
     // if secret and cached secret is not exactly same
     if (secret !== cachedData.secret_token) {
@@ -41,6 +41,7 @@ export class JwtRegisterAuthGuard {
     console.log(cachedData.secret_token);
     console.log('===');
 
+    // remove cached data if expired only
     jwt.verify(secret, process.env.JWT_REGISTER_CACHE_SECRET, (err: jwt.VerifyErrors) => {
       if (err) {
         console.log(err);

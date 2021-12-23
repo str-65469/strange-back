@@ -74,9 +74,20 @@ export class UsersService {
     return this.userRepo.createQueryBuilder().where('id = :id', { id }).select('*').getRawOne();
   }
 
-  async findOneByEmail(email: string, getPassword: boolean = false): Promise<User | undefined> {
-    if (getPassword) {
-      return this.userRepo.createQueryBuilder().where('email = :email', { email }).select('*').getRawOne();
+  async findOneByEmail(
+    email: string,
+    opts?: Partial<{ fetchPassword: boolean; fetchDetails: boolean }>,
+  ): Promise<User | undefined> {
+    if (opts?.fetchPassword) {
+      return this.userRepo
+        .createQueryBuilder('users')
+        .where('users.email = :email', { email })
+        .addSelect('users.password')
+        .getOne();
+    }
+
+    if (opts?.fetchDetails) {
+      return this.userRepo.findOne({ where: { email }, relations: ['details'] });
     }
 
     return this.userRepo.findOne({ where: { email } });
@@ -195,6 +206,18 @@ export class UsersService {
     await this.userRepo.save(user);
 
     return await this.getUserDetails(id);
+  }
+
+  async updatePassword(id: number, newPassword: string) {
+    const password = bcrypt.hashSync(newPassword, bcrypt.genSaltSync(12));
+
+    console.log(id);
+    console.log(newPassword);
+    console.log(password);
+
+    return this.userRepo.update(id, {
+      password,
+    });
   }
 
   public async findNewDuoDetails(user: User, prevId?: number) {

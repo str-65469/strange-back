@@ -3,10 +3,11 @@ import User from 'src/database/entity/user.entity';
 import { RandomGenerator } from '../../utils/random_generator';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { JwtService } from '@nestjs/jwt';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Header, HttpStatus, Injectable } from '@nestjs/common';
 import { MessageCode } from 'src/app/common/enum/exceptions/general_exception.enum';
 import { GeneralException } from 'src/app/common/exceptions/general.exception';
 import { configs } from 'src/configs/config';
+import { IncomingHttpHeaders } from 'http2';
 
 interface RefreshTokenResponse {
   secret: string;
@@ -17,6 +18,8 @@ interface ValidateAcessTokenProps {
   token: string;
   secret: string;
   expired_message?: string;
+  expired_clbck?: () => void;
+  other_clbck?: () => void;
 }
 
 export interface AccessTokenPayload {
@@ -27,7 +30,7 @@ export interface AccessTokenPayload {
 
 @Injectable()
 export class JwtAcessService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(public readonly jwtService: JwtService) {}
 
   public generateAccessToken(user: User | UserRegisterCache, socketId: string): string {
     const payload = {
@@ -53,10 +56,23 @@ export class JwtAcessService {
     return { secret, refreshToken };
   }
 
+  public generateForgotPasswordToken(id: number) {
+    const secret = RandomGenerator.randomString();
+    const payload = { id };
+
+    const token = this.jwtService.sign(payload, {
+      expiresIn: configs.tokens.user_forgot_password,
+      secret,
+    });
+
+    return { secret, token };
+  }
+
   public validateToken(params: ValidateAcessTokenProps): boolean {
-    jwt.verify(params.token, params.secret, (err: jwt.VerifyErrors) => {
+    jwt.verify(params.token, params.secret, async (err: jwt.VerifyErrors) => {
       if (err) {
         if (err.name === MessageCode.TOKEN_EXPIRED) {
+          await params.expired_clbck();
           throw new GeneralException(HttpStatus.UNAUTHORIZED, {
             message: params?.expired_message ?? configs.messages.exceptions.generalTokenExpired,
             status_code: HttpStatus.UNAUTHORIZED,
@@ -65,6 +81,7 @@ export class JwtAcessService {
           });
         }
 
+        await params.other_clbck();
         throw new GeneralException(HttpStatus.UNAUTHORIZED, {
           message: err.message,
           status_code: HttpStatus.UNAUTHORIZED,
@@ -75,5 +92,15 @@ export class JwtAcessService {
     });
 
     return true;
+  }
+
+  public getForgotPasswordToken(headers: IncomingHttpHeaders): string | null {
+    const tokenString = headers['Authorization'] || headers['authorization'] || null;
+
+    if (!tokenString || Array.isArray(tokenString)) {
+      return null;
+    }
+
+    return tokenString.split(' ')[1];
   }
 }
