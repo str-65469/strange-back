@@ -34,6 +34,7 @@ import { ForgotPasswordRequestDto } from '../common/request/forgot_password/forg
 import { ForgotPasswordConfirmRequestDto } from '../common/request/forgot_password/forgot_password_confirm.dto';
 import { v4 } from 'uuid';
 import { classToPlain } from 'class-transformer';
+import { generateCompressedSprite } from '../utils/dicebear';
 
 @Controller('/auth')
 export class AuthController {

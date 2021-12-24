@@ -20,6 +20,7 @@ import { UserRegisterDto } from 'src/app/common/request/user/user_register.dto';
 import { UserProfileUpdateDto } from 'src/app/common/request/user/user_update.dto';
 import { UserPasswordUpdateDto } from 'src/app/common/request/user/user_update_password.dto';
 import tokens from 'src/configs/addons/tokens';
+import { generateCompressedSprite } from 'src/app/utils/dicebear';
 
 export type UserSpamDetailed = User & { details: UserDetails; spams: MatchingSpams };
 
@@ -166,6 +167,7 @@ export class UsersService {
       password,
       username,
       secret,
+      img_path: generateCompressedSprite() as string,
       socket_id: RandomGenerator.randomString(),
     });
 

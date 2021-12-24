@@ -12,9 +12,12 @@ import { FileHelper } from 'src/app/utils/file_helper';
 
 @Entity('users')
 export default class User extends GeneralEntity {
+  public static TABLE_NAME = 'users';
+  public static IMAGE_COLUMN_NAME = 'img_path';
+
   @Column({ unique: true }) username: string;
   @Column() email: string;
-  @Column({ nullable: true }) img_path?: string;
+  @Column({ nullable: true, type: 'text' }) img_path?: string;
 
   @Column({ select: false })
   @Exclude({ toPlainOnly: true })

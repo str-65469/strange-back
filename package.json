@@ -27,6 +27,9 @@
     "seed": "yarn run ts-node src/database/seeders/seeder.bootstrap.ts"
   },
   "dependencies": {
+    "@dicebear/avatars": "^4.10.2",
+    "@dicebear/avatars-bottts-sprites": "^4.10.2",
+    "@dicebear/avatars-gridy-sprites": "^4.10.2",
     "@nestjs-modules/mailer": "^1.6.0",
     "@nestjs/common": "^8.2.3",
     "@nestjs/config": "^1.1.5",

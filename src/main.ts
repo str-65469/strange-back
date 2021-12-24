@@ -10,19 +10,13 @@ import { join } from 'path';
  **	upload 11.24.1 folder inside public/static
  ** run: yarn (for new packages)
  ** add new env variables
+ ** yarn nestjs-command user:update_image
+
  ** delete all register cache
- ** run: yarn migrate:generate
+ ** run: yarn migrate:generate // check for any drop column and resolve (especially img_path)
  ** check last generated file before runnning
  ** run: yarn migrate:run
  */
-
-// password doesnt changes stays the same (but characters change)
-
-// old (password)
-// $2b$12$HX14orbCHXzJWZXYm36phewy4JlKxPoangShPPrMR/2zpTpdXKMUa
-
-// new (password) smae for some reason
-// $2b$12$/VbwYGiuQGkglJ3DH1vfzuFnbEaSVZIoMdy4Qrv5Hn5YrMz4YB37.
 
 NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
   const port = 4000;
@@ -58,6 +52,3 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
  * "clean": "rimraf src/database/migrations/*",
  * "migrate": "yarn run clean && yarn run migratemain && yarn run migrate:run"
  */
-
-// registration_timeout
-// password_recovery_timeout

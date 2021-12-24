@@ -1,45 +1,22 @@
-import { Command, Positional, Option } from 'nestjs-command';
+import { Command } from 'nestjs-command';
 import { Injectable } from '@nestjs/common';
-import { UserService } from './user.service';
+import { getManager } from 'typeorm';
+import User from 'src/database/entity/user.entity';
 
 @Injectable()
 export class UserCommand {
-  constructor(private readonly userService: UserService) {}
-
   @Command({
-    command: 'create:user <username>',
-    describe: 'create a user',
+    command: 'user:update_image',
+    describe: 'update image varchar to text',
   })
-  async create(
-    @Positional({
-      name: 'username',
-      describe: 'the username',
-      type: 'string',
-    })
-    username: string,
+  async create() {
+    const entityManager = getManager();
 
-    @Option({
-      name: 'group',
-      describe: 'user group (ex: "jedi")',
-      type: 'string',
-      alias: 'g',
-      required: false,
-    })
-    group: string,
-
-    @Option({
-      name: 'saber',
-      describe: 'if user has a lightsaber',
-      type: 'boolean',
-      default: false,
-      required: false,
-    })
-    saber: boolean,
-  ) {
-    this.userService.add({
-      username,
-      group,
-      saber,
+    await entityManager.transaction(async (manager) => {
+      const updateQueryType = `ALTER TABLE ${User.TABLE_NAME} ALTER COLUMN ${User.IMAGE_COLUMN_NAME} TYPE TEXT;`;
+      await manager.query(updateQueryType);
     });
+
+    console.log('querying done');
   }
 }
