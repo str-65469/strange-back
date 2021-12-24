@@ -16,7 +16,7 @@ export class ForgotPasswordMailService {
         context: properties,
       })
       .catch((err) => {
-        console.log('===================[ Forgot password Service Error ]');
+        console.log('Forgot password Service Error');
         console.log(err);
       });
   }

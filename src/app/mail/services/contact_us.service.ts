@@ -23,7 +23,7 @@ export class ContactUsMailService {
         context: properties,
       })
       .catch((err) => {
-        console.log('===================[ Contact Us Service Error ]');
+        console.log('Contact Us Service Error');
         console.log(err);
       });
   }

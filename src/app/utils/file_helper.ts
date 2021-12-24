@@ -2,14 +2,25 @@ import { BadRequestException } from '@nestjs/common';
 import { extname } from 'path';
 
 export class FileHelper {
-  public static readonly FILE_SIZE_MB_1 = 1150000; // ~1.1mb (1048576 - exactly 1mb)
-
   public static imagePath(img_path?: string) {
+    // console.log(img_path);
+
     if (process.env.NODE_ENV === 'development') {
+      //   console.log(img_path.startsWith('data:image'));
+
+      //   if (img_path.startsWith('data:image')) {
+      //     return img_path ?? null;
+      //   }
+
       return img_path ?? null;
-    } else {
-      return img_path ? process.env.APP_URL + '/upload' + img_path : null;
     }
+
+    // for dicebear svg
+    // if (img_path.startsWith('data:image')) {
+    //   return img_path ?? null;
+    // }
+
+    return img_path ? process.env.APP_URL + '/upload' + img_path : null;
   }
 
   public static imageFileFilter(_, file, callback) {
@@ -30,7 +41,7 @@ export class FileHelper {
   }
 
   public static profileImage(progileImageId: number) {
-    return `${process.env.APP_URL}/public/static/11.24.1/img/profileicon/${progileImageId}.png`;
+    return `${process.env.APP_URL}${this.profileImagePath(progileImageId)}`;
   }
 
   public static profileImagePath(progileImageId: number) {

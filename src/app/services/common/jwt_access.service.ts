@@ -39,9 +39,7 @@ export class JwtAcessService {
       socket_id: socketId,
     };
 
-    return this.jwtService.sign(payload, {
-      expiresIn: configs.tokens.access_token.expires_in,
-    });
+    return this.jwtService.sign(payload, { expiresIn: configs.tokens.access_token.expires_in });
   }
 
   public generateRefreshToken(user: User | UserRegisterCache, userSecret?: string): RefreshTokenResponse {
@@ -68,11 +66,19 @@ export class JwtAcessService {
     return { secret, token };
   }
 
-  public validateToken(params: ValidateAcessTokenProps): boolean {
-    jwt.verify(params.token, params.secret, async (err: jwt.VerifyErrors) => {
+  public async validateToken(params: ValidateAcessTokenProps) {
+    await jwt.verify(params.token, params.secret, async (err: jwt.VerifyErrors) => {
       if (err) {
+        console.log('===============1');
+
         if (err.name === MessageCode.TOKEN_EXPIRED) {
-          await params.expired_clbck();
+          console.log('===============2');
+          if (params.expired_clbck) {
+            await params.expired_clbck();
+          }
+
+          console.log('==============3');
+
           throw new GeneralException(HttpStatus.UNAUTHORIZED, {
             message: params?.expired_message ?? configs.messages.exceptions.generalTokenExpired,
             status_code: HttpStatus.UNAUTHORIZED,
@@ -81,7 +87,14 @@ export class JwtAcessService {
           });
         }
 
-        await params.other_clbck();
+        console.log('===============4');
+
+        if (params.other_clbck) {
+          await params.other_clbck();
+        }
+
+        console.log('===============5');
+
         throw new GeneralException(HttpStatus.UNAUTHORIZED, {
           message: err.message,
           status_code: HttpStatus.UNAUTHORIZED,

@@ -16,7 +16,5 @@ export class UserCommand {
       const updateQueryType = `ALTER TABLE ${User.TABLE_NAME} ALTER COLUMN ${User.IMAGE_COLUMN_NAME} TYPE TEXT;`;
       await manager.query(updateQueryType);
     });
-
-    console.log('querying done');
   }
 }

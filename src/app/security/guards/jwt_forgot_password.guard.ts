@@ -47,7 +47,7 @@ export class JwtForgotPasswordAuthGuard {
     }
 
     // no need for missing token or invalid signature check
-    this.jwtAcessService.validateToken({
+    await this.jwtAcessService.validateToken({
       secret: cachedData.secret,
       token: cachedData.secret_token,
       expired_message: configs.messages.exceptions.forgotPasswordTokenExpired,

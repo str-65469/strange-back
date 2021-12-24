@@ -17,7 +17,7 @@ export class RegisterMailCheckService {
         context: properties,
       })
       .catch((err) => {
-        console.log('===================[ Register Mail Check Service Error ]');
+        console.log('Register Mail Check Service Error');
         console.log(err);
       });
   }

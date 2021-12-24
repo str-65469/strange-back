@@ -213,10 +213,6 @@ export class UsersService {
   async updatePassword(id: number, newPassword: string) {
     const password = bcrypt.hashSync(newPassword, bcrypt.genSaltSync(12));
 
-    console.log(id);
-    console.log(newPassword);
-    console.log(password);
-
     return this.userRepo.update(id, {
       password,
     });

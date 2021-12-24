@@ -8,8 +8,6 @@ async function bootstrap() {
   try {
     await app.select(SeederModule).get(SeederProvider).run();
   } catch (error) {
-    console.log('error occured');
-    console.error(error);
     await app.close();
   }
 

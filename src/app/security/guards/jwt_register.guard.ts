@@ -24,10 +24,6 @@ export class JwtRegisterAuthGuard {
 
     const { id, secret } = request.query;
 
-    console.log('===');
-    console.log(id);
-    console.log(secret);
-
     // first check if in register cache
     const cachedData = await this.authService.retrieveRegisterCachedData(id);
 
@@ -36,16 +32,9 @@ export class JwtRegisterAuthGuard {
       throw new UnauthorizedException('Invalid token');
     }
 
-    console.log('===');
-    console.log(cachedData.id);
-    console.log(cachedData.secret_token);
-    console.log('===');
-
     // remove cached data if expired only
     jwt.verify(secret, process.env.JWT_REGISTER_CACHE_SECRET, (err: jwt.VerifyErrors) => {
       if (err) {
-        console.log(err);
-
         // clear cache with that id if err found on token
         this.userRegisterCacheRepo.delete(id);
 

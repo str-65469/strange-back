@@ -5,6 +5,7 @@ import { FileHelper } from 'src/app/utils/file_helper';
 import { Express, Request } from 'express';
 import { diskStorage } from 'multer';
 import { UsersService } from '../services/core/user/users.service';
+import { configs } from 'src/configs/config';
 
 @Controller('user/upload')
 export class UserFileController {
@@ -18,7 +19,7 @@ export class UserFileController {
         filename: FileHelper.customFileName,
       }),
       fileFilter: FileHelper.imageFileFilter,
-      limits: { fileSize: FileHelper.FILE_SIZE_MB_1 },
+      limits: { fileSize: configs.general.PROFILE_UPLOAD_FILE_SIZE_MAX },
     }),
     UserSafeInterceptor,
   )

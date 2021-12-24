@@ -8,6 +8,5 @@ export class SeederProvider implements SeederCommand {
 
   run(): void {
     this.testService.log();
-    console.log(123);
   }
 }

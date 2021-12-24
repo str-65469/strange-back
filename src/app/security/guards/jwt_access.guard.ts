@@ -8,7 +8,7 @@ import { JwtAcessService } from 'src/app/services/common/jwt_access.service';
 export class JwtAcessTokenAuthGuard implements CanActivate {
   constructor(private readonly jwtAcessService: JwtAcessService, private readonly cookieService: CookieService) {}
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const http = context.switchToHttp();
 
     // get tokens and response
@@ -27,6 +27,8 @@ export class JwtAcessTokenAuthGuard implements CanActivate {
       this.cookieService.clearCookie(response);
       throw new UnauthorizedException(configs.messages.exceptions.refreshTokenMissing);
     }
+
+    console.log(123);
 
     // validating access token
     return this.jwtAcessService.validateToken({
