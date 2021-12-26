@@ -6,8 +6,10 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
 /**
- *!	In this order steps
+ *!	In this order steps (this for any branch)
  **	upload 11.24.1 folder inside public/static
+
+ *! this command if for master branch
  ** run: yarn (for new packages)
  ** add new env variables
  ** yarn nestjs-command user:update_image
@@ -39,16 +41,12 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
 });
 
 /**
- *!		| socket refresh token
- *TODO	| remove crypto not used anywhere
- *TODO	| use some date library like moment.js
- *TODO 	| add custom exception in every exception
- *? 	| socket flow helped greatly (https://stackoverflow.com/questions/17476294/how-to-send-a-message-to-a-particular-client-with-socket-io)
- */
+ * ?	| informative
+ *		| use some date library like moment.js
+ *		| socket flow helped greatly (https://stackoverflow.com/questions/17476294/how-to-send-a-message-to-a-particular-client-with-socket-io)
 
-/**
- * ! old package json code
- * "migratemain": "yarn run typeorm migration:generate -n Main",
- * "clean": "rimraf src/database/migrations/*",
- * "migrate": "yarn run clean && yarn run migratemain && yarn run migrate:run"
+ * !	| old package json code
+ * 		| "migratemain": "yarn run typeorm migration:generate -n Main",
+ * 		| "clean": "rimraf src/database/migrations/*",
+ * 		| "migrate": "yarn run clean && yarn run migratemain && yarn run migrate:run"
  */

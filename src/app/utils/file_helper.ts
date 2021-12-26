@@ -16,9 +16,9 @@ export class FileHelper {
     }
 
     // for dicebear svg
-    // if (img_path.startsWith('data:image')) {
-    //   return img_path ?? null;
-    // }
+    if (img_path && img_path.startsWith('data:image')) {
+      return img_path ?? null;
+    }
 
     return img_path ? process.env.APP_URL + '/upload' + img_path : null;
   }
