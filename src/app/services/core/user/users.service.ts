@@ -36,7 +36,6 @@ export class UsersService {
 
   userID(request: Request) {
     const accessToken = request.cookies?.access_token;
-    // const accessToken = this.request.cookies?.access_token;
 
     if (!accessToken) {
       throw new UnauthorizedException(configs.messages.exceptions.accessTokenMissing);

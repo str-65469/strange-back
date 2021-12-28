@@ -69,7 +69,7 @@ export class JwtAcessService {
     await jwt.verify(params.token, params.secret, async (err: jwt.VerifyErrors) => {
       // expired
       if (err instanceof jwt.TokenExpiredError) {
-        await params?.expired_clbck();
+        if (params?.expired_clbck) await params?.clbck();
         throw new GeneralException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_EXPIRED_ERROR, err.message);
       }
 
@@ -78,7 +78,7 @@ export class JwtAcessService {
         throw new GeneralException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_ERROR, err.message);
       }
 
-      await params?.clbck();
+      if (params?.clbck) await params?.clbck();
     });
 
     return true;
