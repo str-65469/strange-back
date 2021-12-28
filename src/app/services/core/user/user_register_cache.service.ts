@@ -11,7 +11,7 @@ export class UserRegisterCacheService {
   ) {}
 
   async delete(id) {
-    return await this.userRegisterCacheRepo.delete(id);
+    return this.userRegisterCacheRepo.delete(id);
   }
 
   findByEmailOrUsername(email: string, username: string) {

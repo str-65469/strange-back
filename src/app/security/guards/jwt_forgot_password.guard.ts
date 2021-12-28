@@ -50,7 +50,6 @@ export class JwtForgotPasswordAuthGuard {
     await this.jwtAcessService.validateToken({
       secret: cachedData.secret,
       token: cachedData.secret_token,
-      expired_message: configs.messages.exceptions.forgotPasswordTokenExpired,
       expired_clbck: () => {
         this.authService.userForgotPasswordCacheService.delete(cacheId);
         throw new UnauthorizedException(configs.messages.exceptions.forgotPasswordTokenExpired);

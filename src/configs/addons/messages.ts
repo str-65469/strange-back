@@ -1,17 +1,9 @@
 export default {
   exceptions: {
-    generalTokenExpired: 'token has been expired',
-    generalTokenMissing: 'token is missing',
-
-    accessTokenExpired: 'access token has been expired',
+    generalMessage: 'exception message not found',
     accessTokenMissing: 'access token is missing',
-
-    refreshTokenExpired: 'refresh token has been expired',
     refreshTokenMissing: 'refresh token is missing',
-
-    registerTokenExpired: 'register token has been expired',
     registerTokenMissing: 'register token is missing',
-
     forgotPasswordTokenExpired: 'forgot password token has been expired',
     forgotPasswordTokenMissing: 'forgot password token is missing',
   },

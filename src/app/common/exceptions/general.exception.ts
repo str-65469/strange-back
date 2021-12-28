@@ -1,15 +1,15 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { MessageCode } from 'src/app/common/enum/exceptions/general_exception.enum';
-
-interface GeneralExceptonProps {
-  message: string;
-  status_code: number;
-  message_code: MessageCode;
-  [key: string]: any; // add any other props
-}
+import { ExceptionMessageCode } from '../enum/message_codes/exception_message_code.enum';
+import { GenericExceptionProps } from '../exception_filters/all_exception.filter';
 
 export class GeneralException extends HttpException {
-  constructor(statusCode: HttpStatus, opts: GeneralExceptonProps) {
-    super(opts, statusCode);
+  constructor(statusCode: HttpStatus, messageCode: ExceptionMessageCode, message?: string) {
+    const generalExceptonProps: GenericExceptionProps = {
+      statusCode,
+      messageCode,
+      message,
+    };
+
+    super(generalExceptonProps, statusCode);
   }
 }

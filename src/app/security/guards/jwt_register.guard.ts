@@ -1,15 +1,14 @@
-import * as jwt from 'jsonwebtoken';
 import { BadRequestException, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
-import { Repository } from 'typeorm';
+import { UserRegisterCacheService } from 'src/app/services/core/user/user_register_cache.service';
+import { JwtAcessService } from 'src/app/services/common/jwt_access.service';
 import { AuthService } from 'src/app/services/core/auth/auth.service';
 
 @Injectable()
 export class JwtRegisterAuthGuard {
   constructor(
-    @InjectRepository(UserRegisterCache) private readonly userRegisterCacheRepo: Repository<UserRegisterCache>,
     private readonly authService: AuthService,
+    private readonly jwtAcessService: JwtAcessService,
+    private readonly userRegisterCacheService: UserRegisterCacheService,
   ) {}
 
   async canActivate(context: ExecutionContext) {
@@ -32,14 +31,10 @@ export class JwtRegisterAuthGuard {
       throw new UnauthorizedException('Invalid token');
     }
 
-    // remove cached data if expired only
-    jwt.verify(secret, process.env.JWT_REGISTER_CACHE_SECRET, (err: jwt.VerifyErrors) => {
-      if (err) {
-        // clear cache with that id if err found on token
-        this.userRegisterCacheRepo.delete(id);
-
-        throw new UnauthorizedException(err);
-      }
+    await this.jwtAcessService.validateToken({
+      token: secret,
+      secret: process.env.JWT_REGISTER_CACHE_SECRET,
+      expired_clbck: () => this.userRegisterCacheService.delete(id),
     });
 
     return true;

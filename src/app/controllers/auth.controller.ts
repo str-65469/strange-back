@@ -26,7 +26,7 @@ import { UsersService } from '../services/core/user/users.service';
 import { UserDetailsServiceService } from '../services/core/user/user_details.service';
 import { UserRegisterCacheService } from '../services/core/user/user_register_cache.service';
 import { UserRegisterDto } from '../common/request/user/user_register.dto';
-import { RegisterCacheExceptionFilter } from '../common/exceptions/register_cache.excpetion.filter';
+import { RegisterCacheExceptionFilter } from '../common/exception_filters/register_cache.excpetion.filter';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtRefreshTokenAuthGuard } from '../security/guards/jwt_refresh.guard';
 import { ForgotPasswordRequest, JwtForgotPasswordAuthGuard } from '../security/guards/jwt_forgot_password.guard';

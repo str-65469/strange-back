@@ -47,7 +47,6 @@ export class JwtRefreshTokenAuthGuard implements CanActivate {
     return this.jwtAcessService.validateToken({
       token: refreshToken,
       secret: secret,
-      expired_message: configs.messages.exceptions.refreshTokenExpired,
     });
   }
 }

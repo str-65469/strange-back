@@ -28,13 +28,10 @@ export class JwtAcessTokenAuthGuard implements CanActivate {
       throw new UnauthorizedException(configs.messages.exceptions.refreshTokenMissing);
     }
 
-    console.log(123);
-
     // validating access token
     return this.jwtAcessService.validateToken({
       token: accessToken,
       secret: process.env.JWT_SECRET,
-      expired_message: configs.messages.exceptions.accessTokenExpired,
     });
   }
 }

@@ -3,11 +3,11 @@ import User from 'src/database/entity/user.entity';
 import { RandomGenerator } from '../../utils/random_generator';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { JwtService } from '@nestjs/jwt';
-import { Header, HttpStatus, Injectable } from '@nestjs/common';
-import { MessageCode } from 'src/app/common/enum/exceptions/general_exception.enum';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { GeneralException } from 'src/app/common/exceptions/general.exception';
 import { configs } from 'src/configs/config';
 import { IncomingHttpHeaders } from 'http2';
+import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';
 
 interface RefreshTokenResponse {
   secret: string;
@@ -17,9 +17,8 @@ interface RefreshTokenResponse {
 interface ValidateAcessTokenProps {
   token: string;
   secret: string;
-  expired_message?: string;
+  clbck?: () => void;
   expired_clbck?: () => void;
-  other_clbck?: () => void;
 }
 
 export interface AccessTokenPayload {
@@ -66,42 +65,20 @@ export class JwtAcessService {
     return { secret, token };
   }
 
-  public async validateToken(params: ValidateAcessTokenProps) {
+  public async validateToken(params: ValidateAcessTokenProps): Promise<boolean> {
     await jwt.verify(params.token, params.secret, async (err: jwt.VerifyErrors) => {
-      if (err) {
-        console.log('===============1');
-
-        if (err.name === MessageCode.TOKEN_EXPIRED) {
-          console.log('===============2');
-          if (params.expired_clbck) {
-            await params.expired_clbck();
-          }
-
-          console.log('==============3');
-
-          throw new GeneralException(HttpStatus.UNAUTHORIZED, {
-            message: params?.expired_message ?? configs.messages.exceptions.generalTokenExpired,
-            status_code: HttpStatus.UNAUTHORIZED,
-            message_code: MessageCode.TOKEN_EXPIRED,
-            detailed: err,
-          });
-        }
-
-        console.log('===============4');
-
-        if (params.other_clbck) {
-          await params.other_clbck();
-        }
-
-        console.log('===============5');
-
-        throw new GeneralException(HttpStatus.UNAUTHORIZED, {
-          message: err.message,
-          status_code: HttpStatus.UNAUTHORIZED,
-          message_code: MessageCode.GENERAL,
-          detailed: err,
-        });
+      // expired
+      if (err instanceof jwt.TokenExpiredError) {
+        await params?.expired_clbck();
+        throw new GeneralException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_EXPIRED_ERROR, err.message);
       }
+
+      // general
+      if (err instanceof jwt.JsonWebTokenError) {
+        throw new GeneralException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_ERROR, err.message);
+      }
+
+      await params?.clbck();
     });
 
     return true;
