@@ -129,7 +129,7 @@ export class AuthController {
     this.cookieService.createCookie(res, accessToken, refreshToken);
 
     return createUrl(configs.general.routes.DASHBOARD_URL, {
-      path: configs.general.frontMarkupRoutes.userProfile,
+      path: configs.general.dashboardRoutes.userProfile,
     });
   }
 

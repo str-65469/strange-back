@@ -12,10 +12,11 @@ export default {
 
   frontMarkupRoutes: {
     notFound: '/not_found',
-    userProfile: '/profile',
-    passwordRecoveryTimeout: '/password_recovery_timeout',
-    registerConfirm: '/register_confirm',
     registerTimeout: '/registration_timeout',
+  },
+
+  dashboardRoutes: {
+    userProfile: '/profile',
   },
 
   DICEBEAR_MAX_SIZE: 12000, //~ 12kb
