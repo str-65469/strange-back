@@ -1,6 +1,6 @@
 import * as paypal from '@paypal/checkout-server-sdk';
 import { Request } from 'express';
-import { Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, ParseIntPipe, Req, UseGuards } from '@nestjs/common';
 import { PaypalPaymentDetailsService } from '../services/core/paypal_payment_details.service';
 import { SuperlikeService } from 'src/app/services/core/superlike/superlike.service';
 import { SuperLikeServiceType } from 'src/app/common/enum/superlike_services';
@@ -9,6 +9,8 @@ import { PaymentType } from '../common/enum/payment_type.enum';
 import { SuperlikePaymentService } from '../services/core/superlike/superlike_payment.service';
 import { UserBelongingsService } from '../services/core/user/user_belongings.service';
 import { UsersService } from '../services/core/user/users.service';
+import { GenericException } from '../common/exceptions/general.exception';
+import { ExceptionMessageCode } from '../common/enum/message_codes/exception_message_code.enum';
 
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('superlike')
@@ -67,15 +69,7 @@ export class SuperLikeBillingController {
         id: order.result.id,
       };
     } catch (error) {
-      console.log(error);
-
-      throw new HttpException(
-        {
-          error,
-          msg: 'something went wrong',
-        },
-        HttpStatus.EXPECTATION_FAILED,
-      );
+      throw new GenericException(HttpStatus.EXPECTATION_FAILED, ExceptionMessageCode.PAYPAL_ORDER_ERROR);
     }
   }
 
@@ -113,15 +107,7 @@ export class SuperLikeBillingController {
 
       return { msg: 'successfull payment' };
     } catch (error) {
-      console.log(error);
-
-      throw new HttpException(
-        {
-          error,
-          msg: 'something went wrong',
-        },
-        HttpStatus.EXPECTATION_FAILED,
-      );
+      throw new GenericException(HttpStatus.EXPECTATION_FAILED, ExceptionMessageCode.PAYPAL_PAYMENT_ERROR);
     }
   }
 }

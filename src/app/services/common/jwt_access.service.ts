@@ -4,7 +4,7 @@ import { RandomGenerator } from '../../utils/random_generator';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { JwtService } from '@nestjs/jwt';
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { GeneralException } from 'src/app/common/exceptions/general.exception';
+import { GenericException } from 'src/app/common/exceptions/general.exception';
 import { configs } from 'src/configs/config';
 import { IncomingHttpHeaders } from 'http2';
 import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';
@@ -70,12 +70,12 @@ export class JwtAcessService {
       // expired
       if (err instanceof jwt.TokenExpiredError) {
         if (params?.expired_clbck) await params?.clbck();
-        throw new GeneralException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_EXPIRED_ERROR, err.message);
+        throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_EXPIRED_ERROR, err.message);
       }
 
       // general
       if (err instanceof jwt.JsonWebTokenError) {
-        throw new GeneralException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_ERROR, err.message);
+        throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_ERROR, err.message);
       }
 
       if (params?.clbck) await params?.clbck();
@@ -87,10 +87,10 @@ export class JwtAcessService {
   public getForgotPasswordToken(headers: IncomingHttpHeaders): string | null {
     const tokenString = headers['Authorization'] || headers['authorization'] || null;
 
-    if (!tokenString || Array.isArray(tokenString)) {
-      return null;
+    if (typeof tokenString === 'string') {
+      return tokenString.split(' ').length > 0 ? tokenString.split(' ')[1] : null;
     }
 
-    return tokenString.split(' ')[1];
+    return null;
   }
 }

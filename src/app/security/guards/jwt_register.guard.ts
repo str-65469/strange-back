@@ -1,7 +1,9 @@
-import { BadRequestException, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { UserRegisterCacheService } from 'src/app/services/core/user/user_register_cache.service';
 import { JwtAcessService } from 'src/app/services/common/jwt_access.service';
 import { AuthService } from 'src/app/services/core/auth/auth.service';
+import { GenericException } from 'src/app/common/exceptions/general.exception';
+import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';
 
 @Injectable()
 export class JwtRegisterAuthGuard {
@@ -17,7 +19,11 @@ export class JwtRegisterAuthGuard {
     // validate parameters
     ['id', 'secret'].forEach((param) => {
       if (!request.query[param]) {
-        throw new BadRequestException(`query parameter {${param}} is missing`);
+        throw new GenericException(
+          HttpStatus.BAD_REQUEST,
+          ExceptionMessageCode.QUERY_PARAMETER_MISSING,
+          `query parameter {${param}} is missing`,
+        );
       }
     });
 
@@ -28,7 +34,7 @@ export class JwtRegisterAuthGuard {
 
     // if secret and cached secret is not exactly same
     if (secret !== cachedData.secret_token) {
-      throw new UnauthorizedException('Invalid token');
+      throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_MISMATCH_ERROR);
     }
 
     await this.jwtAcessService.validateToken({

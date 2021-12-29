@@ -19,11 +19,12 @@ import { JwtAcessService } from 'src/app/services/common/jwt_access.service';
 import { UsersService } from '../services/core/user/users.service';
 import { NotificationsService } from '../services/core/notifications.service';
 import { MatchedDuosService } from '../services/core/matcheds/matched_duos.service';
+import { configs } from 'src/configs/config';
 
 @Module({
   imports: [
     JwtModule.register({ secret: process.env.JWT_SECRET }),
-    HttpModule.register({ baseURL: process.env.CHECKED_SERVER_URL, timeout: 10000 }), // 10 sec
+    HttpModule.register({ baseURL: configs.general.routes.CHECKED_SERVER_URL, timeout: 10000 }), // 10 sec
     TypeOrmModule.forFeature([
       MatchedDuos,
       MatchingLobby,

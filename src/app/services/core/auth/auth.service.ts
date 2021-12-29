@@ -1,12 +1,14 @@
 import * as bcrypt from 'bcrypt';
 import User from 'src/database/entity/user.entity';
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/app/services/core/user/users.service';
 import { UserDetailsServiceService } from 'src/app/services/core/user/user_details.service';
 import { UserLoginDto } from 'src/app/common/request/user/user_login.dto';
 import { UserRegisterCacheService } from '../user/user_register_cache.service';
 import { LolServer } from 'src/app/common/enum/lol_server.enum';
 import { UserForgotPasswordCacheService } from '../user/user_forgot_password.service';
+import { GenericException } from 'src/app/common/exceptions/general.exception';
+import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';
 
 @Injectable()
 export class AuthService {
@@ -22,13 +24,13 @@ export class AuthService {
     const user = await this.userService.findOneByEmail(userCredentials.email, { fetchPassword: true });
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new GenericException(HttpStatus.NOT_FOUND, ExceptionMessageCode.USER_EMAIL_OR_PASSWORD_INCORRECT);
     }
 
     const isPasswordMatch = await bcrypt.compare(userCredentials.password, user.password);
 
     if (!isPasswordMatch) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new GenericException(HttpStatus.NOT_FOUND, ExceptionMessageCode.USER_EMAIL_OR_PASSWORD_INCORRECT);
     }
 
     return user;
@@ -45,11 +47,11 @@ export class AuthService {
 
     if (user) {
       if (user.email === email) {
-        throw new BadRequestException('Email already in use');
+        throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.USER_EMAIL_ALREADY_IN_USE);
       }
 
       if (user.username === username) {
-        throw new BadRequestException('Username already in use');
+        throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.USERNAME_ALREADY_IN_USE);
       }
     }
 
@@ -61,14 +63,14 @@ export class AuthService {
       const user = await this.userForgotPasswordCacheService.findByEmail(email);
 
       if (user) {
-        throw new NotFoundException('user already in cache');
+        throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.USER_ALREADY_IN_CACHE);
       }
     }
 
     const user = await this.userService.findOneByEmail(email, { fetchDetails: true });
 
     if (!user) {
-      throw new NotFoundException('user not found');
+      throw new GenericException(HttpStatus.NOT_FOUND, ExceptionMessageCode.USER_NOT_FOUND);
     }
 
     return user;
@@ -78,7 +80,7 @@ export class AuthService {
     const userDetails = await this.userDetailsService.findBySummonerAndServer(server, summonerName);
 
     if (userDetails) {
-      throw new BadRequestException('Summoner name already in user');
+      throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.SUMMONER_NAME_ALREADY_IN_USE);
     }
   }
 
@@ -86,7 +88,7 @@ export class AuthService {
     const cachedData = await this.userRegisterCacheService.findOne(id);
 
     if (!cachedData) {
-      throw new BadRequestException('Cached information not found');
+      throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.REGISTER_CACHE_NOT_FOUND);
     }
 
     return cachedData;
@@ -96,7 +98,7 @@ export class AuthService {
     const cachedData = await this.userForgotPasswordCacheService.findOne(id);
 
     if (!cachedData) {
-      throw new BadRequestException('Cached information not found');
+      throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.FORGOT_PASSWORD_CACHE_NOT_FOUND);
     }
 
     return cachedData;

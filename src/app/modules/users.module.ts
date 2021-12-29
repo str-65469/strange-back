@@ -14,6 +14,7 @@ import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { MatchingSpamService } from 'src/app/services/core/matcheds/matching_spam.service';
 import { UserController } from 'src/app/controllers/user.controller';
 import { UsersService } from 'src/app/services/core/user/users.service';
+import { configs } from 'src/configs/config';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { UsersService } from 'src/app/services/core/user/users.service';
     TypeOrmModule.forFeature([User, UserDetails, UserRegisterCache, MatchingSpams]),
     JwtModule.register({ secret: process.env.JWT_REGISTER_CACHE_SECRET }),
     MulterModule.register({ dest: './upload' }),
-    HttpModule.register({ baseURL: process.env.CHECKED_SERVER_URL, timeout: 10000 }), // 10 sec
+    HttpModule.register({ baseURL: configs.general.routes.CHECKED_SERVER_URL, timeout: 10000 }), // 10 sec
   ],
   controllers: [UserController, UserFileController],
   providers: [UsersService, JwtAcessService, CookieService, MatchingSpamService],

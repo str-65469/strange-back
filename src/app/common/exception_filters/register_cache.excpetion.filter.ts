@@ -1,21 +1,28 @@
 import * as dotenv from 'dotenv';
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, UnauthorizedException, HttpStatus } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
+import { configs } from 'src/configs/config';
+import { buildUrl } from 'src/app/utils/url_builder';
+import { GenericException } from '../exceptions/general.exception';
+import { GenericExceptionProps } from './all_exception.filter';
 
-@Catch(UnauthorizedException, HttpException)
+@Catch(GenericException)
 export class RegisterCacheExceptionFilter implements ExceptionFilter {
-  catch(exception: HttpException | UnauthorizedException, host: ArgumentsHost) {
+  catch(exception: GenericException, host: ArgumentsHost) {
     // first load dotenv
     dotenv.config();
 
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const exceptionResponse = exception.getResponse() as GenericExceptionProps;
     const status = exception.getStatus();
+    const url = buildUrl(configs.general.routes.MARKUP_URL);
+    const { registerTimeout, notFound } = configs.general.frontMarkupRoutes;
 
-    if (status === HttpStatus.UNAUTHORIZED) {
-      return response.status(status).redirect(`${process.env.MARKUP_URL}/registration_timeout`);
+    if (exceptionResponse.statusCode === HttpStatus.UNAUTHORIZED) {
+      return response.status(status).redirect(url.addUrlParams(registerTimeout).getUrl);
     }
 
-    return response.status(status).redirect(`${process.env.MARKUP_URL}/not_found`);
+    return response.status(status).redirect(url.addUrlParams(notFound).getUrl);
   }
 }

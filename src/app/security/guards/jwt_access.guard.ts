@@ -1,8 +1,8 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Res } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { configs } from 'src/configs/config';
+import { Injectable, CanActivate, ExecutionContext, HttpStatus } from '@nestjs/common';
 import { CookieService } from 'src/app/services/common/cookie.service';
 import { JwtAcessService } from 'src/app/services/common/jwt_access.service';
+import { GenericException } from 'src/app/common/exceptions/general.exception';
+import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';
 
 @Injectable()
 export class JwtAcessTokenAuthGuard implements CanActivate {
@@ -20,12 +20,12 @@ export class JwtAcessTokenAuthGuard implements CanActivate {
     // check both token existence
     if (!accessToken) {
       this.cookieService.clearCookie(response);
-      throw new UnauthorizedException(configs.messages.exceptions.accessTokenMissing);
+      throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.ACCESS_TOKEN_MISSING);
     }
 
     if (!refreshToken) {
       this.cookieService.clearCookie(response);
-      throw new UnauthorizedException(configs.messages.exceptions.refreshTokenMissing);
+      throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.REFRESH_TOKEN_MISSING);
     }
 
     // validating access token

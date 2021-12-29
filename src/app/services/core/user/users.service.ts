@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import User from 'src/database/entity/user.entity';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
-import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { UserRegisterCache } from '../../../../database/entity/user_register_cache.entity';
 import { LolCredentials, LolCredentialsResponse } from '../../../common/schemas/lol_credentials';
 import { RandomGenerator } from 'src/app/utils/random_generator';
@@ -21,6 +21,8 @@ import { UserProfileUpdateDto } from 'src/app/common/request/user/user_update.dt
 import { UserPasswordUpdateDto } from 'src/app/common/request/user/user_update_password.dto';
 import tokens from 'src/configs/addons/tokens';
 import { generateCompressedSprite } from 'src/app/utils/dicebear';
+import { GenericException } from 'src/app/common/exceptions/general.exception';
+import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';
 
 export type UserSpamDetailed = User & { details: UserDetails; spams: MatchingSpams };
 
@@ -38,7 +40,11 @@ export class UsersService {
     const accessToken = request.cookies?.access_token;
 
     if (!accessToken) {
-      throw new UnauthorizedException(configs.messages.exceptions.accessTokenMissing);
+      throw new GenericException(
+        HttpStatus.UNAUTHORIZED,
+        ExceptionMessageCode.ACCESS_TOKEN_MISSING,
+        configs.messages.exceptions.accessTokenMissing,
+      );
     }
 
     const accessTokenDecoded = this.jwtService.decode(accessToken) as { id: number; email: string };
@@ -125,8 +131,12 @@ export class UsersService {
           win_rate: res.data.winRatio,
         };
       })
-      .catch((err) => {
-        throw new HttpException('Check your division or summoner name please', err?.response?.status);
+      .catch(() => {
+        throw new GenericException(
+          HttpStatus.BAD_REQUEST,
+          ExceptionMessageCode.DIVISION_SUMMONER_ERROR,
+          configs.messages.exceptions.summonerDivisionCheck,
+        );
       });
   }
 

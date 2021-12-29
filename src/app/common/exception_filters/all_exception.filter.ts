@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { IncomingHttpHeaders } from 'http';
 import { configs } from 'src/configs/config';
 import { ExceptionMessageCode } from '../enum/message_codes/exception_message_code.enum';
-import { GeneralException } from '../exceptions/general.exception';
+import { GenericException } from '../exceptions/general.exception';
 
 interface GenericExceptionPropsStack {
   path: string;
@@ -18,7 +18,7 @@ interface GenericExceptionPropsStack {
 export interface GenericExceptionProps {
   message: string;
   messageCode: ExceptionMessageCode;
-  statusCode?: number;
+  statusCode: HttpStatus;
   stack?: Partial<GenericExceptionPropsStack>;
 }
 
@@ -33,7 +33,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let responseBody: GenericExceptionProps | null = null;
 
     // http exceptions
-    if (exception instanceof GeneralException) {
+    if (exception instanceof GenericException) {
       const exceptionResponse = exception.getResponse() as GenericExceptionProps;
       const statusCode = exception.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -49,10 +49,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     // http exceptions not thrown by me
     if (exception instanceof HttpException) {
+      const exceptionResponseBody = exception.getResponse() as any;
       const statusCode = exception.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
+      const message = Array.isArray(exceptionResponseBody?.message) ? exceptionResponseBody?.message[0] : null;
 
       responseBody = {
-        message: exception.message,
+        message: message ?? exception.message,
         messageCode: ExceptionMessageCode.GENERAL_ERROR,
         statusCode,
         stack: this.getAdditionInfo(request, exception),

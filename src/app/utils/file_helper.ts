@@ -1,17 +1,13 @@
-import { BadRequestException } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 import { extname } from 'path';
+import { configs } from 'src/configs/config';
+import { ExceptionMessageCode } from '../common/enum/message_codes/exception_message_code.enum';
+import { GenericException } from '../common/exceptions/general.exception';
+import { createUrl } from './url_builder';
 
 export class FileHelper {
   public static imagePath(img_path?: string) {
-    // console.log(img_path);
-
     if (process.env.NODE_ENV === 'development') {
-      //   console.log(img_path.startsWith('data:image'));
-
-      //   if (img_path.startsWith('data:image')) {
-      //     return img_path ?? null;
-      //   }
-
       return img_path ?? null;
     }
 
@@ -20,12 +16,14 @@ export class FileHelper {
       return img_path ?? null;
     }
 
-    return img_path ? process.env.APP_URL + '/upload' + img_path : null;
+    const upload = createUrl(configs.general.routes.APP_URL, { path: ['/upload', img_path ?? ''] });
+
+    return img_path ? upload : null;
   }
 
   public static imageFileFilter(_, file, callback) {
     if (!file.originalname.match(/\.(jpeg)$/)) {
-      return callback(new BadRequestException('Only JPEG image files are allowed !'), false);
+      return callback(new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.ONLY_JPEG_ALLOWED), false);
     }
 
     callback(null, true);
@@ -41,7 +39,9 @@ export class FileHelper {
   }
 
   public static profileImage(progileImageId: number) {
-    return `${process.env.APP_URL}${this.profileImagePath(progileImageId)}`;
+    return createUrl(configs.general.routes.APP_URL, {
+      path: this.profileImagePath(progileImageId),
+    });
   }
 
   public static profileImagePath(progileImageId: number) {

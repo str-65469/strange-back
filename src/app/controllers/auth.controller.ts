@@ -9,7 +9,7 @@ import {
   UseGuards,
   Req,
   UseFilters,
-  BadRequestException,
+  HttpStatus,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
@@ -32,8 +32,12 @@ import { JwtRefreshTokenAuthGuard } from '../security/guards/jwt_refresh.guard';
 import { ForgotPasswordRequest, JwtForgotPasswordAuthGuard } from '../security/guards/jwt_forgot_password.guard';
 import { ForgotPasswordRequestDto } from '../common/request/forgot_password/forgot_password.dto';
 import { ForgotPasswordConfirmRequestDto } from '../common/request/forgot_password/forgot_password_confirm.dto';
-import { v4 } from 'uuid';
 import { classToPlain } from 'class-transformer';
+import { createUrl } from '../utils/url_builder';
+import { configs } from 'src/configs/config';
+import { GenericException } from '../common/exceptions/general.exception';
+import { ExceptionMessageCode } from '../common/enum/message_codes/exception_message_code.enum';
+import { v4 } from 'uuid';
 
 @Controller('/auth')
 export class AuthController {
@@ -82,7 +86,7 @@ export class AuthController {
 
     // third cache into database
     const userCached = await this.userService.cacheUserRegister(body, checkedLolCreds).catch((err) => {
-      throw new BadRequestException('User already in cache', err?.response?.status);
+      throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.USER_ALREADY_IN_CACHE);
     });
 
     // send to mail
@@ -124,7 +128,9 @@ export class AuthController {
     // send httpOnly access_token, refresh_token cookie
     this.cookieService.createCookie(res, accessToken, refreshToken);
 
-    return res.redirect(`${process.env.DASHBOARD_URL}/profile`);
+    return createUrl(configs.general.routes.DASHBOARD_URL, {
+      path: configs.general.frontMarkupRoutes.userProfile,
+    });
   }
 
   @UseGuards(JwtRefreshTokenAuthGuard)
@@ -183,7 +189,7 @@ export class AuthController {
 
     // check if sommoner name and server is correct
     if (userWithDetails.details.summoner_name !== summoner_name) {
-      throw new BadRequestException('summoner name is incorrect');
+      throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.INCORRECT_SUMMONER_NAME);
     }
 
     // first save dto data to database
@@ -219,7 +225,7 @@ export class AuthController {
 
     // validate if uuid is correct
     if (uuid !== forgotPasswordCache.uuid) {
-      throw new BadRequestException('uuid is incorrect');
+      throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.INCORRECT_UUID);
     }
 
     // delete from cache

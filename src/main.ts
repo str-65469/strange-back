@@ -108,7 +108,7 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
  * 		|   // replace with new value
  * 		|   let key1Index = textArr.findIndex((el) => isExactMatch(el, obj.key));
  *		|   if (key1Index === -1) {
- *		|     throw new NotFoundException();
+ *		|     throw new Error();
  *		|   }
  *		|   let key1Value = textArr[key1Index]; // key and value joined e.g. key=value
  *		|   let key1Arr = key1Value.split('=');
@@ -124,6 +124,6 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
  *		|   };
  *		| } catch (error) {
  *		|   console.log(error);
- *		|   throw new NotFoundException();
+ *		|   throw new Error();
  *		| }
  */

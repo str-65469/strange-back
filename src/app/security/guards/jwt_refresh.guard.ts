@@ -1,9 +1,11 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { configs } from 'src/configs/config';
 import { CookieService } from 'src/app/services/common/cookie.service';
 import { JwtAcessService } from 'src/app/services/common/jwt_access.service';
 import { UsersService } from 'src/app/services/core/user/users.service';
+import { GenericException } from 'src/app/common/exceptions/general.exception';
+import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';
 
 @Injectable()
 export class JwtRefreshTokenAuthGuard implements CanActivate {
@@ -26,12 +28,20 @@ export class JwtRefreshTokenAuthGuard implements CanActivate {
     // check both token existence
     if (!accessToken) {
       this.cookieService.clearCookie(response);
-      throw new UnauthorizedException(configs.messages.exceptions.accessTokenMissing);
+      throw new GenericException(
+        HttpStatus.UNAUTHORIZED,
+        ExceptionMessageCode.ACCESS_TOKEN_MISSING,
+        configs.messages.exceptions.accessTokenMissing,
+      );
     }
 
     if (!refreshToken) {
       this.cookieService.clearCookie(response);
-      throw new UnauthorizedException(configs.messages.exceptions.refreshTokenMissing);
+      throw new GenericException(
+        HttpStatus.UNAUTHORIZED,
+        ExceptionMessageCode.REFRESH_TOKEN_MISSING,
+        configs.messages.exceptions.refreshTokenMissing,
+      );
     }
 
     const accessTokenDecoded = this.jwtService.decode(accessToken) as { id: number; email: string };
@@ -40,7 +50,7 @@ export class JwtRefreshTokenAuthGuard implements CanActivate {
     const secret = user?.secret;
 
     if (!user) {
-      throw new NotFoundException('user not found');
+      throw new GenericException(HttpStatus.NOT_FOUND, ExceptionMessageCode.USER_NOT_FOUND);
     }
 
     // validate refresh token

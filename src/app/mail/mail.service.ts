@@ -5,6 +5,8 @@ import { ContactUsMailProps, ContactUsMailService } from './services/contact_us.
 import { RegisterMailCheckService } from './services/register_check.service';
 import * as dotenv from 'dotenv';
 import { ForgotPasswordMailService } from './services/forgot_password.service';
+import { createUrl } from '../utils/url_builder';
+import { configs } from 'src/configs/config';
 dotenv.config();
 
 export const SENDER_ADDRESS = `"${process.env.APP_TITLE} 👻" <${process.env.MAIL_USER}>`;
@@ -20,12 +22,11 @@ export class MailService {
   async sendUserConfirmation(userCached: UserRegisterCache) {
     const { id, username, secret_token } = userCached;
 
-    const properties = {
-      url: process.env.APP_URL + `/auth/register/confirm?id=${id}&secret=${secret_token}`,
-      username,
-    };
+    const url = createUrl(configs.general.routes.APP_URL, {
+      path: `/auth/register/confirm?id=${id}&secret=${secret_token}`,
+    });
 
-    return this.registerMailService.sendConfirmationEmail(userCached, properties);
+    return this.registerMailService.sendConfirmationEmail(userCached, { url, username });
   }
 
   async sendForgotPasswordUUID(email: string, uuid: string, username: string) {
