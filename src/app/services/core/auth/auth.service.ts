@@ -62,9 +62,7 @@ export class AuthService {
     if (opts?.inForgotPasswordCache) {
       const user = await this.userForgotPasswordCacheService.findByEmail(email);
 
-      if (user) {
-        throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.USER_ALREADY_IN_CACHE);
-      }
+      return user;
     }
 
     const user = await this.userService.findOneByEmail(email, { fetchDetails: true });

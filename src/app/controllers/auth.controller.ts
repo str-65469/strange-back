@@ -38,6 +38,8 @@ import { configs } from 'src/configs/config';
 import { GenericException } from '../common/exceptions/general.exception';
 import { ExceptionMessageCode } from '../common/enum/message_codes/exception_message_code.enum';
 import { v4 } from 'uuid';
+import User from 'src/database/entity/user.entity';
+import { ForgotPasswordCache } from 'src/database/entity/forgot_password_cache.entity';
 
 @Controller('/auth')
 export class AuthController {
@@ -186,10 +188,18 @@ export class AuthController {
     const { email, summoner_name } = body;
 
     // first checking if email already in forgot password cache
-    await this.authService.emailExists(email, { inForgotPasswordCache: true });
+    const userCache = (await this.authService.emailExists(email, { inForgotPasswordCache: true })) as ForgotPasswordCache;
+
+    // if already in cache just send token
+    if (userCache) {
+      return {
+        token: userCache.secret_token,
+        msg: 'uuid code sent',
+      };
+    }
 
     // check if email exists in users and fetch user details as well
-    const userWithDetails = await this.authService.emailExists(email);
+    const userWithDetails = (await this.authService.emailExists(email)) as User;
 
     // check if sommoner name and server is correct
     if (userWithDetails.details.summoner_name !== summoner_name) {
