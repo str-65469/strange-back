@@ -21,9 +21,10 @@ export class ReportsController {
     const userPictureId = checkedLolCreds.profileImageId;
     const validPictures = picturesArr.filter((el) => el !== userPictureId);
     const randomPictureId = GeneralHelper.random(validPictures);
-    const url = FileHelper.profileImage(randomPictureId);
+    const imagePath = FileHelper.profileImage(randomPictureId);
 
     await this.reportSerice.save(data, randomPictureId, email);
-    return url;
+
+    return { imagePath };
   }
 }
