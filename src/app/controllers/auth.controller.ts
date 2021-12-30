@@ -190,6 +190,8 @@ export class AuthController {
     // first checking if email already in forgot password cache
     const userCache = (await this.authService.emailExists(email, { inForgotPasswordCache: true })) as ForgotPasswordCache;
 
+    console.log(userCache);
+
     // if already in cache just send token
     if (userCache) {
       // check if summoner name exists
@@ -202,10 +204,12 @@ export class AuthController {
       };
     }
 
+    console.log('past');
+
     // check if email exists in users and fetch user details as well
     const userWithDetails = (await this.authService.emailExists(email)) as User;
 
-    // check if sommoner name and server is correct
+    // check if sommoner name is correct
     if (userWithDetails.details.summoner_name !== summoner_name) {
       throw new GenericException(HttpStatus.NOT_FOUND, ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND);
     }
