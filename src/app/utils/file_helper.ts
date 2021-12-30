@@ -1,5 +1,5 @@
+import * as path from 'path';
 import { HttpStatus } from '@nestjs/common';
-import { extname } from 'path';
 import { configs } from 'src/configs/config';
 import { ExceptionMessageCode } from '../common/enum/message_codes/exception_message_code.enum';
 import { GenericException } from '../common/exceptions/general.exception';
@@ -32,8 +32,8 @@ export class FileHelper {
   public static customFileName(_, file, callback) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
 
-    const fileExtName = extname(file.originalname);
-    const fileName = `${uniqueSuffix}.${fileExtName}`;
+    const fileExtName = path.extname(file.originalname);
+    const fileName = `${uniqueSuffix}${fileExtName}`;
 
     callback(null, fileName);
   }

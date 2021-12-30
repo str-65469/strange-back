@@ -128,9 +128,9 @@ export class AuthController {
     // send httpOnly access_token, refresh_token cookie
     this.cookieService.createCookie(res, accessToken, refreshToken);
 
-    return createUrl(configs.general.routes.DASHBOARD_URL, {
-      path: configs.general.dashboardRoutes.userProfile,
-    });
+    const redirect = createUrl(configs.general.routes.DASHBOARD_URL, { path: configs.general.dashboardRoutes.userProfile });
+
+    return res.redirect(redirect);
   }
 
   @UseGuards(JwtRefreshTokenAuthGuard)

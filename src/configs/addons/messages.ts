@@ -1,6 +1,6 @@
 export default {
   exceptions: {
-    generalMessage: 'exception message not found',
+    generalMessage: 'message not found',
 
     accessTokenMissing: 'access token is missing',
 
