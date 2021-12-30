@@ -11,6 +11,10 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
  *		|upload 11.24.1 folder inside public/static
  *
  *! this command if for master branch
+ * 		| add this in nginx config: proxy_set_header X-Forwarded-For $remote_addr;  # this line
+ * 		| sudo systemctl restart nginx
+ * 		| sudo pm2 flush log
+ * 		| sudo pm2 update
  *		| run: yarn (for new packages)
  *		| add new env variables
  *		| yarn nestjs-command user:update_image

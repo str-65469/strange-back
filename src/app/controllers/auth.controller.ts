@@ -54,6 +54,8 @@ export class AuthController {
     private readonly userBelongingsService: UserBelongingsService,
   ) {}
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle(60)
   @Post('/login')
   async login(@Body() body: UserLoginDto, @Res() res: Response) {
     this.cookieService.clearCookie(res);
@@ -68,6 +70,7 @@ export class AuthController {
   }
 
   @UseGuards(ThrottlerGuard)
+  @Throttle(60)
   @Post('/register')
   async register(@Body() body: UserRegisterDto) {
     const { email, summoner_name, server, username } = body;
@@ -95,7 +98,8 @@ export class AuthController {
     return { checkedLolCreds, check: true };
   }
 
-  @UseGuards(JwtRegisterAuthGuard)
+  @UseGuards(JwtRegisterAuthGuard, ThrottlerGuard)
+  @Throttle(60)
   @UseFilters(RegisterCacheExceptionFilter)
   @Get('/register/confirm/')
   async registerVerify(@Query('id', ParseIntPipe) id: number, @Req() req: Request, @Res() res: Response) {
@@ -106,8 +110,8 @@ export class AuthController {
 
     // generate refresh token and new secret
     const { refreshToken, secret } = this.jwtAcessService.generateRefreshToken(cachedData);
-    const possibleIP = req.headers['x-forwarded-for'] as string;
-    const ip = possibleIP || req.socket.remoteAddress || null;
+
+    const ip = req.ip || req.header('x-forwarded-for');
 
     // save additional data to user details and data in user
     const user = await this.userService.saveUserByCachedData(cachedData, secret, ip);
@@ -189,7 +193,7 @@ export class AuthController {
 
     // check if sommoner name and server is correct
     if (userWithDetails.details.summoner_name !== summoner_name) {
-      throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.INCORRECT_SUMMONER_NAME);
+      throw new GenericException(HttpStatus.NOT_FOUND, ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND);
     }
 
     // first save dto data to database
