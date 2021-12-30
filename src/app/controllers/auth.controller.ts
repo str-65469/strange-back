@@ -192,9 +192,13 @@ export class AuthController {
 
     // if already in cache just send token
     if (userCache) {
+      // check if summoner name exists
+      if (summoner_name !== userCache.summoner_name) {
+        throw new GenericException(HttpStatus.NOT_FOUND, ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND);
+      }
+
       return {
         token: userCache.secret_token,
-        msg: 'uuid code sent',
       };
     }
 
