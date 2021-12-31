@@ -7,9 +7,6 @@ import { join } from 'path';
 import { AllExceptionsFilter } from './app/common/exception_filters/all_exception.filter';
 
 /**
- *!	In this order steps (this for any branch)
- *		|upload 11.24.1 folder inside public/static
- *
  *! this command if for master branch
  * 		| add this in nginx config: proxy_set_header X-Forwarded-For $remote_addr;  # this line
  * 		| sudo systemctl restart nginx
@@ -22,6 +19,8 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
  *		| run: yarn migrate:generate // check for any drop column and resolve (especially img_path)
  *		| check last generated file before runnning
  *		| run: yarn migrate:run
+ *		| upload 11.24.1 folder inside public/static
+ *		| remove outer static folder
  */
 
 NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
