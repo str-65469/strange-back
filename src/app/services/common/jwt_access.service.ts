@@ -17,8 +17,8 @@ interface RefreshTokenResponse {
 interface ValidateAcessTokenProps {
   token: string;
   secret: string;
-  clbck?: () => void;
-  expired_clbck?: () => void;
+  clbck?: () => Promise<void>;
+  expired_clbck?: () => Promise<void>;
 }
 
 export interface AccessTokenPayload {
@@ -69,7 +69,8 @@ export class JwtAcessService {
     await jwt.verify(params.token, params.secret, async (err: jwt.VerifyErrors) => {
       // expired
       if (err instanceof jwt.TokenExpiredError) {
-        if (params?.expired_clbck) await params?.clbck();
+        if ('expired_clbck' in params) await params?.clbck();
+
         throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_EXPIRED_ERROR, err.message);
       }
 
@@ -78,7 +79,7 @@ export class JwtAcessService {
         throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_ERROR, err.message);
       }
 
-      if (params?.clbck) await params?.clbck();
+      if ('clbck' in params) await params?.clbck();
     });
 
     return true;
