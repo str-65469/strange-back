@@ -13,6 +13,7 @@ interface GenericExceptionPropsStack {
   extraStack: any;
   timestamp: string;
   headers: IncomingHttpHeaders;
+  temp: any;
 }
 
 export interface GenericExceptionProps {
@@ -84,6 +85,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       method: request.method,
       headers: request.headers,
       extraStack: exception && Object.values(exception).length ? exception : undefined,
+      temp: exception,
     };
 
     return process.env.NODE_ENV === 'development' ? additionalParams : undefined;
