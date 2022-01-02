@@ -29,7 +29,7 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
   const httpAdapterHost = app.get(HttpAdapterHost);
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
+  //   app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
   app.enableCors({ origin: true, methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS', credentials: true });
   app.useStaticAssets(join(__dirname, '../..', 'upload'), { prefix: '/upload' });
   app.useStaticAssets(join(__dirname, '../..', 'public'), { prefix: '/public' });
