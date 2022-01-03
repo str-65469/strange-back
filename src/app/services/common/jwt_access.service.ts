@@ -17,8 +17,8 @@ interface RefreshTokenResponse {
 interface ValidateAcessTokenProps {
   token: string;
   secret: string;
-  clbck?: () => Promise<void> | void;
-  expired_clbck?: () => Promise<void> | void;
+  clbck?: () => any;
+  expired_clbck?: () => any;
 }
 
 export interface AccessTokenPayload {

@@ -14,11 +14,16 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
  * 		| sudo pm2 update
  *		| run: yarn (for new packages)
  *		| add new env variables
+
  *		| yarn nestjs-command user:update_image
+
  *		| delete all register cache
+
  *		| run: yarn migrate:generate // check for any drop column and resolve (especially img_path)
+
  *		| check last generated file before runnning
  *		| run: yarn migrate:run
+
  *		| upload 11.24.1 folder inside public/static
  *		| remove outer static folder
  */
