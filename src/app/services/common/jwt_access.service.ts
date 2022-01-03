@@ -74,12 +74,12 @@ export class JwtAcessService {
         throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_EXPIRED_ERROR, err.message);
       }
 
+      if ('clbck' in params) await params.clbck();
+
       // general
       if (err instanceof jwt.JsonWebTokenError) {
         throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_ERROR, err.message);
       }
-
-      if ('clbck' in params) await params.clbck();
     });
 
     return true;
