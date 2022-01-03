@@ -31,6 +31,8 @@ import { ReportsService } from '../services/core/reports.service';
 import { UserBelongingsService } from '../services/core/user/user_belongings.service';
 import { AuthModule } from './auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { CredentialsController } from '../controllers/credentieals.controller';
+import { CredentialsService } from '../services/core/credentials.service';
 
 @Module({
   imports: [
@@ -64,7 +66,14 @@ import { JwtModule } from '@nestjs/jwt';
       },
     ]),
   ],
-  controllers: [MatchedDuosController, NotificationsController, AppController, ReportsController, SuperLikeController],
+  controllers: [
+    MatchedDuosController,
+    NotificationsController,
+    AppController,
+    ReportsController,
+    SuperLikeController,
+    CredentialsController,
+  ],
   providers: [
     UserBelongingsService,
     MatchingLobbyService,
@@ -72,6 +81,7 @@ import { JwtModule } from '@nestjs/jwt';
     NotificationsService,
     ContactUsService,
     ReportsService,
+    CredentialsService,
   ],
   exports: [],
 })

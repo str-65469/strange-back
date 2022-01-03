@@ -6,6 +6,11 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { AllExceptionsFilter } from './app/common/exception_filters/all_exception.filter';
 
+/**
+ * ! run theese steps
+ * 		| run command "__needs implementing__"(replace img_path null with dicebear)
+ */
+
 NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
   const port = 4000;
 

@@ -8,7 +8,11 @@ import { createUrl } from './url_builder';
 export class FileHelper {
   public static imagePath(img_path?: string) {
     if (process.env.NODE_ENV === 'development') {
-      return img_path ?? null;
+      //   return img_path ?? null;
+
+      // for testing switch
+      const upload = createUrl(configs.general.routes.APP_URL, { path: ['/upload', img_path ?? ''] });
+      return img_path ? upload : null;
     }
 
     // for dicebear svg
