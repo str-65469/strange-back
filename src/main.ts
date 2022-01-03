@@ -6,28 +6,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { AllExceptionsFilter } from './app/common/exception_filters/all_exception.filter';
 
-/**
- *! this command if for master branch
- * 		| add this in nginx config: proxy_set_header X-Forwarded-For $remote_addr;  # this line
- * 		| sudo systemctl restart nginx
- * 		| sudo pm2 flush log
- * 		| sudo pm2 update
- *		| run: yarn (for new packages)
- *		| add new env variables
-
- *		| yarn nestjs-command user:update_image
-
- *		| delete all register cache
-
- *		| run: yarn migrate:generate // check for any drop column and resolve (especially img_path)
-
- *		| check last generated file before runnning
- *		| run: yarn migrate:run
-
- *		| upload 11.24.1 folder inside public/static
- *		| remove outer static folder
- */
-
 NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
   const port = 4000;
 
