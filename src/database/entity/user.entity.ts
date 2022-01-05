@@ -9,6 +9,9 @@ import { UserBelongings } from './user_belongings.entity';
 import { UserDetails } from './user_details.entity';
 import { Exclude } from 'class-transformer';
 import { FileHelper } from 'src/app/utils/file_helper';
+import { ChatHeads } from './chat/chat_heads.entity';
+import { ChatMessages } from './chat/chat_messages.entity';
+import { ChatParticipants } from './chat/chat_participants.entity';
 
 @Entity('users')
 export default class User extends GeneralEntity {
@@ -59,6 +62,12 @@ export default class User extends GeneralEntity {
 
   @OneToMany(() => SuperLikePayment, (likes) => likes.user)
   superLikePayments: SuperLikePayment[];
+
+  @OneToMany(() => ChatMessages, (chatMessages) => chatMessages.user)
+  chatMessages: ChatMessages[];
+
+  @OneToMany(() => ChatParticipants, (chatParticipants) => chatParticipants.user)
+  chatParticipants: ChatParticipants[];
 
   @OneToOne(() => UserBelongings, (belongings) => belongings.user)
   belongings: UserBelongings;
