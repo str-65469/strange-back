@@ -17,6 +17,7 @@ import { DuoFinderResponseType, DuoFinderTransferTypes } from '../common/enum/du
 import { HandleDuoFindBody } from '../common/schemas/response';
 import { UsersService } from '../services/core/user/users.service';
 import { AllSocketExceptionsFilter } from '../common/exception_filters/all_socket_exception.filter';
+import { ChatService } from '../services/core/chat.service';
 
 @UseGuards(SocketAccessGuard)
 @UseFilters(AllSocketExceptionsFilter)
@@ -28,6 +29,7 @@ export class SocketGateway {
     private readonly duoFinderService: DuoFinderService,
     private readonly userService: UsersService,
     private readonly userBelongingsService: UserBelongingsService,
+    private readonly chatService: ChatService,
   ) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -51,7 +53,6 @@ export class SocketGateway {
   @SubscribeMessage(configs.socket.duomatchFind)
   public async handleDuoFind(@MessageBody() data: HandleDuoFindBody, @ConnectedSocket() socket: Socket) {
     const payload = this.userService.userSocketPayload(socket);
-
     const user = await this.userService.userSpamAndDetails(payload.id);
     const prevFound = await this.userService.getUserDetails(data.prevFound.id);
 
@@ -129,6 +130,9 @@ export class SocketGateway {
 
         socket.emit('duo_match_finder', { type: DuoFinderResponseType.NOBODY_FOUND }); // not found must go
         this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', JSON.parse(serialize(foundAnyone))); // send to user
+
+        // create chat here
+        this.chatService.createChatTables(user.id, prevFound.id);
       }
       // if nobody was sent from front just return nothing (which means init didnt send any user)
       else {
@@ -178,5 +182,7 @@ export class SocketGateway {
 
     socket.emit('duo_match_finder', JSON.parse(serialize(foundNewMatch))); // foun new match as well
     this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', JSON.parse(serialize(foundAnyone))); // send to user
+    // create chat here
+    this.chatService.createChatTables(user.id, prevFound.id);
   }
 }

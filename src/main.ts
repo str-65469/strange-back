@@ -8,6 +8,11 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
 
 /**
  * ! run theese steps
+ * 		| run yarn
+ * 		| run yarn migrate:generate
+ * 		| check migration first
+ * 		| run yarn migrate:run
+ * 		|
  * 		| run command "__needs implementing__"(replace img_path null with dicebear)
  * 		| run command "__needs implementing__"(create chat head and chat participants for all matched users)
  */
@@ -60,21 +65,6 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
  * 		| }
  * 		| });
  * 		| return `sh ${automatePath}`;
- *
- * ! cleanall
- * 		| if (process.env.NODE_ENV !== 'development') {
- * 		|   return 'not so fast';
- * 		| }
- * 		| getRepository(MatchingSpams)
- * 		|   .createQueryBuilder()
- * 		|   .update()
- * 		|   .set({ accept_list: [], decline_list: [], remove_list: [], matched_list: [] })
- * 		|   .execute();
- * 		| getRepository(MatchedDuos).createQueryBuilder().delete().where('id > 0').execute();
- * 		| getRepository(MatchedDuosNotifications).createQueryBuilder().delete().where('id > 0').execute();
- * 		| getRepository(MatchingLobby).createQueryBuilder().delete().where('id > 0').execute();
- * 		| return 'cleaned';
- *
  * ! env replace
  * 		| if (process.env.NODE_ENV !== 'development') {
  * 		|   return 'not so fast';

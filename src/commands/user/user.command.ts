@@ -1,5 +1,5 @@
 import { Command } from 'nestjs-command';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import { getManager } from 'typeorm';
 import User from 'src/database/entity/user.entity';
 

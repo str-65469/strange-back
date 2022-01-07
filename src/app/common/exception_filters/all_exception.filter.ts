@@ -9,11 +9,9 @@ import { GenericException } from '../exceptions/general.exception';
 interface GenericExceptionPropsStack {
   path: string;
   method: string;
-  errorName: string;
   extraStack: any;
   timestamp: string;
   headers: IncomingHttpHeaders;
-  temp: any;
 }
 
 export interface GenericExceptionProps {
@@ -37,7 +35,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof GenericException) {
       const exceptionResponse = exception.getResponse() as GenericExceptionProps;
       const statusCode = exception.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
-
       responseBody = {
         message: exceptionResponse?.message ?? configs.messages.exceptions.generalMessage,
         messageCode: exceptionResponse?.messageCode ?? ExceptionMessageCode.INTERNAL_SERVER_ERROR,
@@ -79,13 +76,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   private getAdditionInfo(request: Request, exception: any) {
     const additionalParams: GenericExceptionPropsStack = {
-      errorName: 'internal server error',
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
       headers: request.headers,
       extraStack: exception && Object.values(exception).length ? exception : undefined,
-      temp: exception,
     };
 
     return process.env.NODE_ENV === 'development' ? additionalParams : undefined;

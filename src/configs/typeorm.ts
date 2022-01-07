@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 dotenv.config();
 
@@ -11,7 +12,13 @@ export class TypeormConfig {
   public static get instance(): TypeOrmModuleOptions {
     if (!this._instance) {
       this._instance = new this(process.env)
-        .ensureValues(['POSTGRES_HOST', 'POSTGRES_PORT', 'POSTGRES_USERNAME', 'POSTGRES_PASSWORD', 'POSTGRES_DATABASE'])
+        .ensureValues([
+          'POSTGRES_HOST',
+          'POSTGRES_PORT',
+          'POSTGRES_USERNAME',
+          'POSTGRES_PASSWORD',
+          'POSTGRES_DATABASE',
+        ])
         .getTypeOrmConfig();
     }
 
@@ -27,6 +34,8 @@ export class TypeormConfig {
       }
     });
 
+    // console.log(path.join(__dirname, '/../../../**/*.entity{.ts,.js}'));
+
     return this;
   }
 
@@ -38,14 +47,15 @@ export class TypeormConfig {
       username: process.env.POSTGRES_USERNAME,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DATABASE,
-
-      //   logging: true, // true
-      logging: false, // true
+      logging: false,
       synchronize: false,
-      entities: ['dist/**/*.entity.js'],
-
       migrationsTableName: 'migrations',
-      migrations: ['src/database/migration/*.ts'],
+      migrations: ['dist/src/database/migrations/*.js'],
+      entities: [__dirname + '/../**/*.entity.{js,ts}'],
+
+      //   entities: ['dist/**/*.entity.js'],
+      //   entities: [path.join(__dirname, '/../../../**/*.entity{.ts,.js}')],
+      //   migrations: ['src/database/migration/*.ts'],
 
       cli: {
         migrationsDir: 'src/database/migration',

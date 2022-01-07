@@ -7,12 +7,12 @@
   "database": "strangeelo",
   "logging": false,
   "synchronize": false,
-  "entities": [
-    "dist/**/*.entity.js"
-  ],
   "migrationsTableName": "migrations",
   "migrations": [
-    "src/database/migration/*.ts"
+    "dist/src/database/migrations/*.js"
+  ],
+  "entities": [
+    "/home/giorgi/Desktop/strange-back/src/configs/../**/*.entity.{js,ts}"
   ],
   "cli": {
     "migrationsDir": "src/database/migration"
