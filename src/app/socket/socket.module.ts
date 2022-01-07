@@ -20,6 +20,7 @@ import { UsersService } from '../services/core/user/users.service';
 import { NotificationsService } from '../services/core/notifications.service';
 import { MatchedDuosService } from '../services/core/matcheds/matched_duos.service';
 import { configs } from 'src/configs/config';
+import { SocketService } from '../services/core/socket.service';
 
 @Module({
   imports: [
@@ -37,9 +38,10 @@ import { configs } from 'src/configs/config';
     ]),
   ],
   providers: [
+    SocketGateway,
+    SocketService,
     UserBelongingsService,
     JwtAcessService,
-    SocketGateway,
     DuoFinderService,
     UsersService,
     MatchedDuosService,
@@ -47,5 +49,6 @@ import { configs } from 'src/configs/config';
     NotificationsService,
     MatchingSpamService,
   ],
+  exports: [SocketGateway, SocketService],
 })
 export class SocketModule {}

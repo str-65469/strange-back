@@ -6,17 +6,17 @@ import { ChatHeads } from './chat_heads.entity';
 
 @Entity('chat_messages')
 export class ChatMessages extends GeneralEntity {
-  @Column({ name: 'text_message', type: 'text' }) textMessage: string | null;
-  @Column({ name: 'img_url' }) imgUrl: string | null;
-  @Column({ name: 'voice_url' }) voiceUrl: string | null;
-  @Column({ name: 'video_url' }) videoUrl: string | null;
-  @Column({ name: 'gif_url' }) gifURl: string | null;
+  @Column({ name: 'text_message', type: 'text' }) textMessage: string;
+  @Column({ name: 'img_url' }) imgUrl: string;
+  @Column({ name: 'voice_url' }) voiceUrl: string;
+  @Column({ name: 'video_url' }) videoUrl: string;
+  @Column({ name: 'gif_url' }) gifURl: string;
   @Column({ name: 'message_type', nullable: false, enum: MessageType, type: 'enum' }) messageType: MessageType;
   @Column({ name: 'is_deleted', nullable: false, default: false }) isDeleted: boolean;
 
-  @ManyToOne(() => User, (user) => user.chatMessages) user: User;
+  @Column({ type: 'unsigned big int', nullable: true }) userId: number;
+  @Column({ type: 'unsigned big int', nullable: true }) chatHeadId: number;
 
-  @ManyToOne(() => ChatHeads, (chatHead) => chatHead.chatMessages)
-  @JoinColumn({ name: 'chatHeadId' })
-  chatHead: ChatHeads;
+  @ManyToOne(() => User, (user) => user.chatMessages) user: User;
+  @ManyToOne(() => ChatHeads, (chatHead) => chatHead.chatMessages) chatHead: ChatHeads;
 }

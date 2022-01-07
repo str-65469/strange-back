@@ -8,15 +8,12 @@ import { GenericException } from 'src/app/common/exceptions/general.exception';
 import { configs } from 'src/configs/config';
 import { IncomingHttpHeaders } from 'http2';
 import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';
-
-interface RefreshTokenResponse {
-  secret: string;
-  refreshToken: string;
-}
+import { GenericSocketException } from 'src/app/common/exceptions/general_socket.exception';
 
 interface ValidateAcessTokenProps {
   token: string;
   secret: string;
+  is_socket?: boolean;
   clbck?: () => any;
   expired_clbck?: () => any;
 }
@@ -41,7 +38,7 @@ export class JwtAcessService {
     return this.jwtService.sign(payload, { expiresIn: configs.tokens.access_token.expires_in });
   }
 
-  public generateRefreshToken(user: User | UserRegisterCache, userSecret?: string): RefreshTokenResponse {
+  public generateRefreshToken(user: User | UserRegisterCache, userSecret?: string) {
     const secret = userSecret ?? RandomGenerator.randomString();
     const payload = { id: user.id, username: user.username };
 
@@ -65,16 +62,39 @@ export class JwtAcessService {
     return { secret, token };
   }
 
-  public async validateToken(params: ValidateAcessTokenProps): Promise<boolean> {
-    await jwt.verify(params.token, params.secret, async (err: jwt.VerifyErrors) => {
+  public async validateToken(params: ValidateAcessTokenProps): Promise<AccessTokenPayload> {
+    if (!params.token) {
+      if (params?.is_socket) {
+        throw new GenericSocketException(ExceptionMessageCode.TOKEN_MISSING);
+      }
+
+      throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_MISSING);
+    }
+
+    let decodedToken: AccessTokenPayload;
+
+    await jwt.verify(params.token, params.secret, async (err: jwt.VerifyErrors, decoded: jwt.JwtPayload) => {
+      if (!err) {
+        decodedToken = decoded as AccessTokenPayload;
+        return null;
+      }
+
       // expired
       if (err instanceof jwt.TokenExpiredError) {
         if ('expired_clbck' in params) await params.expired_clbck();
+
+        if (params?.is_socket) {
+          throw new GenericSocketException(ExceptionMessageCode.TOKEN_EXPIRED_ERROR, err.message);
+        }
 
         throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_EXPIRED_ERROR, err.message);
       }
 
       if ('clbck' in params) await params.clbck();
+
+      if (params?.is_socket) {
+        throw new GenericSocketException(ExceptionMessageCode.TOKEN_ERROR, err.message);
+      }
 
       // general
       if (err instanceof jwt.JsonWebTokenError) {
@@ -82,7 +102,7 @@ export class JwtAcessService {
       }
     });
 
-    return true;
+    return decodedToken;
   }
 
   public getForgotPasswordToken(headers: IncomingHttpHeaders): string | null {

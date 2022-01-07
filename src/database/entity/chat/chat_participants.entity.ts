@@ -7,8 +7,9 @@ import { ChatHeads } from './chat_heads.entity';
 export class ChatParticipants extends GeneralEntity {
   @Column({ type: 'timestamptz', name: 'chat_last_deleted_at' }) chatLastDeletedAt: Date | null;
 
-  @ManyToOne(() => User, (user) => user.chatParticipants) user: User;
+  @Column({ type: 'unsigned big int', nullable: true }) userId: number;
+  @Column({ type: 'unsigned big int', nullable: true }) chatHeadId: number;
 
-  @ManyToOne(() => ChatHeads, (chatHead) => chatHead.chatParticipants)
-  chatHead: ChatHeads;
+  @ManyToOne(() => User, (user) => user.chatParticipants) user: User;
+  @ManyToOne(() => ChatHeads, (chatHead) => chatHead.chatParticipants) chatHead: ChatHeads;
 }

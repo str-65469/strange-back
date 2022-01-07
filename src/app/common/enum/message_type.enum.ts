@@ -1,1 +1,3 @@
-export enum MessageType {}
+export enum MessageType {
+  TEXT = 'TEXT',
+}

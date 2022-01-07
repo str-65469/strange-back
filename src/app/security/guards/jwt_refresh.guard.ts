@@ -54,9 +54,11 @@ export class JwtRefreshTokenAuthGuard implements CanActivate {
     }
 
     // validate refresh token
-    return this.jwtAcessService.validateToken({
+    const jwtPayload = await this.jwtAcessService.validateToken({
       token: refreshToken,
       secret: secret,
     });
+
+    return true;
   }
 }

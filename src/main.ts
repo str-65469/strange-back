@@ -9,6 +9,14 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
 /**
  * ! run theese steps
  * 		| run command "__needs implementing__"(replace img_path null with dicebear)
+ * 		| run command "__needs implementing__"(create chat head and chat participants for all matched users)
+ */
+
+/**
+ * TODO
+ *
+ * 		| implement is_online on connect in socket id
+ * 		| check for is_online in send message before sending to socket
  */
 
 NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {

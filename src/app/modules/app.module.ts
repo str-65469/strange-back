@@ -19,7 +19,6 @@ import { MailModule } from '../mail/mail.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ContactUs } from '../../database/entity/contact_us.entity';
 import { UserDetails } from '../../database/entity/user_details.entity';
-import { SocketModule } from '../socket/socket.module';
 import { RouterModule } from '@nestjs/core';
 import { SuperLikeController } from '../controllers/superlike.controller';
 import { UserBelongings } from '../../database/entity/user_belongings.entity';
@@ -33,11 +32,11 @@ import { AuthModule } from './auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { CredentialsController } from '../controllers/credentieals.controller';
 import { CredentialsService } from '../services/core/credentials.service';
+import { ChatModule } from './chat.module';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    SocketModule,
     MulterModule.register({ dest: path.join(__dirname, '../../../../', 'upload') }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(TypeormConfig.instance),
@@ -58,6 +57,7 @@ import { CredentialsService } from '../services/core/credentials.service';
     MailModule,
     SeederModule,
     BillingModule,
+    ChatModule,
 
     RouterModule.register([
       {

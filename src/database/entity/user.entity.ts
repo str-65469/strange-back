@@ -38,7 +38,7 @@ export default class User extends GeneralEntity {
   @Exclude({ toPlainOnly: true })
   ip?: string;
 
-  @Column({ nullable: true })
+  @Column({ default: false, nullable: true })
   @Exclude({ toPlainOnly: true })
   is_online?: boolean;
 

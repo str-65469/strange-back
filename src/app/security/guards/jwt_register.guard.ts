@@ -37,7 +37,7 @@ export class JwtRegisterAuthGuard {
       throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_MISMATCH_ERROR);
     }
 
-    await this.jwtAcessService.validateToken({
+    const jwtPayload = await this.jwtAcessService.validateToken({
       token: secret,
       secret: process.env.JWT_REGISTER_CACHE_SECRET,
       expired_clbck: () => this.userRegisterCacheService.delete(id),

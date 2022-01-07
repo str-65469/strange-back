@@ -9,21 +9,20 @@ import {
 import { DuoFinderService } from '../services/core/duo_finder.service';
 import { Server, Socket } from 'socket.io';
 import { configs } from 'src/configs/config';
-import { UseInterceptors, ClassSerializerInterceptor, UseGuards } from '@nestjs/common';
+import { UseInterceptors, ClassSerializerInterceptor, UseGuards, UseFilters } from '@nestjs/common';
 import { serialize } from 'class-transformer';
 import { SocketAccessGuard } from '../security/guards/socket_access.guard';
 import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
 import { DuoFinderResponseType, DuoFinderTransferTypes } from '../common/enum/duofinder/duofinder';
 import { HandleDuoFindBody } from '../common/schemas/response';
 import { UsersService } from '../services/core/user/users.service';
-
-const { duomatchConnect, duomatchFind } = configs.socket;
+import { AllSocketExceptionsFilter } from '../common/exception_filters/all_socket_exception.filter';
 
 @UseGuards(SocketAccessGuard)
+@UseFilters(AllSocketExceptionsFilter)
 @WebSocketGateway()
 export class SocketGateway {
-  @WebSocketServer()
-  private wss: Server;
+  @WebSocketServer() public wss: Server;
 
   constructor(
     private readonly duoFinderService: DuoFinderService,
@@ -32,7 +31,7 @@ export class SocketGateway {
   ) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @SubscribeMessage(duomatchConnect)
+  @SubscribeMessage(configs.socket.duomatchConnect)
   public async handleDuoConnect(@ConnectedSocket() socket: Socket) {
     const { id, socket_id } = this.userService.userSocketPayload(socket);
     const user = await this.userService.userSpamAndDetails(id);
@@ -42,11 +41,14 @@ export class SocketGateway {
     // join to user specific id
     socket.join(socket_id);
 
+    // update online status
+    this.userService.updateOnlineStatus(user.id, true);
+
     // send found user and if anyone matched
     return await this.duoFinderService.initFirstMatch(user);
   }
 
-  @SubscribeMessage(duomatchFind)
+  @SubscribeMessage(configs.socket.duomatchFind)
   public async handleDuoFind(@MessageBody() data: HandleDuoFindBody, @ConnectedSocket() socket: Socket) {
     const payload = this.userService.userSocketPayload(socket);
 

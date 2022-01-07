@@ -227,6 +227,12 @@ export class UsersService {
     });
   }
 
+  async updateOnlineStatus(userId: number, status: boolean) {
+    await this.userRepo.update(userId, {
+      is_online: status,
+    });
+  }
+
   public async findNewDuoDetails(user: User, prevId?: number) {
     const { accept_list, remove_list, decline_list, matched_list } = user.spams;
 
