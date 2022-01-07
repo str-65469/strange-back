@@ -35,7 +35,7 @@ export class JwtAcessService {
       socket_id: socketId,
     };
 
-    return this.jwtService.sign(payload, { expiresIn: configs.tokens.access_token.expires_in });
+    return this.jwtService.sign(payload, { expiresIn: configs.tokens.access_token });
   }
 
   public generateRefreshToken(user: User | UserRegisterCache, userSecret?: string) {
@@ -43,7 +43,7 @@ export class JwtAcessService {
     const payload = { id: user.id, username: user.username };
 
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: configs.tokens.refresh_token.expires_in,
+      expiresIn: configs.tokens.refresh_token,
       secret,
     });
 
