@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ChatHeadRepository } from 'src/app/repositories/chat_head.repository';
+import { In } from 'typeorm';
 
 @Injectable()
 export class ChatHeadService {
@@ -7,5 +8,14 @@ export class ChatHeadService {
 
   createTableModel() {
     return this.chatHeadRepository.createTableModel({});
+  }
+
+  getChatHeads(chatHeadIds: number[]) {
+    return this.chatHeadRepository.find({
+      where: {
+        id: In(chatHeadIds),
+      },
+      relations: ['chatParticipants'],
+    });
   }
 }

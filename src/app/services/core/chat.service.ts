@@ -31,7 +31,17 @@ export class ChatService {
     );
 
     if (!user) {
-      throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.USER_DOESNT_BELONG_TO_CHATHEAD);
+      throw new GenericException(
+        HttpStatus.BAD_REQUEST,
+        ExceptionMessageCode.USER_DOESNT_BELONG_TO_CHATHEAD,
+      );
+    }
+
+    if (!partner) {
+      throw new GenericException(
+        HttpStatus.BAD_REQUEST,
+        ExceptionMessageCode.USER_CHATHEAD_PARTNER_NOT_FOUND,
+      );
     }
 
     return {
@@ -66,5 +76,24 @@ export class ChatService {
       );
       await manager.save(chatParticipantsTableModel);
     });
+  }
+
+  async getChatheads(userId: number) {
+    // first fetch user chat participation columns
+    const userChatParticipants = await this.chatParticipantsService.getUserChatParticipants(userId);
+
+    const chatHeadIds = userChatParticipants.map((el) => el.chatHeadId);
+
+    // then fetch all participant columns based on chat head ids
+    const chatHeads = await this.chatHeadService.getChatHeads(chatHeadIds);
+    // const userPartnerParticipants = await this.chatParticipantsService.getPartnerParticipants(chatHeadIds);
+
+    return chatHeads;
+  }
+
+  getMessages(userId: number, chatHeadId: number, take: number, lastId?: number) {
+    const takeCount = take || 10;
+
+    return this.chatMessagesService.fetchMessages(userId, chatHeadId, takeCount, lastId);
   }
 }

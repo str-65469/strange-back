@@ -21,7 +21,11 @@ export class ChatMessages extends GeneralEntity {
   @Column({ name: 'gif_url', nullable: true })
   gifURl: string | null;
 
-  @Column({ name: 'message_type', nullable: false, enum: MessageType, type: 'enum' })
+  @Column({
+    enum: MessageType,
+    type: 'enum',
+    nullable: false,
+  })
   messageType: MessageType;
 
   @Column({ name: 'is_deleted', nullable: false, default: false })

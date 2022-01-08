@@ -1,6 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
-import * as path from 'path';
 
 dotenv.config();
 
@@ -34,8 +33,6 @@ export class TypeormConfig {
       }
     });
 
-    // console.log(path.join(__dirname, '/../../../**/*.entity{.ts,.js}'));
-
     return this;
   }
 
@@ -53,13 +50,14 @@ export class TypeormConfig {
       migrations: ['dist/src/database/migrations/*.js'],
       entities: [__dirname + '/../**/*.entity.{js,ts}'],
 
-      //   entities: ['dist/**/*.entity.js'],
-      //   entities: [path.join(__dirname, '/../../../**/*.entity{.ts,.js}')],
-      //   migrations: ['src/database/migration/*.ts'],
-
       cli: {
         migrationsDir: 'src/database/migration',
       },
     };
   }
 }
+
+// old configs
+// migrations: ['src/database/migration/*.ts'],
+// entities: ['dist/**/*.entity.js'],
+// entities: [path.join(__dirname, '/../../../**/*.entity{.ts,.js}')],

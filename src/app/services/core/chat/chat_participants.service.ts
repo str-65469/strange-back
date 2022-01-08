@@ -1,21 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { ChatParticipantsRepository } from 'src/app/repositories/chat_participant.repositry';
 import { ChatParticipants } from 'src/database/entity/chat/chat_participants.entity';
+import { In } from 'typeorm';
 
 @Injectable()
 export class ChatParticipantsService {
   constructor(private readonly chatParticipantsRepo: ChatParticipantsRepository) {}
 
-  getChatParticipantsByUser(userId: number, partnerId: number, chatHeadId: number): Promise<ChatParticipants[]> {
+  getChatParticipantsByUser(
+    userId: number,
+    partnerId: number,
+    chatHeadId: number,
+  ): Promise<ChatParticipants[]> {
     return this.chatParticipantsRepo.find({
       where: [
         {
-          user: userId,
-          chatHead: chatHeadId,
+          userId: userId,
+          chatHeadId: chatHeadId,
         },
         {
-          user: partnerId,
-          chatHead: chatHeadId,
+          userId: partnerId,
+          chatHeadId: chatHeadId,
         },
       ],
       relations: ['user'],
@@ -47,4 +52,20 @@ export class ChatParticipantsService {
       },
     ]);
   }
+
+  getUserChatParticipants(userId: number) {
+    return this.chatParticipantsRepo.find({
+      where: {
+        userId,
+      },
+    });
+  }
+
+  //   getPartnerParticipants(chatHeadIds: number[]) {
+  //     return this.chatParticipantsRepo.find({
+  //       where: {
+  //         chatHeadId: In(chatHeadIds),
+  //       },
+  //     });
+  //   }
 }

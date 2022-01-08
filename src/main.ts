@@ -28,7 +28,7 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
   const port = 4000;
 
   const httpAdapterHost = app.get(HttpAdapterHost);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(cookieParser());
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
   app.enableCors({ origin: true, methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS', credentials: true });
