@@ -1,0 +1,1 @@
+{"version":3,"file":"general_socket.exception.js","sourceRoot":"","sources":["../../../../../src/app/common/exceptions/general_socket.exception.ts"],"names":[],"mappings":";;;AAAA,mDAAiD;AAIjD,MAAa,sBAAuB,SAAQ,wBAAW;IACrD,YAAY,WAAiC,EAAE,OAAgB;QAC7D,MAAM,oBAAoB,GAAgC;YACxD,WAAW;YACX,OAAO;SACR,CAAC;QAEF,KAAK,CAAC,oBAAoB,CAAC,CAAC;IAC9B,CAAC;CACF;AATD,wDASC"}

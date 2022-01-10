@@ -1,0 +1,36 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ExceptionMessageCode = void 0;
+var ExceptionMessageCode;
+(function (ExceptionMessageCode) {
+    ExceptionMessageCode["INTERNAL_SERVER_ERROR"] = "INTERNAL_SERVER_ERROR";
+    ExceptionMessageCode["GENERAL_ERROR"] = "GENERAL_ERROR";
+    ExceptionMessageCode["TOKEN_ERROR"] = "TOKEN_ERROR";
+    ExceptionMessageCode["TOKEN_NOT_BEFORE_ERROR"] = "TOKEN_NOT_BEFORE_ERROR";
+    ExceptionMessageCode["TOKEN_EXPIRED_ERROR"] = "TOKEN_EXPIRED_ERROR";
+    ExceptionMessageCode["TOKEN_MISSING"] = "TOKEN_MISSING";
+    ExceptionMessageCode["TOKEN_PAYLOAD_MISSING"] = "TOKEN_PAYLOAD_MISSING";
+    ExceptionMessageCode["TOKEN_PARAMETER_MISSING"] = "TOKEN_PARAMETER_MISSING";
+    ExceptionMessageCode["TOKEN_MISMATCH_ERROR"] = "TOKEN_MISMATCH_ERROR";
+    ExceptionMessageCode["ACCESS_TOKEN_MISSING"] = "ACCESS_TOKEN_MISSING";
+    ExceptionMessageCode["REFRESH_TOKEN_MISSING"] = "REFRESH_TOKEN_MISSING";
+    ExceptionMessageCode["FORGOT_PASSWORD_TOKEN_MISSING"] = "FORGOT_PASSWORD_TOKEN_MISSING";
+    ExceptionMessageCode["USER_NOT_FOUND"] = "USER_NOT_FOUND";
+    ExceptionMessageCode["USER_EMAIL_OR_PASSWORD_INCORRECT"] = "USER_EMAIL_OR_PASSWORD_INCORRECT";
+    ExceptionMessageCode["USER_EMAIL_ALREADY_IN_USE"] = "USER_EMAIL_ALREADY_IN_USE";
+    ExceptionMessageCode["USER_ALREADY_IN_CACHE"] = "USER_ALREADY_IN_CACHE";
+    ExceptionMessageCode["USERNAME_ALREADY_IN_USE"] = "USERNAME_ALREADY_IN_USE";
+    ExceptionMessageCode["SUMMONER_NAME_ALREADY_IN_USE"] = "SUMMONER_NAME_ALREADY_IN_USE";
+    ExceptionMessageCode["SUMMONER_NAME_NOT_FOUND"] = "SUMMONER_NAME_NOT_FOUND";
+    ExceptionMessageCode["INCORRECT_UUID"] = "INCORRECT_UUID";
+    ExceptionMessageCode["REGISTER_CACHE_NOT_FOUND"] = "REGISTER_CACHE_NOT_FOUND";
+    ExceptionMessageCode["FORGOT_PASSWORD_CACHE_NOT_FOUND"] = "FORGOT_PASSWORD_CACHE_NOT_FOUND";
+    ExceptionMessageCode["PAYPAL_ORDER_ERROR"] = "PAYPAL_ORDER_ERROR";
+    ExceptionMessageCode["PAYPAL_PAYMENT_ERROR"] = "PAYPAL_PAYMENT_ERROR";
+    ExceptionMessageCode["QUERY_PARAMETER_MISSING"] = "QUERY_PARAMETER_MISSING";
+    ExceptionMessageCode["DIVISION_SUMMONER_ERROR"] = "DIVISION_SUMMONER_ERROR";
+    ExceptionMessageCode["ONLY_JPEG_ALLOWED"] = "ONLY_JPEG_ALLOWED";
+    ExceptionMessageCode["USER_DOESNT_BELONG_TO_CHATHEAD"] = "USER_DOESNT_BELONG_TO_CHATHEAD";
+    ExceptionMessageCode["USER_CHATHEAD_PARTNER_NOT_FOUND"] = "USER_CHATHEAD_PARTNER_NOT_FOUND";
+})(ExceptionMessageCode = exports.ExceptionMessageCode || (exports.ExceptionMessageCode = {}));
+//# sourceMappingURL=exception_message_code.enum.js.map

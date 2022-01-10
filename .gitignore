@@ -4,7 +4,7 @@ public/static/11.24.1
 
 
 # compiled output
-/dist
+# /dist
 /node_modules
 
 # Logs
