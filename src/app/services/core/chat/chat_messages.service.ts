@@ -27,7 +27,7 @@ export class ChatMessagesService {
     lastId?: number,
   ): Promise<Pagination> {
     let where: FindConditions<ChatMessages> = {
-      userId,
+      //   userId,
       chatHeadId,
     };
 

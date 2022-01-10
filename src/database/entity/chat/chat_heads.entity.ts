@@ -16,4 +16,7 @@ export class ChatHeads extends GeneralEntity {
 
   @OneToMany(() => ChatMessages, (chatMessages) => chatMessages.chatHead)
   chatMessages: ChatMessages[];
+
+  // must be removed after mapping
+  chatParticipant?: ChatParticipants;
 }

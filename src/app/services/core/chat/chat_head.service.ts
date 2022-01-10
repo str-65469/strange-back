@@ -15,7 +15,7 @@ export class ChatHeadService {
       where: {
         id: In(chatHeadIds),
       },
-      relations: ['chatParticipants'],
+      relations: ['chatParticipants', 'chatParticipants.user'],
     });
   }
 }

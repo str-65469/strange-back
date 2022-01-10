@@ -86,9 +86,15 @@ export class ChatService {
 
     // then fetch all participant columns based on chat head ids
     const chatHeads = await this.chatHeadService.getChatHeads(chatHeadIds);
-    // const userPartnerParticipants = await this.chatParticipantsService.getPartnerParticipants(chatHeadIds);
 
-    return chatHeads;
+    // find partner id in chatParticipants
+
+    return chatHeads.map((el) => {
+      el.chatParticipant = el.chatParticipants.find((participant) => participant.userId !== userId);
+      return el;
+    });
+
+    // return chatHeads;
   }
 
   getMessages(userId: number, chatHeadId: number, take: number, lastId?: number) {

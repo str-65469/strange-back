@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ContactUsService } from '../services/core/contact_us.service';
 import { ContactUsDto } from '../common/request/contact_us.dto';
+import { Builder } from 'builder-pattern';
+import { Pag, Pagination } from '../common/schemas/pagination';
 
 @Controller()
 export class AppController {

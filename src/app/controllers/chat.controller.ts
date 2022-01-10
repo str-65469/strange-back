@@ -1,8 +1,20 @@
-import { Body, Controller, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { MessageType } from '../common/enum/message_type.enum';
 import { GetMessagesDto } from '../common/request/chat/get_messages.dto';
 import { SendMessageDto } from '../common/request/chat/send_message.dto';
 import { JwtAcessTokenAuthGuard, JwtRequest } from '../security/guards/jwt_access.guard';
+import { UserSafeInterceptor } from '../security/interceptors/user_safe.interceptor';
 import { ChatService } from '../services/core/chat.service';
 import { SocketService } from '../services/core/socket.service';
 
@@ -30,23 +42,22 @@ export class ChatController {
     const chatMessage = await this.chatService.insertMessage(payload.id, chatHeadId, data.message);
 
     //	send message via socket
-    this.socketService.sendMessageToUser(participants.partner.user.socket_id, {
-      messageType: MessageType.TEXT,
-      textMessage: data.message,
-    });
+    this.socketService.sendMessageToUser(participants.partner.user.socket_id, chatMessage);
 
     //! for now
-    return { participants, chatMessage };
+    return chatMessage;
   }
 
-  @Post('/chat-heads')
+  @UseInterceptors(UserSafeInterceptor)
+  @Get('/heads')
   getChats(@Req() req: JwtRequest) {
     const payload = req.jwtPayload;
 
     return this.chatService.getChatheads(payload.id);
   }
 
-  @Post('/messages/:chatHeadId')
+  @UseInterceptors(UserSafeInterceptor)
+  @Get('/messages/:chatHeadId')
   getMessages(
     @Req() req: JwtRequest,
     @Param('chatHeadId', ParseIntPipe) chatHeadId: number,
