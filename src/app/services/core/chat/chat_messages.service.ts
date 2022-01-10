@@ -26,24 +26,31 @@ export class ChatMessagesService {
     take: number,
     lastId?: number,
   ): Promise<Pagination> {
-    let where: FindConditions<ChatMessages> = {
-      //   userId,
+    let chatWhere: FindConditions<ChatMessages> = {
+      chatHeadId,
+    };
+
+    let countWhere: FindConditions<ChatMessages> = {
       chatHeadId,
     };
 
     if (lastId) {
-      where = { id: LessThan(lastId), ...where };
+      chatWhere = { ...chatWhere, id: LessThan(lastId) };
     }
 
-    const [result, total] = await this.chatMessagesRepo.findAndCount({
-      where,
+    const data = await this.chatMessagesRepo.find({
+      where: chatWhere,
       take,
       order: { id: 'DESC' },
     });
 
+    const count = await this.chatMessagesRepo.count({
+      where: countWhere,
+    });
+
     return {
-      data: result,
-      count: total,
+      data,
+      count,
     };
   }
 }
