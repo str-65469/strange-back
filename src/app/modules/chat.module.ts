@@ -1,13 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
-import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notifications.entity';
-import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
-import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { ChatController } from '../controllers/chat.controller';
-import { ChatHeadRepository } from '../repositories/chat_head.repository';
-import { ChatMessagesRepository } from '../repositories/chat_messages.repository';
-import { ChatParticipantsRepository } from '../repositories/chat_participant.repositry';
 import { ChatService } from '../services/core/chat.service';
 import { ChatHeadService } from '../services/core/chat/chat_head.service';
 import { ChatMessagesService } from '../services/core/chat/chat_messages.service';
@@ -20,25 +12,11 @@ import { NotificationsService } from '../services/core/notifications.service';
 import { SocketService } from '../services/core/socket.service';
 import { UserBelongingsService } from '../services/core/user/user_belongings.service';
 import { SocketGateway } from '../socket/socket.gateway';
+import { EntitiesModule } from './entities.module';
 import { UsersModule } from './users.module';
 
 @Module({
-  imports: [
-    UsersModule,
-
-    // SocketModule,
-    TypeOrmModule.forFeature([
-      ChatParticipantsRepository,
-      ChatMessagesRepository,
-      ChatHeadRepository,
-
-      // must be replace in future !
-      MatchedDuos,
-      MatchingLobby,
-      MatchingSpams,
-      MatchedDuosNotifications,
-    ]),
-  ],
+  imports: [UsersModule, EntitiesModule],
   controllers: [ChatController],
   providers: [
     ChatService,
