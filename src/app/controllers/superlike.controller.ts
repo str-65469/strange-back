@@ -1,8 +1,8 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
-import { JwtAcessTokenAuthGuard } from 'src/app/security/guards/jwt_access.guard';
-import { UsersService } from '../services/core/user/users.service';
-import { UserBelongingsService } from '../services/core/user/user_belongings.service';
+import { JwtAcessTokenAuthGuard } from 'src/app/guards/jwt_access.guard';
+import { UsersService } from '../modules/user/users.service';
+import { UserBelongingsService } from '../modules/user/user_belongings.service';
 
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('superlike')

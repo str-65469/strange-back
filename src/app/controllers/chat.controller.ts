@@ -11,12 +11,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { MessageType } from '../common/enum/message_type.enum';
-import { GetMessagesDto } from '../common/request/chat/get_messages.dto';
-import { SendMessageDto } from '../common/request/chat/send_message.dto';
-import { JwtAcessTokenAuthGuard, JwtRequest } from '../security/guards/jwt_access.guard';
-import { UserSafeInterceptor } from '../security/interceptors/user_safe.interceptor';
-import { ChatService } from '../services/core/chat.service';
-import { SocketService } from '../services/core/socket.service';
+import { GetMessagesDto } from '../schemas/request/chat/get_messages.dto';
+import { SendMessageDto } from '../schemas/request/chat/send_message.dto';
+import { JwtAcessTokenAuthGuard, JwtRequest } from '../guards/jwt_access.guard';
+import { UserSafeInterceptor } from '../interceptors/user_safe.interceptor';
+import { ChatService } from '../modules/chat/chat.service';
+import { SocketService } from '../modules/socket/socket.service';
 
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('/chat')

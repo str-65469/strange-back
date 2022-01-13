@@ -1,9 +1,9 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { AccountAbuseReportDto } from '../common/request/account_abues.dto';
-import { ReportsService } from '../services/core/reports.service';
-import { UsersService } from '../services/core/user/users.service';
-import { FileHelper } from '../utils/file_helper';
+import { AccountAbuseReportDto } from '../schemas/request/account_abues.dto';
+import { ReportsService } from '../modules/non_auth/reports.service';
+import { UsersService } from '../modules/user/users.service';
+import { FileHelper } from '../utils/file.helper';
 import { GeneralHelper } from '../utils/general.helper';
 
 @Controller('reports')

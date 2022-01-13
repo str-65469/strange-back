@@ -8,7 +8,7 @@ import { GeneralEntity } from '../entity_inheritance/general';
 import { UserBelongings } from './user_belongings.entity';
 import { UserDetails } from './user_details.entity';
 import { Exclude } from 'class-transformer';
-import { FileHelper } from 'src/app/utils/file_helper';
+import { FileHelper } from 'src/app/utils/file.helper';
 import { ChatHeads } from './chat/chat_heads.entity';
 import { ChatMessages } from './chat/chat_messages.entity';
 import { ChatParticipants } from './chat/chat_participants.entity';

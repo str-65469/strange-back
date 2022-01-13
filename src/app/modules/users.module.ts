@@ -1,14 +1,14 @@
-import { JwtAcessService } from '../services/common/jwt_access.service';
+import { JwtAcessService } from './common_services/jwt_access.service';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { MulterModule } from '@nestjs/platform-express';
 import { UserFileController } from '../controllers/user_files.controller';
 import { HttpModule } from '@nestjs/axios';
-import { MailModule } from 'src/app/mail/mail.module';
-import { CookieService } from 'src/app/services/common/cookie.service';
-import { MatchingSpamService } from 'src/app/services/core/matcheds/matching_spam.service';
+import { MailModule } from 'src/app/modules/mail.module';
+import { CookieService } from 'src/app/modules/common_services/cookie.service';
+import { MatchingSpamService } from 'src/app/modules/user/matching_spam.service';
 import { UserController } from 'src/app/controllers/user.controller';
-import { UsersService } from 'src/app/services/core/user/users.service';
+import { UsersService } from 'src/app/modules/user/users.service';
 import { configs } from 'src/configs/config';
 import { EntitiesModule } from './entities.module';
 

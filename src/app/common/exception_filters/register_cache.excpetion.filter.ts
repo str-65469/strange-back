@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 import { configs } from 'src/configs/config';
-import { buildUrl } from 'src/app/utils/url_builder';
+import { buildUrl } from 'src/app/utils/url_builder.helper';
 import { GenericException } from '../exceptions/general.exception';
 import { GenericExceptionProps } from './all_exception.filter';
 

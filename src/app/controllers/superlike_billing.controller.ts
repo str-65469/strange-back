@@ -1,14 +1,14 @@
 import * as paypal from '@paypal/checkout-server-sdk';
 import { Request } from 'express';
 import { Controller, Get, HttpStatus, Param, ParseIntPipe, Req, UseGuards } from '@nestjs/common';
-import { PaypalPaymentDetailsService } from '../services/core/paypal_payment_details.service';
-import { SuperlikeService } from 'src/app/services/core/superlike/superlike.service';
+import { PaypalPaymentDetailsService } from '../modules/billing/paypal_payment_details.service';
+import { SuperlikeService } from 'src/app/modules/user/superlike.service';
 import { SuperLikeServiceType } from 'src/app/common/enum/superlike_services';
-import { JwtAcessTokenAuthGuard } from 'src/app/security/guards/jwt_access.guard';
+import { JwtAcessTokenAuthGuard } from 'src/app/guards/jwt_access.guard';
 import { PaymentType } from '../common/enum/payment_type.enum';
-import { SuperlikePaymentService } from '../services/core/superlike/superlike_payment.service';
-import { UserBelongingsService } from '../services/core/user/user_belongings.service';
-import { UsersService } from '../services/core/user/users.service';
+import { SuperlikePaymentService } from '../modules/user/superlike_payment.service';
+import { UserBelongingsService } from '../modules/user/user_belongings.service';
+import { UsersService } from '../modules/user/users.service';
 import { GenericException } from '../common/exceptions/general.exception';
 import { ExceptionMessageCode } from '../common/enum/message_codes/exception_message_code.enum';
 

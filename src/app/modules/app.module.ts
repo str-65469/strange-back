@@ -10,20 +10,19 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeormConfig } from '../../configs/typeorm';
 import { UsersModule } from './users.module';
-import { MailModule } from '../mail/mail.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { RouterModule } from '@nestjs/core';
 import { SuperLikeController } from '../controllers/superlike.controller';
-import { ContactUsService } from '../services/core/contact_us.service';
-import { MatchedDuosService } from '../services/core/matcheds/matched_duos.service';
-import { MatchingLobbyService } from '../services/core/matcheds/matching_lobby.service';
-import { NotificationsService } from '../services/core/notifications.service';
-import { ReportsService } from '../services/core/reports.service';
-import { UserBelongingsService } from '../services/core/user/user_belongings.service';
+import { ContactUsService } from './non_auth/contact_us.service';
+import { MatchedDuosService } from './user/matched_duos.service';
+import { MatchingLobbyService } from './user/matching_lobby.service';
+import { NotificationsService } from './non_auth/notifications.service';
+import { ReportsService } from './non_auth/reports.service';
+import { UserBelongingsService } from './user/user_belongings.service';
 import { AuthModule } from './auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { CredentialsController } from '../controllers/credentieals.controller';
-import { CredentialsService } from '../services/core/credentials.service';
+import { CredentialsService } from './non_auth/credentials.service';
 import { ChatModule } from './chat.module';
 import { EntitiesModule } from './entities.module';
 
@@ -32,7 +31,6 @@ import { EntitiesModule } from './entities.module';
     // defined modules
     UsersModule,
     AuthModule,
-    MailModule,
     SeederModule,
     BillingModule,
     ChatModule,

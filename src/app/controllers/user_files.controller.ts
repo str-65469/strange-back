@@ -1,10 +1,10 @@
 import { Controller, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { UserSafeInterceptor } from '../security/interceptors/user_safe.interceptor';
+import { UserSafeInterceptor } from '../interceptors/user_safe.interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FileHelper } from 'src/app/utils/file_helper';
+import { FileHelper } from 'src/app/utils/file.helper';
 import { Express, Request } from 'express';
 import { diskStorage } from 'multer';
-import { UsersService } from '../services/core/user/users.service';
+import { UsersService } from '../modules/user/users.service';
 import { configs } from 'src/configs/config';
 
 @Controller('user/upload')

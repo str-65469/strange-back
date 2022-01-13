@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { UserBelongingsService } from 'src/app/services/core/user/user_belongings.service';
-import { MatchingSpamService } from 'src/app/services/core/matcheds/matching_spam.service';
-import { UserDetailsServiceService } from 'src/app/services/core/user/user_details.service';
-import { UserRegisterCacheService } from 'src/app/services/core/user/user_register_cache.service';
+import { UserBelongingsService } from 'src/app/modules/user/user_belongings.service';
+import { MatchingSpamService } from 'src/app/modules/user/matching_spam.service';
+import { UserDetailsServiceService } from 'src/app/modules/user/user_details.service';
+import { UserRegisterCacheService } from 'src/app/modules/user/user_register_cache.service';
 import { AuthController } from '../controllers/auth.controller';
-import { JwtAcessService } from '../services/common/jwt_access.service';
-import { AuthService } from '../services/core/auth/auth.service';
+import { JwtAcessService } from './common_services/jwt_access.service';
+import { AuthService } from './auth/auth.service';
 import { UsersModule } from './users.module';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { UserForgotPasswordCacheService } from '../services/core/user/user_forgot_password.service';
+import { UserForgotPasswordCacheService } from './user/user_forgot_password.service';
 import { EntitiesModule } from './entities.module';
 
 @Module({

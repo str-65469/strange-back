@@ -1,8 +1,8 @@
 import { Controller, Get, UseGuards, UseInterceptors } from '@nestjs/common';
-import { CredentialsResponse } from '../common/response/credentials/credentials.response';
-import { JwtAcessTokenAuthGuard } from '../security/guards/jwt_access.guard';
-import { UserSafeInterceptor } from '../security/interceptors/user_safe.interceptor';
-import { CredentialsService } from '../services/core/credentials.service';
+import { CredentialsResponse } from '../schemas/response/credentials/credentials.response';
+import { JwtAcessTokenAuthGuard } from '../guards/jwt_access.guard';
+import { UserSafeInterceptor } from '../interceptors/user_safe.interceptor';
+import { CredentialsService } from '../modules/non_auth/credentials.service';
 
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('credentials')

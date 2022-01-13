@@ -1,8 +1,8 @@
 import { ClassSerializerInterceptor, Controller, Get, Query, Req, UseGuards, UseInterceptors } from '@nestjs/common';
-import { JwtAcessTokenAuthGuard } from 'src/app/security/guards/jwt_access.guard';
+import { JwtAcessTokenAuthGuard } from 'src/app/guards/jwt_access.guard';
 import { Request } from 'express';
-import { MatchedDuosService } from '../services/core/matcheds/matched_duos.service';
-import { UsersService } from '../services/core/user/users.service';
+import { MatchedDuosService } from '../modules/user/matched_duos.service';
+import { UsersService } from '../modules/user/users.service';
 
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('matcheds')

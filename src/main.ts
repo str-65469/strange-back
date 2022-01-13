@@ -7,7 +7,9 @@ import { join } from 'path';
 import { AllExceptionsFilter } from './app/common/exception_filters/all_exception.filter';
 
 /**
- * ! run theese steps
+ * ! https://github.com/yggdrasilts/axiosfit
+ *
+ * @important
  * 		| run yarn
  * 		| run yarn migrate:generate
  * 		| check migration first
@@ -15,13 +17,13 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
  * 		|
  * 		| run command "__needs implementing__"(replace img_path null with dicebear)
  * 		| run command "__needs implementing__"(create chat head and chat participants for all matched users)
- */
-
-/**
- * TODO
  *
+ * @todo
  * 		| implement is_online on connect in socket id
  * 		| check for is_online in send message before sending to socket
+ *
+ * @informative
+ *      | public/static folder must contain these folders: 11.24.1 (lol assets), random_dicebears
  */
 
 NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
