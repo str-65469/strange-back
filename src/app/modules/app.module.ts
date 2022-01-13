@@ -1,13 +1,8 @@
 import * as path from 'path';
-import User from '../../database/entity/user.entity';
 import { BillingModule } from './billing.module';
-import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
 import { ReportsController } from '../controllers/reports.controller';
-import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
 import { MatchedDuosController } from '../controllers/matched_duos.controller';
-import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notifications.entity';
 import { NotificationsController } from '../controllers/notifications.controller';
-import { AccountAbuseReport } from '../../database/entity/account_abuse_reports.entity';
 import { SeederModule } from '../../database/seeders/seeder.module';
 import { Module } from '@nestjs/common';
 import { AppController } from '../controllers/app.controller';
@@ -17,11 +12,8 @@ import { TypeormConfig } from '../../configs/typeorm';
 import { UsersModule } from './users.module';
 import { MailModule } from '../mail/mail.module';
 import { MulterModule } from '@nestjs/platform-express';
-import { ContactUs } from '../../database/entity/contact_us.entity';
-import { UserDetails } from '../../database/entity/user_details.entity';
 import { RouterModule } from '@nestjs/core';
 import { SuperLikeController } from '../controllers/superlike.controller';
-import { UserBelongings } from '../../database/entity/user_belongings.entity';
 import { ContactUsService } from '../services/core/contact_us.service';
 import { MatchedDuosService } from '../services/core/matcheds/matched_duos.service';
 import { MatchingLobbyService } from '../services/core/matcheds/matching_lobby.service';
@@ -33,24 +25,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { CredentialsController } from '../controllers/credentieals.controller';
 import { CredentialsService } from '../services/core/credentials.service';
 import { ChatModule } from './chat.module';
+import { EntitiesModule } from './entities.module';
 
 @Module({
   imports: [
-    JwtModule.register({}),
-    MulterModule.register({ dest: path.join(__dirname, '../../../../', 'upload') }),
-    ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot(TypeormConfig.instance),
-    TypeOrmModule.forFeature([
-      ContactUs,
-      MatchedDuosNotifications,
-      MatchedDuos,
-      User,
-      UserDetails,
-      AccountAbuseReport,
-      MatchingLobby,
-      UserBelongings,
-    ]),
-
     // defined modules
     UsersModule,
     AuthModule,
@@ -58,7 +36,12 @@ import { ChatModule } from './chat.module';
     SeederModule,
     BillingModule,
     ChatModule,
+    EntitiesModule,
 
+    JwtModule.register({}),
+    MulterModule.register({ dest: path.join(__dirname, '../../../../', 'upload') }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot(TypeormConfig.instance),
     RouterModule.register([
       {
         path: 'billing',

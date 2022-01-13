@@ -11,7 +11,6 @@ import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { PaypalPaymentDetails } from 'src/database/entity/paypal_payment_details.entity';
 import { SuperLikePayment } from 'src/database/entity/superlike_payment.entity';
 import { SuperLikeServices } from 'src/database/entity/superlike_services.entity';
-
 import { UserBelongings } from 'src/database/entity/user_belongings.entity';
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';

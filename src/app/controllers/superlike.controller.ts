@@ -7,7 +7,10 @@ import { UserBelongingsService } from '../services/core/user/user_belongings.ser
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('superlike')
 export class SuperLikeController {
-  constructor(private readonly userService: UsersService, private readonly userBelongingsService: UserBelongingsService) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly userBelongingsService: UserBelongingsService,
+  ) {}
 
   @Get('count')
   public async fetchSuperLike(@Req() req: Request) {

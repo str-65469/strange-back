@@ -1,6 +1,5 @@
 import * as bcrypt from 'bcrypt';
 import User from 'src/database/entity/user.entity';
-import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { UserRegisterCache } from '../../../../database/entity/user_register_cache.entity';
 import { LolCredentials, LolCredentialsResponse } from '../../../common/schemas/lol_credentials';
@@ -19,12 +18,9 @@ import { AccessTokenPayload } from 'src/app/services/common/jwt_access.service';
 import { UserRegisterDto } from 'src/app/common/request/user/user_register.dto';
 import { UserProfileUpdateDto } from 'src/app/common/request/user/user_update.dto';
 import { UserPasswordUpdateDto } from 'src/app/common/request/user/user_update_password.dto';
-import tokens from 'src/configs/addons/tokens';
 import { generateCompressedSprite } from 'src/app/utils/dicebear';
 import { GenericException } from 'src/app/common/exceptions/general.exception';
 import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';
-
-export type UserSpamDetailed = User & { details: UserDetails; spams: MatchingSpams };
 
 @Injectable()
 export class UsersService {
@@ -33,7 +29,8 @@ export class UsersService {
     private readonly jwtService: JwtService,
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(UserDetails) private readonly userDetailsRepo: Repository<UserDetails>,
-    @InjectRepository(UserRegisterCache) private readonly registerCacheRepo: Repository<UserRegisterCache>,
+    @InjectRepository(UserRegisterCache)
+    private readonly registerCacheRepo: Repository<UserRegisterCache>,
   ) {}
 
   userID(request: Request) {
@@ -140,10 +137,16 @@ export class UsersService {
       });
   }
 
-  async cacheUserRegister(body: UserRegisterDto, details: LolCredentialsResponse): Promise<UserRegisterCache> {
+  async cacheUserRegister(
+    body: UserRegisterDto,
+    details: LolCredentialsResponse,
+  ): Promise<UserRegisterCache> {
     const { email, password, server, summoner_name, username } = body;
     const { league, league_number, league_points, level, win_rate } = details;
-    const secret = this.jwtService.sign({ email, summoner_name, username }, { expiresIn: tokens.user_register_token });
+    const secret = this.jwtService.sign(
+      { email, summoner_name, username },
+      { expiresIn: configs.tokens.user_register_token },
+    );
 
     const d1 = new Date();
     const d2 = new Date(d1);

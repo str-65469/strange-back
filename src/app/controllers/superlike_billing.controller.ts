@@ -31,7 +31,10 @@ export class SuperLikeBillingController {
     console.log(process.env.PAYPAL_CLIENT_ID);
     console.log(process.env.PAYPAL_SECRET_ID);
 
-    const Enviroment = process.env.NODE_ENV === 'production' ? paypal.core.LiveEnvironment : paypal.core.SandboxEnvironment;
+    const Enviroment =
+      process.env.NODE_ENV === 'production'
+        ? paypal.core.LiveEnvironment
+        : paypal.core.SandboxEnvironment;
 
     const paypalClient = new paypal.core.PayPalHttpClient(
       new Enviroment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_SECRET_ID),
@@ -82,7 +85,10 @@ export class SuperLikeBillingController {
     const userId = await this.userService.userID(req);
     const packet = await this.superLikeService.findByType(type);
 
-    const Enviroment = process.env.NODE_ENV === 'production' ? paypal.core.LiveEnvironment : paypal.core.SandboxEnvironment;
+    const Enviroment =
+      process.env.NODE_ENV === 'production'
+        ? paypal.core.LiveEnvironment
+        : paypal.core.SandboxEnvironment;
     const paypalClient = new paypal.core.PayPalHttpClient(
       new Enviroment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_SECRET_ID),
     );
@@ -107,7 +113,10 @@ export class SuperLikeBillingController {
 
       return { msg: 'successfull payment' };
     } catch (error) {
-      throw new GenericException(HttpStatus.EXPECTATION_FAILED, ExceptionMessageCode.PAYPAL_PAYMENT_ERROR);
+      throw new GenericException(
+        HttpStatus.EXPECTATION_FAILED,
+        ExceptionMessageCode.PAYPAL_PAYMENT_ERROR,
+      );
     }
   }
 }
