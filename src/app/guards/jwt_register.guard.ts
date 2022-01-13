@@ -1,6 +1,6 @@
 import { ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { UserRegisterCacheService } from 'src/app/modules/user/user_register_cache.service';
-import { JwtAcessService } from 'src/app/modules/common_services/jwt_access.service';
+import { JwtAcessService } from 'src/app/common/services/jwt_access.service';
 import { AuthService } from 'src/app/modules/auth/auth.service';
 import { GenericException } from 'src/app/common/exceptions/general.exception';
 import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';

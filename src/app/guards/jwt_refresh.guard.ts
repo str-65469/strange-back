@@ -1,8 +1,8 @@
 import { Injectable, CanActivate, ExecutionContext, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { configs } from 'src/configs/config';
-import { CookieService } from 'src/app/modules/common_services/cookie.service';
-import { JwtAcessService } from 'src/app/modules/common_services/jwt_access.service';
+import { CookieService } from 'src/app/common/services/cookie.service';
+import { JwtAcessService } from 'src/app/common/services/jwt_access.service';
 import { UsersService } from 'src/app/modules/user/users.service';
 import { GenericException } from 'src/app/common/exceptions/general.exception';
 import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';

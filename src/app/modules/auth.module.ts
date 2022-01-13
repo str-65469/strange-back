@@ -5,7 +5,7 @@ import { MatchingSpamService } from 'src/app/modules/user/matching_spam.service'
 import { UserDetailsServiceService } from 'src/app/modules/user/user_details.service';
 import { UserRegisterCacheService } from 'src/app/modules/user/user_register_cache.service';
 import { AuthController } from '../controllers/auth.controller';
-import { JwtAcessService } from './common_services/jwt_access.service';
+import { JwtAcessService } from '../common/services/jwt_access.service';
 import { AuthService } from './auth/auth.service';
 import { UsersModule } from './users.module';
 import { ThrottlerModule } from '@nestjs/throttler';

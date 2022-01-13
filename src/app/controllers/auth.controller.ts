@@ -14,12 +14,12 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
 import { AuthService } from '../modules/auth/auth.service';
-import { JwtAcessService } from '../modules/common_services/jwt_access.service';
+import { JwtAcessService } from '../common/services/jwt_access.service';
 import { MailService } from 'src/app/modules/mail/mail.service';
 import { JwtRegisterAuthGuard } from '../guards/jwt_register.guard';
 import { JwtAcessTokenAuthGuard } from '../guards/jwt_access.guard';
 import { UserBelongingsService } from 'src/app/modules/user/user_belongings.service';
-import { CookieService } from 'src/app/modules/common_services/cookie.service';
+import { CookieService } from 'src/app/common/services/cookie.service';
 import { MatchingSpamService } from 'src/app/modules/user/matching_spam.service';
 import { UserLoginDto } from '../schemas/request/user/user_login.dto';
 import { UsersService } from '../modules/user/users.service';

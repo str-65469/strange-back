@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import { JwtAcessService } from 'src/app/modules/common_services/jwt_access.service';
+import { JwtAcessService } from 'src/app/common/services/jwt_access.service';
 
 @Injectable()
 export class SocketAccessGuard implements CanActivate {

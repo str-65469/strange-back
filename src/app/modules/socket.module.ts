@@ -6,7 +6,7 @@ import { DuoFinderService } from './duofinder/duo_finder.service';
 import { UserBelongingsService } from 'src/app/modules/user/user_belongings.service';
 import { MatchingLobbyService } from 'src/app/modules/user/matching_lobby.service';
 import { MatchingSpamService } from 'src/app/modules/user/matching_spam.service';
-import { JwtAcessService } from 'src/app/modules/common_services/jwt_access.service';
+import { JwtAcessService } from 'src/app/common/services/jwt_access.service';
 import { UsersService } from './user/users.service';
 import { NotificationsService } from './non_auth/notifications.service';
 import { MatchedDuosService } from './user/matched_duos.service';

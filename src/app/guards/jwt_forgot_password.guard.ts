@@ -1,7 +1,7 @@
 import { ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/app/modules/auth/auth.service';
 import { Request } from 'express';
-import { JwtAcessService } from 'src/app/modules/common_services/jwt_access.service';
+import { JwtAcessService } from 'src/app/common/services/jwt_access.service';
 import { configs } from 'src/configs/config';
 import { ForgotPasswordCache } from 'src/database/entity/forgot_password_cache.entity';
 import { GenericException } from 'src/app/common/exceptions/general.exception';

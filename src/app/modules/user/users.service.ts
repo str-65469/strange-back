@@ -14,7 +14,7 @@ import { Request } from 'express';
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import { Socket } from 'socket.io';
 import { LolLeague } from 'src/app/common/enum/lol_league.enum';
-import { AccessTokenPayload } from 'src/app/modules/common_services/jwt_access.service';
+import { AccessTokenPayload } from 'src/app/common/services/jwt_access.service';
 import { UserRegisterDto } from 'src/app/schemas/request/user/user_register.dto';
 import { UserProfileUpdateDto } from 'src/app/schemas/request/user/user_update.dto';
 import { UserPasswordUpdateDto } from 'src/app/schemas/request/user/user_update_password.dto';
