@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import {ChatParticipantsRepository} from 'src/app/modules/entities/repositories/chat_participant.repositry';
+import {ChatParticipantsRepository} from 'src/app/repositories/chat_participant.repositry';
 import {ChatParticipants} from 'src/database/entity/chat/chat_participants.entity';
 import {In} from 'typeorm';
 

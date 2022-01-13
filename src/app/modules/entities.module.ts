@@ -14,15 +14,17 @@ import { SuperLikeServices } from 'src/database/entity/superlike_services.entity
 import { UserBelongings } from 'src/database/entity/user_belongings.entity';
 import { UserDetails } from 'src/database/entity/user_details.entity';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
-import { ChatHeadRepository } from './entities/repositories/chat_head.repository';
-import { ChatMessagesRepository } from './entities/repositories/chat_messages.repository';
-import { ChatParticipantsRepository } from './entities/repositories/chat_participant.repositry';
+import { ChatHeadRepository } from '../repositories/chat_head.repository';
+import { ChatMessagesRepository } from '../repositories/chat_messages.repository';
+import { ChatParticipantsRepository } from '../repositories/chat_participant.repositry';
+import {UserRepository} from "../repositories/user_repository";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       // user
-      User,
+      User, //TODO replace all soon !!!
+      UserRepository,
       UserDetails,
       UserBelongings,
       UserRegisterCache,

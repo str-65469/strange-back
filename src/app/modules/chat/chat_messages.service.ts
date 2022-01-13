@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MessageType } from 'src/app/common/enum/message_type.enum';
 import { Pagination } from 'src/app/schemas/pagination';
-import { ChatMessagesRepository } from 'src/app/modules/entities/repositories/chat_messages.repository';
+import { ChatMessagesRepository } from 'src/app/repositories/chat_messages.repository';
 import { ChatMessages } from 'src/database/entity/chat/chat_messages.entity';
 import { FindConditions, LessThan } from 'typeorm';
 

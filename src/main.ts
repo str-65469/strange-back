@@ -10,6 +10,7 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
  * ! https://github.com/yggdrasilts/axiosfit
  *
  * @important
+ *      | add all urls /api (markup,dashboard,development-markup,development-dashboard)
  * 		| run yarn
  * 		| run yarn migrate:generate
  * 		| check migration first

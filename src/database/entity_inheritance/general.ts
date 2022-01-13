@@ -17,3 +17,5 @@ export abstract class GeneralEntity {
   })
   public updated_at: Date;
 }
+
+

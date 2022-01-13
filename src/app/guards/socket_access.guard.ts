@@ -14,7 +14,7 @@ export class SocketAccessGuard implements CanActivate {
       throw new WsException('Token missing');
     }
 
-    // validate token (it will neve come here but still needed !!!)
+    // validate token (it will never come here but still needed !!!)
     const jwtPayload = await this.jwtAcessService.validateToken({
       is_socket: true,
       token,

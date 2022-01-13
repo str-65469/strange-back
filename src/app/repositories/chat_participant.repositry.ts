@@ -3,7 +3,7 @@ import { DeepPartial, EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(ChatParticipants)
 export class ChatParticipantsRepository extends Repository<ChatParticipants> {
-  createDoubleTableModel(chatParticipantsArray: DeepPartial<ChatParticipants[]>): ChatParticipants[] {
-    return this.create(chatParticipantsArray);
-  }
+    createDoubleTableModel(chatParticipantsArray: DeepPartial<ChatParticipants[]>): ChatParticipants[] {
+        return this.create(chatParticipantsArray);
+    }
 }
