@@ -1,6 +1,6 @@
 import { Command } from 'nestjs-command';
 import { Injectable } from '@nestjs/common';
-import { Connection, EntityTarget, QueryRunner, Repository } from 'typeorm';
+import { Connection, EntityTarget, QueryRunner } from 'typeorm';
 import { MatchedDuos } from 'src/database/entity/matched_duos.entity';
 import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notifications.entity';
 import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
@@ -8,7 +8,6 @@ import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { ChatParticipants } from 'src/database/entity/chat/chat_participants.entity';
 import { ChatMessages } from 'src/database/entity/chat/chat_messages.entity';
 import { ChatHeads } from 'src/database/entity/chat/chat_heads.entity';
-import * as readline from 'readline';
 
 @Injectable({})
 export class GeneralCommand {
@@ -81,22 +80,5 @@ export class GeneralCommand {
     console.log(Object.values(values));
     console.log('='.repeat(30));
     console.table(values);
-  }
-
-  //TODO add later
-  private areYouSure() {
-    // const rl = readline.createInterface({
-    //   input: process.stdin,
-    //   output: process.stdout,
-    // });
-    // rl.question('Are you sure you want to do this (y/n) ? ', function (name: 'y' | 'n') {
-    //   if (name === 'y') {
-    //     rl.close();
-    //   } else {
-    //     process.exit();
-    //   }
-    // });
-    // rl.addListener('close', async () => {
-    // });
   }
 }
