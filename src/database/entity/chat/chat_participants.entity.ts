@@ -5,11 +5,14 @@ import { ChatHeads } from './chat_heads.entity';
 
 @Entity('chat_participants')
 export class ChatParticipants extends GeneralEntity {
-  @Column({ type: 'timestamptz', name: 'chat_last_deleted_at', nullable: true })
-  chatLastDeletedAt: Date | null;
+    @Column({ type: 'timestamptz', name: 'chat_last_deleted_at', nullable: true })
+    chatLastDeletedAt: Date | null;
 
-  @Column({ type: 'unsigned big int', nullable: true }) userId: number;
-  @Column({ type: 'unsigned big int', nullable: true }) chatHeadId: number;
-  @ManyToOne(() => User, (user) => user.chatParticipants) user: User;
-  @ManyToOne(() => ChatHeads, (chatHead) => chatHead.chatParticipants) chatHead: ChatHeads;
+    @Column({ type: 'timestamptz', name: 'chat_last_seen_at', nullable: true })
+    chatLastSeenAt: Date | null;
+
+    @Column({ type: 'unsigned big int', nullable: true }) userId: number;
+    @Column({ type: 'unsigned big int', nullable: true }) chatHeadId: number;
+    @ManyToOne(() => User, (user) => user.chatParticipants) user: User;
+    @ManyToOne(() => ChatHeads, (chatHead) => chatHead.chatParticipants) chatHead: ChatHeads;
 }

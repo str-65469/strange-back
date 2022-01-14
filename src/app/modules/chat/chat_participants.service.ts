@@ -1,12 +1,10 @@
-import {Injectable} from '@nestjs/common';
-import {ChatParticipantsRepository} from 'src/app/repositories/chat_participant.repositry';
-import {ChatParticipants} from 'src/database/entity/chat/chat_participants.entity';
-import {In} from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { ChatParticipantsRepository } from 'src/app/repositories/chat_participant.repositry';
+import { ChatParticipants } from 'src/database/entity/chat/chat_participants.entity';
 
 @Injectable()
 export class ChatParticipantsService {
-    constructor(private readonly chatParticipantsRepo: ChatParticipantsRepository) {
-    }
+    constructor(private readonly chatParticipantsRepo: ChatParticipantsRepository) {}
 
     getChatParticipantsByUser(
         userId: number,
@@ -62,11 +60,12 @@ export class ChatParticipantsService {
         });
     }
 
-    //   getPartnerParticipants(chatHeadIds: number[]) {
-    //     return this.chatParticipantsRepo.find({
-    //       where: {
-    //         chatHeadId: In(chatHeadIds),
-    //       },
-    //     });
-    //   }
+    updateLastSeenTimeStamp(chatParticipantId: number, messageDate?: Date) {
+        const now = new Date();
+        const date = messageDate ?? now;
+
+        return this.chatParticipantsRepo.update(chatParticipantId, {
+            chatLastSeenAt: date,
+        });
+    }
 }

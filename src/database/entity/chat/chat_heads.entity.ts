@@ -5,18 +5,19 @@ import { ChatParticipants } from './chat_participants.entity';
 
 @Entity('chat_heads')
 export class ChatHeads extends GeneralEntity {
-  @Column({ name: 'name', nullable: true })
-  name: string | null;
+    @Column({ name: 'name', nullable: true })
+    name: string | null;
 
-  @Column({ name: 'is_one_to_one', nullable: false, default: true })
-  isOneToOne: boolean;
+    @Column({ name: 'is_one_to_one', nullable: false, default: true })
+    isOneToOne: boolean;
 
-  @OneToMany(() => ChatParticipants, (chatParticipants) => chatParticipants.chatHead)
-  chatParticipants: ChatParticipants[];
+    @OneToMany(() => ChatParticipants, (chatParticipants) => chatParticipants.chatHead)
+    chatParticipants: ChatParticipants[];
 
-  @OneToMany(() => ChatMessages, (chatMessages) => chatMessages.chatHead)
-  chatMessages: ChatMessages[];
+    @OneToMany(() => ChatMessages, (chatMessages) => chatMessages.chatHead)
+    chatMessages: ChatMessages[];
 
-  // must be removed after mapping
-  chatParticipant?: ChatParticipants;
+    // must be removed after mapping
+    chatParticipant?: ChatParticipants;
+    lastChatMessage?: ChatMessages;
 }

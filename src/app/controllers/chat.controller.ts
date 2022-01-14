@@ -1,14 +1,15 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-  UseInterceptors,
+    Body,
+    Controller,
+    Get,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Post,
+    Query,
+    Req,
+    UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import { MessageType } from '../common/enum/message_type.enum';
 import { GetMessagesDto } from '../schemas/request/chat/get_messages.dto';
@@ -21,51 +22,74 @@ import { SocketService } from '../modules/socket/socket.service';
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('/chat')
 export class ChatController {
-  constructor(
-    private readonly chatService: ChatService,
-    private readonly socketService: SocketService,
-  ) {}
+    constructor(
+        private readonly chatService: ChatService,
+        private readonly socketService: SocketService,
+    ) {}
 
-  @Post('/send-message/:chatHeadId/:partnerId')
-  async sendMessage(
-    @Param('chatHeadId', ParseIntPipe) chatHeadId: number,
-    @Param('partnerId', ParseIntPipe) partnerId: number,
-    @Body() data: SendMessageDto,
-    @Req() req: JwtRequest,
-  ) {
-    const payload = req.jwtPayload;
+    @Patch('/send-message/:chatHeadId/:partnerId')
+    async sendMessage(
+        @Param('chatHeadId', ParseIntPipe) chatHeadId: number,
+        @Param('partnerId', ParseIntPipe) partnerId: number,
+        @Body() data: SendMessageDto,
+        @Req() req: JwtRequest,
+    ) {
+        const payload = req.jwtPayload;
 
-    //	check if user is in that chat table by checking chatHeadId in chat participants
-    const participants = await this.chatService.userBelongsToChatHead(payload.id, partnerId, chatHeadId);
+        //	check if user is in that chat table by checking chatHeadId in chat participants
+        const participants = await this.chatService.userBelongsToChatHead(
+            payload.id,
+            partnerId,
+            chatHeadId,
+        );
 
-    //	update table messages by my own id from token, chatHeadId and stuff
-    const chatMessage = await this.chatService.insertMessage(payload.id, chatHeadId, data.message);
+        //	update table messages by my own id from token, chatHeadId and stuff
+        const chatMessage = await this.chatService.insertMessage(payload.id, chatHeadId, data.message);
 
-    //	send message via socket
-    this.socketService.sendMessageToUser(participants.partner.user.socket_id, chatMessage);
+        // update last_seen_timestamp of partner if he/she is online
+        if (participants.chatParticipantPartner.user.is_online === true) {
+            this.chatService.updateLastSeenTimeStamp(
+                participants.chatParticipantPartner.id,
+                chatMessage.created_at,
+            );
+        }
 
-    //! for now
-    return chatMessage;
-  }
+        // mine just update
+        this.chatService.updateLastSeenTimeStamp(
+            participants.chatParticipantUser.id,
+            chatMessage.created_at,
+        );
 
-  @UseInterceptors(UserSafeInterceptor)
-  @Get('/heads')
-  getChats(@Req() req: JwtRequest) {
-    const payload = req.jwtPayload;
+        //	send message via socket
+        this.socketService.sendMessageToUser(
+            participants.chatParticipantPartner.user.socket_id,
+            chatMessage,
+        );
 
-    return this.chatService.getChatheads(payload.id);
-  }
+        //! send chatparticipant and also return every time for chat_last_seen_at
 
-  @UseInterceptors(UserSafeInterceptor)
-  @Get('/messages/:chatHeadId')
-  getMessages(
-    @Req() req: JwtRequest,
-    @Param('chatHeadId', ParseIntPipe) chatHeadId: number,
-    @Query() getMessagesDto: GetMessagesDto,
-  ) {
-    const payload = req.jwtPayload;
-    const { lastId, take } = getMessagesDto;
+        // return chatmessage
+        return chatMessage;
+    }
 
-    return this.chatService.getMessages(payload.id, chatHeadId, take, lastId);
-  }
+    @UseInterceptors(UserSafeInterceptor)
+    @Get('/heads')
+    getChats(@Req() req: JwtRequest) {
+        const payload = req.jwtPayload;
+
+        return this.chatService.getChatheads(payload.id, true);
+    }
+
+    @UseInterceptors(UserSafeInterceptor)
+    @Get('/messages/:chatHeadId')
+    getMessages(
+        @Req() req: JwtRequest,
+        @Param('chatHeadId', ParseIntPipe) chatHeadId: number,
+        @Query() getMessagesDto: GetMessagesDto,
+    ) {
+        const payload = req.jwtPayload;
+        const { lastId, take } = getMessagesDto;
+
+        return this.chatService.getMessages(payload.id, chatHeadId, take, lastId);
+    }
 }

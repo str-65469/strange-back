@@ -14,6 +14,7 @@
   "entities": [
     "/home/giorgi/Desktop/strange-back/src/configs/../**/*.entity.{js,ts}"
   ],
+  "useUTC": true,
   "cli": {
     "migrationsDir": "src/database/migration"
   }

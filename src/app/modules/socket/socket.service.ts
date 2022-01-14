@@ -5,9 +5,9 @@ import { ChatMessages } from 'src/database/entity/chat/chat_messages.entity';
 
 @Injectable()
 export class SocketService {
-  constructor(private readonly socketGateway: SocketGateway) {}
+    constructor(private readonly socketGateway: SocketGateway) {}
 
-  sendMessageToUser(socketId: string, chatMessage: ChatMessages) {
-    this.socketGateway.wss.sockets.to(socketId).emit(configs.socket.chat, chatMessage);
-  }
+    sendMessageToUser(socketId: string, chatMessage: ChatMessages) {
+        this.socketGateway.wss.sockets.to(socketId).emit(configs.socket.chat, chatMessage);
+    }
 }

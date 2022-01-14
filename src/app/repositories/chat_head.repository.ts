@@ -1,5 +1,5 @@
 import { ChatHeads } from 'src/database/entity/chat/chat_heads.entity';
-import { DeepPartial, EntityRepository, Repository } from 'typeorm';
+import { DeepPartial, EntityRepository, FindConditions, FindManyOptions, Repository } from 'typeorm';
 
 @EntityRepository(ChatHeads)
 export class ChatHeadRepository extends Repository<ChatHeads> {

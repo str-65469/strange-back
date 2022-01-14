@@ -8,98 +8,126 @@ import { ChatParticipantsService } from './chat_participants.service';
 
 @Injectable()
 export class ChatService {
-  constructor(
-    private readonly chatParticipantsService: ChatParticipantsService,
-    private readonly chatMessagesService: ChatMessagesService,
-    private readonly chatHeadService: ChatHeadService,
-    private readonly connection: Connection,
-  ) {}
+    constructor(
+        private readonly chatParticipantsService: ChatParticipantsService,
+        private readonly chatMessagesService: ChatMessagesService,
+        private readonly chatHeadService: ChatHeadService,
+        private readonly connection: Connection,
+    ) {}
 
-  async userBelongsToChatHead(userId: number, partnerId: number, chatHeadId: number) {
-    const participants = await this.chatParticipantsService.getChatParticipantsByUser(
-      userId,
-      partnerId,
-      chatHeadId,
-    );
+    async userBelongsToChatHead(userId: number, partnerId: number, chatHeadId: number) {
+        const participants = await this.chatParticipantsService.getChatParticipantsByUser(
+            userId,
+            partnerId,
+            chatHeadId,
+        );
 
-    const user = participants.find(
-      (participant) => participant.chatHeadId === chatHeadId && participant.userId === userId,
-    );
+        const user = participants.find(
+            (participant) => participant.chatHeadId === chatHeadId && participant.userId === userId,
+        );
 
-    const partner = participants.find(
-      (participant) => participant.chatHeadId === chatHeadId && participant.userId === partnerId,
-    );
+        const partner = participants.find(
+            (participant) => participant.chatHeadId === chatHeadId && participant.userId === partnerId,
+        );
 
-    if (!user) {
-      throw new GenericException(
-        HttpStatus.BAD_REQUEST,
-        ExceptionMessageCode.USER_DOESNT_BELONG_TO_CHATHEAD,
-      );
+        if (!user) {
+            throw new GenericException(
+                HttpStatus.BAD_REQUEST,
+                ExceptionMessageCode.USER_DOESNT_BELONG_TO_CHATHEAD,
+            );
+        }
+
+        if (!partner) {
+            throw new GenericException(
+                HttpStatus.BAD_REQUEST,
+                ExceptionMessageCode.USER_CHATHEAD_PARTNER_NOT_FOUND,
+            );
+        }
+
+        return {
+            chatParticipantUser: user,
+            chatParticipantPartner: partner,
+        };
     }
 
-    if (!partner) {
-      throw new GenericException(
-        HttpStatus.BAD_REQUEST,
-        ExceptionMessageCode.USER_CHATHEAD_PARTNER_NOT_FOUND,
-      );
+    async insertMessage(userId: number, chatHeadId: number, message: string) {
+        return this.chatMessagesService.insertMessage(userId, chatHeadId, message);
     }
 
-    return {
-      user,
-      partner,
-    };
-  }
+    async createChatTables(userId: number, partnerId: number): Promise<void> {
+        return this.connection.transaction(async (manager) => {
+            // first check if chat participants already exists or not
+            const participants = await this.chatParticipantsService.getChatParticipants(
+                userId,
+                partnerId,
+            );
 
-  async insertMessage(userId: number, chatHeadId: number, message: string) {
-    return this.chatMessagesService.insertMessage(userId, chatHeadId, message);
-  }
+            // participants and chathead already exists
+            if (participants.length > 0) {
+                return;
+            }
 
-  async createChatTables(userId: number, partnerId: number): Promise<void> {
-    return this.connection.transaction(async (manager) => {
-      // first check if chat participants already exists or not
-      const participants = await this.chatParticipantsService.getChatParticipants(userId, partnerId);
+            // then create chat head
+            const chatHeadTableModel = this.chatHeadService.createTableModel();
+            const chatHeadTable = await manager.save(chatHeadTableModel);
 
-      // participants and chathead already exists
-      if (participants.length > 0) {
-        return;
-      }
+            // then create chat participants
+            const chatParticipantsTableModel = this.chatParticipantsService.createTableModel(
+                userId,
+                partnerId,
+                chatHeadTable.id,
+            );
+            await manager.save(chatParticipantsTableModel);
+        });
+    }
 
-      // then create chat head
-      const chatHeadTableModel = this.chatHeadService.createTableModel();
-      const chatHeadTable = await manager.save(chatHeadTableModel);
+    async getChatheads(userId: number, fetchLastMessage: boolean = false): Promise<any> {
+        // first fetch user chat participation columns
+        const userChatParticipants = await this.chatParticipantsService.getUserChatParticipants(userId);
 
-      // then create chat participants
-      const chatParticipantsTableModel = this.chatParticipantsService.createTableModel(
-        userId,
-        partnerId,
-        chatHeadTable.id,
-      );
-      await manager.save(chatParticipantsTableModel);
-    });
-  }
+        const chatHeadIds = userChatParticipants.map((el) => el.chatHeadId);
 
-  async getChatheads(userId: number) {
-    // first fetch user chat participation columns
-    const userChatParticipants = await this.chatParticipantsService.getUserChatParticipants(userId);
+        // then fetch all participant columns based on chat head ids
+        const chatHeads = await this.chatHeadService.getChatHeads(chatHeadIds);
 
-    const chatHeadIds = userChatParticipants.map((el) => el.chatHeadId);
+        if (fetchLastMessage) {
+            const lastMessage = await this.chatMessagesService.getLastChatMessages(
+                userChatParticipants,
+                userId,
+            );
 
-    // then fetch all participant columns based on chat head ids
-    const chatHeads = await this.chatHeadService.getChatHeads(chatHeadIds);
+            return chatHeads.map((el) => {
+                const chatParticipant = el.chatParticipants.find(
+                    (participant) => participant.userId !== userId,
+                );
 
-    // find partner id in chatParticipants
+                el.chatParticipant = chatParticipant;
+                el.lastChatMessage = lastMessage.find(
+                    (el) =>
+                        el.userId === chatParticipant.userId &&
+                        el.chatHeadId === chatParticipant.chatHeadId,
+                );
 
-    return chatHeads.map((el) => {
-      el.chatParticipant = el.chatParticipants.find((participant) => participant.userId !== userId);
-      return el;
-    });
+                return el;
+            });
+        }
 
-    // return chatHeads;
-  }
+        return chatHeads.map((el) => {
+            el.chatParticipant = el.chatParticipants.find(
+                (participant) => participant.userId !== userId,
+            );
 
-  getMessages(userId: number, chatHeadId: number, take: number, lastId?: number) {
-    const takeCount = take || 10;
+            return el;
+        });
+    }
 
-    return this.chatMessagesService.fetchMessages(userId, chatHeadId, takeCount, lastId);
-  }
+    getMessages(userId: number, chatHeadId: number, take: number, lastId?: number) {
+        const takeCount = take || 10;
+
+        return this.chatMessagesService.fetchMessages(userId, chatHeadId, takeCount, lastId);
+    }
+
+    updateLastSeenTimeStamp(chatParticipantId: number, messageDate: Date) {
+        return this.chatParticipantsService.updateLastSeenTimeStamp(chatParticipantId, messageDate);
+    }
 }
