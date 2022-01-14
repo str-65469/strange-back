@@ -15,73 +15,72 @@ import { ChatParticipants } from './chat/chat_participants.entity';
 
 @Entity('users')
 export default class User extends GeneralEntity {
-  public static TABLE_NAME = 'users';
-  public static IMAGE_COLUMN_NAME = 'img_path';
+    public static TABLE_NAME = 'users';
+    public static IMAGE_COLUMN_NAME = 'img_path';
 
-  @Column({ unique: true }) username: string;
-  @Column() email: string;
-  @Column({ nullable: true, type: 'text' }) img_path?: string;
+    @Column({ unique: true }) username: string;
+    @Column() email: string;
+    @Column({ nullable: true, type: 'text' }) img_path?: string;
 
-  @Column({ select: false })
-  @Exclude({ toPlainOnly: true })
-  password: string;
+    @Column({ select: false })
+    @Exclude({ toPlainOnly: true })
+    password: string;
 
-  @Column()
-  @Exclude({ toPlainOnly: true })
-  socket_id: string;
+    @Column()
+    @Exclude({ toPlainOnly: true })
+    socket_id: string;
 
-  @Column({ nullable: true })
-  @Exclude({ toPlainOnly: true })
-  secret?: string;
+    @Column({ nullable: true })
+    @Exclude({ toPlainOnly: true })
+    secret?: string;
 
-  @Column({ nullable: true, select: false })
-  @Exclude({ toPlainOnly: true })
-  ip?: string;
+    @Column({ nullable: true, select: false })
+    @Exclude({ toPlainOnly: true })
+    ip?: string;
 
-  @Column({ default: false, nullable: true })
-  @Exclude({ toPlainOnly: true })
-  is_online?: boolean;
+    @Column({ default: false, nullable: true })
+    is_online?: boolean;
 
-  @OneToMany(() => MatchedDuosNotifications, (notifications) => notifications.user)
-  notificationUsers: MatchedDuosNotifications[];
+    @OneToMany(() => MatchedDuosNotifications, (notifications) => notifications.user)
+    notificationUsers: MatchedDuosNotifications[];
 
-  @OneToMany(() => MatchedDuosNotifications, (notifications) => notifications.matchedUser)
-  notificationMatchedUsers: MatchedDuosNotifications[];
+    @OneToMany(() => MatchedDuosNotifications, (notifications) => notifications.matchedUser)
+    notificationMatchedUsers: MatchedDuosNotifications[];
 
-  @OneToMany(() => MatchedDuos, (matched) => matched.user)
-  matchedDuoUsers: MatchedDuos[];
+    @OneToMany(() => MatchedDuos, (matched) => matched.user)
+    matchedDuoUsers: MatchedDuos[];
 
-  @OneToMany(() => MatchedDuos, (matched) => matched.matchedUser)
-  matchedDuoMatchedUsers: MatchedDuos[];
+    @OneToMany(() => MatchedDuos, (matched) => matched.matchedUser)
+    matchedDuoMatchedUsers: MatchedDuos[];
 
-  @OneToMany(() => MatchingLobby, (lobby) => lobby.user)
-  lobbyUsers: MatchingLobby[];
+    @OneToMany(() => MatchingLobby, (lobby) => lobby.user)
+    lobbyUsers: MatchingLobby[];
 
-  @OneToMany(() => MatchingLobby, (lobby) => lobby.likedUser)
-  lobbyLikedUsers: MatchingLobby[];
+    @OneToMany(() => MatchingLobby, (lobby) => lobby.likedUser)
+    lobbyLikedUsers: MatchingLobby[];
 
-  @OneToMany(() => SuperLikePayment, (likes) => likes.user)
-  superLikePayments: SuperLikePayment[];
+    @OneToMany(() => SuperLikePayment, (likes) => likes.user)
+    superLikePayments: SuperLikePayment[];
 
-  @OneToMany(() => ChatMessages, (chatMessages) => chatMessages.user)
-  chatMessages: ChatMessages[];
+    @OneToMany(() => ChatMessages, (chatMessages) => chatMessages.user)
+    chatMessages: ChatMessages[];
 
-  @OneToMany(() => ChatParticipants, (chatParticipants) => chatParticipants.user)
-  chatParticipants: ChatParticipants[];
+    @OneToMany(() => ChatParticipants, (chatParticipants) => chatParticipants.user)
+    chatParticipants: ChatParticipants[];
 
-  @OneToOne(() => UserBelongings, (belongings) => belongings.user)
-  belongings: UserBelongings;
+    @OneToOne(() => UserBelongings, (belongings) => belongings.user)
+    belongings: UserBelongings;
 
-  @OneToOne(() => MatchingSpams, (spams) => spams.user)
-  spams: MatchingSpams;
+    @OneToOne(() => MatchingSpams, (spams) => spams.user)
+    spams: MatchingSpams;
 
-  @OneToOne(() => UserDetails, (details) => details.user)
-  details: UserDetails;
+    @OneToOne(() => UserDetails, (details) => details.user)
+    details: UserDetails;
 
-  full_image_path?: string;
+    full_image_path?: string;
 
-  @AfterLoad()
-  setFullImagePath() {
-    this.full_image_path = FileHelper.imagePath(this.img_path);
-  }
+    @AfterLoad()
+    setFullImagePath() {
+        this.full_image_path = FileHelper.imagePath(this.img_path);
+    }
 }

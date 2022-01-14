@@ -36,24 +36,49 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private readonly jwtAccessService: JwtAcessService,
     ) {}
 
+    static CONNECTED_STATUS = true;
+    static DISCONNECTED_STATUS = false;
+
     async handleConnection(@ConnectedSocket() client: Socket) {
         const token = client.handshake.auth?.token;
         const tokenPayload = await this.jwtAccessService.decodeAccessToken(token);
-
         const userId = tokenPayload.id;
-        // console.log(tokenPayload);
-        // console.log(userId)
 
-        await this.userService.updateOnlineStatus(userId, true);
+        // update online status to everyone
+        //TODO optimize this (fetch only chat participant ids)
+        const chatheads = await this.chatService.getChatheads(userId);
+        const chatUsers = chatheads.map((el) => el.chatParticipant.user);
+
+        // emit to all socketids
+        chatUsers.forEach((user) => {
+            this.wss.to(user.socket_id).emit('online_status_update', {
+                userId: userId, // current user id
+                status: SocketGateway.CONNECTED_STATUS,
+            });
+        });
+
+        await this.userService.updateOnlineStatus(userId, SocketGateway.CONNECTED_STATUS);
     }
 
     async handleDisconnect(@ConnectedSocket() client: Socket) {
         const token = client.handshake.auth?.token;
         const tokenPayload = await this.jwtAccessService.decodeAccessToken(token);
         const userId = tokenPayload.id;
-        // console.log(tokenPayload);
-        // console.log(userId)
-        await this.userService.updateOnlineStatus(userId, false);
+
+        // update online status to everyone
+        //TODO optimize this (fetch only chat participant ids)
+        const chatheads = await this.chatService.getChatheads(userId);
+        const chatUsers = chatheads.map((el) => el.chatParticipant.user);
+
+        // emit to all socketids
+        chatUsers.forEach((user) => {
+            this.wss.to(user.socket_id).emit('online_status_update', {
+                userId: userId, // current user id
+                status: SocketGateway.DISCONNECTED_STATUS,
+            });
+        });
+
+        await this.userService.updateOnlineStatus(userId, SocketGateway.DISCONNECTED_STATUS);
     }
 
     @UseInterceptors(ClassSerializerInterceptor)

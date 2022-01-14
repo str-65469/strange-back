@@ -28,22 +28,26 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
  */
 
 NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
-  const port = 4000;
+    const port = 4000;
 
-  const httpAdapterHost = app.get(HttpAdapterHost);
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  app.use(cookieParser());
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
-  app.setGlobalPrefix('/api');
-  app.enableCors({ origin: true, methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS', credentials: true });
-  app.useStaticAssets(join(__dirname, '../..', 'upload'), { prefix: '/upload' });
-  app.useStaticAssets(join(__dirname, '../..', 'public'), { prefix: '/public' });
-  app.setViewEngine('hbs');
-  app.set('trust proxy', 1);
+    const httpAdapterHost = app.get(HttpAdapterHost);
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
+    app.use(cookieParser());
+    app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
+    app.setGlobalPrefix('/api');
+    app.enableCors({
+        origin: true,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+        credentials: true,
+    });
+    app.useStaticAssets(join(__dirname, '../..', 'upload'), { prefix: '/upload' });
+    app.useStaticAssets(join(__dirname, '../..', 'public'), { prefix: '/public' });
+    app.setViewEngine('hbs');
+    app.set('trust proxy', 1);
 
-  await app.listen(port);
+    await app.listen(port);
 
-  console.log({ DEBUG_MODE: process.env.NODE_ENV, PORT: port });
+    console.log({ DEBUG_MODE: process.env.NODE_ENV, PORT: port });
 });
 
 /**
@@ -55,6 +59,33 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
  * 		| "migratemain": "yarn run typeorm migration:generate -n Main",
  * 		| "clean": "rimraf src/database/migrations/*",
  * 		| "migrate": "yarn run clean && yarn run migratemain && yarn run migrate:run"
+ * 
+ * ! socket cheatsheet
+ * 
+ * ? Add socket to room
+ * socket.join('some room');
+ * 
+ * ? Remove socket from room
+ * socket.leave('some room');
+ * 
+ * ? Send to current client
+ * socket.emit('message', 'this is a test');
+ * 
+ * ? Send to all clients include sender
+ * io.sockets.emit('message', 'this is a test');
+ * 
+ * ? Send to all clients except sender
+ * socket.broadcast.emit('message', 'this is a test');
+ * 
+ * ? Send to all clients in 'game' room(channel) except sender
+ * socket.broadcast.to('game').emit('message', 'this is a test');
+ * 
+ * ? Send to all clients in 'game' room(channel) include sender
+ * io.sockets.in('game').emit('message', 'this is a test');
+ * 
+ * ? Send to individual socket id
+ * io.sockets.socket(socketId).emit('message', 'this is a test');
+ * 
  * 
  * ! bash
  * 		| if (process.env.NODE_ENV !== 'development') {
