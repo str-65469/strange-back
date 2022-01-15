@@ -33,7 +33,7 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
     const httpAdapterHost = app.get(HttpAdapterHost);
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
     app.use(cookieParser());
-    // app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
+    app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
     app.setGlobalPrefix('/api');
     app.enableCors({
         origin: true,
