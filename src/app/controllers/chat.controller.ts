@@ -5,13 +5,11 @@ import {
     Param,
     ParseIntPipe,
     Patch,
-    Post,
     Query,
     Req,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
-import { MessageType } from '../common/enum/message_type.enum';
 import { GetMessagesDto } from '../schemas/request/chat/get_messages.dto';
 import { SendMessageDto } from '../schemas/request/chat/send_message.dto';
 import { JwtAcessTokenAuthGuard, JwtRequest } from '../guards/jwt_access.guard';
@@ -22,10 +20,7 @@ import { SocketService } from '../modules/socket/socket.service';
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('/chat')
 export class ChatController {
-    constructor(
-        private readonly chatService: ChatService,
-        private readonly socketService: SocketService,
-    ) {}
+    constructor(private readonly chatService: ChatService, private readonly socketService: SocketService) {}
 
     @Patch('/send-message/:chatHeadId/:partnerId')
     async sendMessage(
@@ -37,39 +32,22 @@ export class ChatController {
         const payload = req.jwtPayload;
 
         //	check if user is in that chat table by checking chatHeadId in chat participants
-        const participants = await this.chatService.userBelongsToChatHead(
-            payload.id,
-            partnerId,
-            chatHeadId,
-        );
+        const participants = await this.chatService.userBelongsToChatHead(payload.id, partnerId, chatHeadId);
 
         //	update table messages by my own id from token, chatHeadId and stuff
         const chatMessage = await this.chatService.insertMessage(payload.id, chatHeadId, data.message);
 
-        // update last_seen_timestamp of partner if he/she is online
-        if (participants.chatParticipantPartner.user.is_online === true) {
-            this.chatService.updateLastSeenTimeStamp(
-                participants.chatParticipantPartner.id,
-                chatMessage.created_at,
-            );
-        }
-
         // mine just update
-        this.chatService.updateLastSeenTimeStamp(
-            participants.chatParticipantUser.id,
-            chatMessage.created_at,
-        );
+        const chatParticipant = await this.chatService.updateLastSeenTimeStamp({
+            chatParticipantId: participants.chatParticipantUser.id,
+            messageDate: chatMessage.created_at,
+        });
 
         //	send message via socket
-        this.socketService.sendMessageToUser(
-            participants.chatParticipantPartner.user.socket_id,
-            chatMessage,
-        );
-
-        //! send chatparticipant and also return every time for chat_last_seen_at
+        this.socketService.sendMessageToUser(participants.chatParticipantPartner.user.socket_id, chatMessage);
 
         // return chatmessage
-        return chatMessage;
+        return { chatMessage, userParticipant: chatParticipant };
     }
 
     @UseInterceptors(UserSafeInterceptor)
@@ -91,5 +69,17 @@ export class ChatController {
         const { lastId, take } = getMessagesDto;
 
         return this.chatService.getMessages(payload.id, chatHeadId, take, lastId);
+    }
+
+    @Patch('/messages/:chatHeadId/update-last-seen')
+    async updateLastSeenAt(@Param('chatHeadId', ParseIntPipe) chatHeadId: number, @Req() req: JwtRequest) {
+        const payload = req.jwtPayload;
+
+        const chatParticipant = await this.chatService.updateLastSeenTimeStamp({
+            userId: payload.id,
+            chatHeadId,
+        });
+
+        return chatParticipant;
     }
 }

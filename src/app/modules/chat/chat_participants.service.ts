@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ChatParticipantsRepository } from 'src/app/repositories/chat_participant.repositry';
+import { TypeormReturnedFromRaw } from 'src/app/utils/typeorm.helper';
 import { ChatParticipants } from 'src/database/entity/chat/chat_participants.entity';
 
 @Injectable()
@@ -60,12 +61,27 @@ export class ChatParticipantsService {
         });
     }
 
-    updateLastSeenTimeStamp(chatParticipantId: number, messageDate?: Date) {
-        const now = new Date();
-        const date = messageDate ?? now;
+    async updateLastSeenByParticipantId(chatParticipantId: number, messageDate: Date) {
+        const chatParticipant = this.chatParticipantsRepo
+            .createQueryBuilder()
+            .update()
+            .set({ chatLastSeenAt: messageDate })
+            .where('id = :id', { id: chatParticipantId })
+            .returning('*')
+            .execute();
 
-        return this.chatParticipantsRepo.update(chatParticipantId, {
-            chatLastSeenAt: date,
-        });
+        return TypeormReturnedFromRaw<ChatParticipants>(chatParticipant);
+    }
+
+    updateLastSeenByChatHeadAndUserId(userId: number, chatHeadId: number, date: Date) {
+        const chatParticipant = this.chatParticipantsRepo
+            .createQueryBuilder()
+            .update()
+            .set({ chatLastSeenAt: date })
+            .where('userId = :userId and chatHeadId = :chatHeadId', { userId, chatHeadId })
+            .returning('*')
+            .execute();
+
+        return TypeormReturnedFromRaw<ChatParticipants>(chatParticipant);
     }
 }

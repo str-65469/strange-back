@@ -6,25 +6,26 @@ import { ChatHeads } from './chat_heads.entity';
 
 @Entity('chat_messages')
 export class ChatMessages extends GeneralEntity {
-    @Column({ name: 'text_message', nullable: true, type: 'text' })
+    @Column({ name: 'textMessage', nullable: true, type: 'text' })
     textMessage: string | null;
 
-    @Column({ name: 'img_url', nullable: true })
+    @Column({ name: 'imgUrl', nullable: true })
     imgUrl: string | null;
 
-    @Column({ name: 'voice_url', nullable: true })
+    @Column({ name: 'voiceUrl', nullable: true })
     voiceUrl: string | null;
 
-    @Column({ name: 'video_url', nullable: true })
+    @Column({ name: 'videoUrl', nullable: true })
     videoUrl: string | null;
 
-    @Column({ name: 'gif_url', nullable: true })
+    @Column({ name: 'gifURl', nullable: true })
     gifURl: string | null;
 
     @Column({
         enum: MessageType,
         type: 'enum',
         nullable: false,
+        name: 'messageType',
     })
     messageType: MessageType;
 

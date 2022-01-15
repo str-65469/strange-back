@@ -8,16 +8,17 @@ import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notif
 import { MatchingLobby } from 'src/database/entity/matching_lobby.entity';
 import { MatchingSpams } from 'src/database/entity/matching_spams.entity';
 import { GeneralCommand } from './general/general.command';
+import { RenameCommand } from './general/rename.command';
 import { UserCommand } from './user/user.command';
 
 @Module({
-  imports: [
-    CommandModule,
-    ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot(TypeormConfig.instance),
-    TypeOrmModule.forFeature([MatchingSpams, MatchedDuos, MatchedDuosNotifications, MatchingLobby]),
-  ],
-  controllers: [],
-  providers: [UserCommand, GeneralCommand],
+    imports: [
+        CommandModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+        TypeOrmModule.forRoot(TypeormConfig.instance),
+        TypeOrmModule.forFeature([MatchingSpams, MatchedDuos, MatchedDuosNotifications, MatchingLobby]),
+    ],
+    controllers: [],
+    providers: [UserCommand, GeneralCommand, RenameCommand],
 })
 export class CommandsModule {}

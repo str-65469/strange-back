@@ -5,10 +5,10 @@ import { ChatHeads } from './chat_heads.entity';
 
 @Entity('chat_participants')
 export class ChatParticipants extends GeneralEntity {
-    @Column({ type: 'timestamptz', name: 'chat_last_deleted_at', nullable: true })
+    @Column({ type: 'timestamptz', name: 'chatLastDeletedAt', nullable: true })
     chatLastDeletedAt: Date | null;
 
-    @Column({ type: 'timestamptz', name: 'chat_last_seen_at', nullable: true })
+    @Column({ type: 'timestamptz', name: 'chatLastSeenAt', nullable: true })
     chatLastSeenAt: Date | null;
 
     @Column({ type: 'unsigned big int', nullable: true }) userId: number;

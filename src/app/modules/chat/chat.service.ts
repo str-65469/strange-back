@@ -57,10 +57,7 @@ export class ChatService {
     async createChatTables(userId: number, partnerId: number): Promise<void> {
         return this.connection.transaction(async (manager) => {
             // first check if chat participants already exists or not
-            const participants = await this.chatParticipantsService.getChatParticipants(
-                userId,
-                partnerId,
-            );
+            const participants = await this.chatParticipantsService.getChatParticipants(userId, partnerId);
 
             // participants and chathead already exists
             if (participants.length > 0) {
@@ -85,6 +82,10 @@ export class ChatService {
         // first fetch user chat participation columns
         const userChatParticipants = await this.chatParticipantsService.getUserChatParticipants(userId);
 
+        if (userChatParticipants && userChatParticipants.length === 0) {
+            return [];
+        }
+
         const chatHeadIds = userChatParticipants.map((el) => el.chatHeadId);
 
         // then fetch all participant columns based on chat head ids
@@ -96,26 +97,35 @@ export class ChatService {
                 userId,
             );
 
-            return chatHeads.map((el) => {
-                const chatParticipant = el.chatParticipants.find(
-                    (participant) => participant.userId !== userId,
-                );
+            return chatHeads
+                .map((el) => {
+                    const chatParticipant = el.chatParticipants.find((p) => p.userId !== userId);
+                    const userParticipant = el.chatParticipants.find((p) => p.userId == userId);
+                    const lastChatMessage = lastMessage.find((e) => {
+                        return (
+                            e.userId === chatParticipant.userId && e.chatHeadId === chatParticipant.chatHeadId
+                        );
+                    });
 
-                el.chatParticipant = chatParticipant;
-                el.lastChatMessage = lastMessage.find(
-                    (el) =>
-                        el.userId === chatParticipant.userId &&
-                        el.chatHeadId === chatParticipant.chatHeadId,
-                );
+                    el.chatParticipant = chatParticipant;
+                    el.userParticipant = userParticipant;
+                    el.lastChatMessage = lastChatMessage ?? null;
 
-                return el;
-            });
+                    return el;
+                })
+                .sort((a, b) => {
+                    console.log();
+
+                    return (
+                        new Date(a?.lastChatMessage?.created_at).getTime() -
+                        new Date(b?.lastChatMessage?.created_at).getTime()
+                    );
+                })
+                .reverse();
         }
 
         return chatHeads.map((el) => {
-            el.chatParticipant = el.chatParticipants.find(
-                (participant) => participant.userId !== userId,
-            );
+            el.chatParticipant = el.chatParticipants.find((participant) => participant.userId !== userId);
 
             return el;
         });
@@ -127,7 +137,26 @@ export class ChatService {
         return this.chatMessagesService.fetchMessages(userId, chatHeadId, takeCount, lastId);
     }
 
-    updateLastSeenTimeStamp(chatParticipantId: number, messageDate: Date) {
-        return this.chatParticipantsService.updateLastSeenTimeStamp(chatParticipantId, messageDate);
+    updateLastSeenTimeStamp(
+        data: Partial<{
+            chatParticipantId: number;
+            chatHeadId: number;
+            userId: number;
+            messageDate: Date;
+        }>,
+    ) {
+        const date = data?.messageDate ?? new Date();
+
+        if (data?.chatParticipantId) {
+            const chatParticipantId = data.chatParticipantId;
+
+            return this.chatParticipantsService.updateLastSeenByParticipantId(chatParticipantId, date);
+        }
+
+        return this.chatParticipantsService.updateLastSeenByChatHeadAndUserId(
+            data?.userId,
+            data?.chatHeadId,
+            date,
+        );
     }
 }
