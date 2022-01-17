@@ -15,6 +15,7 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
  * ? https://github.com/yggdrasilts/axiosfit
  *
  * @important
+ *      | first check if lol_api is working and then remove this message !!!!
  *      | remove CHECKED_SERVER_URL from .env
  *      | yarn remove @nestjs/axios
  *      | add all urls /api (markup,dashboard,development-markup,development-dashboard in digitalocean)
@@ -51,7 +52,12 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
 
     await app.listen(port);
 
-    console.log({ DEBUG_MODE: process.env.NODE_ENV, PORT: port });
+    console.log({
+        platform: 'nestjs',
+        library: 'fastify',
+        enviroment: process.env.NODE_ENV,
+        port,
+    });
 });
 
 /**
