@@ -1,26 +1,17 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { LolServer } from '../../../common/enum/lol_server.enum';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { SummonerAuthRequest } from '../auth/summoner_auth.request';
 
-export class UserRegisterDto {
-  @IsNotEmpty()
-  @IsString()
-  username: string;
+export class UserRegisterDto extends SummonerAuthRequest {
+    @IsNotEmpty()
+    @IsString()
+    username: string;
 
-  @IsEmail()
-  @IsString()
-  @IsNotEmpty()
-  email: string;
+    @IsEmail()
+    @IsString()
+    @IsNotEmpty()
+    email: string;
 
-  @IsNotEmpty()
-  @IsString()
-  password: string;
-
-  @IsEnum(LolServer)
-  @IsString()
-  @IsNotEmpty()
-  server: LolServer;
-
-  @IsString()
-  @IsNotEmpty()
-  summoner_name: string;
+    @IsNotEmpty()
+    @IsString()
+    password: string;
 }

@@ -21,6 +21,6 @@ import { NetworkModule } from './network/network.module';
     ],
     controllers: [UserController, UserFileController],
     providers: [UsersService, JwtAcessService, CookieService, MatchingSpamService],
-    exports: [UsersService, JwtAcessService, CookieService, MailModule, MatchingSpamService],
+    exports: [NetworkModule, UsersService, JwtAcessService, CookieService, MailModule, MatchingSpamService],
 })
 export class UsersModule {}

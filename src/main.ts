@@ -13,6 +13,7 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
  *
  *
  * ? https://github.com/yggdrasilts/axiosfit
+ * ? https://www.npmjs.com/package/ts-mixer
  *
  * @important
  *      | first check if lol_api is working and then remove this message !!!!
@@ -20,6 +21,17 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
  *      | yarn remove @nestjs/axios
  *      | add all urls /api (markup,dashboard,development-markup,development-dashboard in digitalocean)
  *      | add new env (LOL_API_URL)
+ *      |
+ *      | user_register_cache is updated so empty cache before migration
+ *      | delete tables of
+ *              super like services,
+ *              superlike payment
+ *        remove type
+ *              superlike_payment_like_service_type_enum
+ *              superlike_payment_payment_type_enum
+ *              superlike_payment_payment_type_enum
+ *        before migration
+ *      |
  * 		| run yarn
  * 		| run yarn migrate:generate
  * 		| check migration first
@@ -54,7 +66,7 @@ NestFactory.create<NestExpressApplication>(AppModule).then(async (app) => {
 
     console.log({
         platform: 'nestjs',
-        library: 'fastify',
+        library: 'express',
         enviroment: process.env.NODE_ENV,
         port,
     });

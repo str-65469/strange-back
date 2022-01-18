@@ -1,17 +1,17 @@
-export default {
-  exceptions: {
-    generalMessage: 'message not found',
+export default Object.freeze({
+    exceptions: {
+        generalMessage: 'message not found',
 
-    accessTokenMissing: 'access token is missing',
+        accessTokenMissing: 'access token is missing',
 
-    refreshTokenMissing: 'refresh token is missing',
-    registerTokenMissing: 'register token is missing',
+        refreshTokenMissing: 'refresh token is missing',
+        registerTokenMissing: 'register token is missing',
 
-    forgotPasswordTokenExpired: 'forgot password token has been expired',
-    forgotPasswordTokenMissing: 'forgot password token is missing',
-    forgotPasswordTokenMissMatch: 'forgot password detected different token',
-    forgotPasswordTokenPayloadIdMissing: 'forgot password token is missing parameter id',
+        forgotPasswordTokenExpired: 'forgot password token has been expired',
+        forgotPasswordTokenMissing: 'forgot password token is missing',
+        forgotPasswordTokenMissMatch: 'forgot password detected different token',
+        forgotPasswordTokenPayloadIdMissing: 'forgot password token is missing parameter id',
 
-    summonerDivisionCheck: 'Check your division or summoner name please',
-  },
-};
+        summonerDivisionCheck: 'Check your division or summoner name please',
+    },
+});

@@ -11,6 +11,8 @@ import {
     UseFilters,
     HttpStatus,
 } from '@nestjs/common';
+import User from 'src/database/entity/user.entity';
+import { v4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
 import { AuthService } from '../modules/auth/auth.service';
@@ -37,9 +39,12 @@ import { createUrl } from '../utils/url_builder.helper';
 import { configs } from 'src/configs/config';
 import { GenericException } from '../common/exceptions/general.exception';
 import { ExceptionMessageCode } from '../common/enum/message_codes/exception_message_code.enum';
-import { v4 } from 'uuid';
-import User from 'src/database/entity/user.entity';
 import { ForgotPasswordCache } from 'src/database/entity/forgot_password_cache.entity';
+import { SummonerAuthRequest } from '../schemas/request/auth/summoner_auth.request';
+import { LolAuthStatus } from '../common/enum/lol_auth_statuses.enum';
+import { NetworkProvider } from '../modules/network/network.provider';
+import { GeneralHelper } from '../utils/general.helper';
+import { SecondStepAuthResponse } from '../modules/auth/response/second_step_auth.response';
 
 @Controller('/auth')
 export class AuthController {
@@ -54,10 +59,11 @@ export class AuthController {
         private readonly userRegisterCacheService: UserRegisterCacheService,
         private readonly matchingSpamService: MatchingSpamService,
         private readonly userBelongingsService: UserBelongingsService,
+        private readonly networkProvider: NetworkProvider,
     ) {}
 
     @UseGuards(ThrottlerGuard)
-    @Throttle(60)
+    @Throttle(configs.general.AUTH_GENERAL_THROTTLE)
     @Post('/login')
     async login(@Body() body: UserLoginDto, @Res() res: Response) {
         this.cookieService.clearCookie(res);
@@ -72,36 +78,128 @@ export class AuthController {
     }
 
     @UseGuards(ThrottlerGuard)
-    @Throttle(60)
-    @Post('/register')
+    @Throttle(configs.general.AUTH_FIRST_STEP_THROTTLE)
+    @Post('/register/step/1')
+    async registerFirstStep(@Body() body: SummonerAuthRequest) {
+        // timestamp check needed
+
+        const { server, summonerName } = body;
+
+        // check if summoner name and server exists in cache
+        const summoner = await this.authService.retrieveRegisterCache(server, summonerName);
+
+        // check if server and summoner_name is already in use in user details
+        await this.authService.summonerNameAndServerExists(server, summonerName);
+
+        // if exists delete and then renew, else create new and then return
+        const userRegisteredCache = await this.authService.renewSummonerNameAndServer(
+            summoner,
+            server,
+            summonerName,
+        );
+
+        return {
+            uuid: userRegisteredCache.uuid,
+        };
+    }
+
+    @UseGuards(ThrottlerGuard)
+    @Throttle(configs.general.AUTH_GENERAL_THROTTLE)
+    @Post('/register/step/2')
+    async registerSecondStep(@Body() body: SummonerAuthRequest) {
+        const { server, summonerName, uuid } = body;
+
+        //! Big logic for checking cache
+        // check if summoner name and server exists in cache
+        //      true -> if exists then check first if is validated
+        //              true -> return validated
+        //
+        //           -> fetch new data and check if profile icon id is changed
+        //              true -> change validated to true
+        //                   -> return validated
+        //
+        //           -> if time stamp is left
+        //              true -> return left time
+        //              false -> return timestamp invalid
+
+        const secondStepAuthResponse = new SecondStepAuthResponse();
+
+        const { userRegCache } = await this.authService.checkCacheAndValidation(server, summonerName, uuid);
+
+        // if timestamp difference is more than 10 min
+        const now = new Date();
+        const differenceMin = GeneralHelper.dater.timeDifferenceMinutes(userRegCache.timestamp_now, now);
+
+        if (differenceMin.min > configs.general.REGISTER_TIMESTAMP_DURATION) {
+            secondStepAuthResponse.status = LolAuthStatus.INVALID_TIMESTAMP;
+            return secondStepAuthResponse;
+        }
+
+        // fetch new data and check if profile icon id is changed
+        const summonerOnlyDetails = await this.networkProvider.lolRemoteService.summonerNameDetails(
+            server,
+            summonerName,
+        );
+
+        if (userRegCache.profile_icon_id !== summonerOnlyDetails.profileIconId) {
+            // change validate to true and return
+            await this.userRegisterCacheService.updateValidation(userRegCache.id, true);
+
+            secondStepAuthResponse.status = LolAuthStatus.IS_VALID;
+            return secondStepAuthResponse;
+        }
+
+        secondStepAuthResponse.timeLeft = differenceMin;
+        return secondStepAuthResponse;
+    }
+
+    @UseGuards(ThrottlerGuard)
+    @Throttle(configs.general.AUTH_GENERAL_THROTTLE)
+    @Post('/register/step/3')
     async register(@Body() body: UserRegisterDto) {
-        const { email, summoner_name, server, username } = body;
+        const { email, summonerName, server, username, uuid } = body;
+
+        //! check everything beforehand
+
+        const secondStepAuthResponse = new SecondStepAuthResponse();
+
+        const { status, userRegCache } = await this.authService.checkCacheAndValidation(
+            server,
+            summonerName,
+            uuid,
+        );
+
+        if (status === LolAuthStatus.INVALID) {
+            secondStepAuthResponse.status = status;
+            return secondStepAuthResponse;
+        }
 
         // first checking if email or username already in register cache
         await this.authService.usernameEmailExists(email, username);
 
-        // second checking if email and username already in user (avoid lot of api request, will become fourth after riot production key)
+        // second checking if email and username already in user
         await this.authService.usernameEmailExists(email, username, { inCache: true });
 
-        // fourth checking if server and summoner_name is already in use in user details
-        await this.authService.summonerNameAndServerExists(server, summoner_name);
-
         // third checking if lol credentials is valid
-        const checkedLolCreds = await this.userService.checkLolCredentialsValid(server, summoner_name);
+        // const checkedLolCreds = await this.userService.checkLolCredentialsValid(server, summonerName);
 
-        // third cache into database
-        const userCached = await this.userService.cacheUserRegister(body, checkedLolCreds).catch((err) => {
-            throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.USER_ALREADY_IN_CACHE);
-        });
+        // update user register cache
+
+        // cache into database
+        // const userCached = await this.userService.cacheUserRegister(body, checkedLolCreds).catch(() => {
+        //     throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.USER_ALREADY_IN_CACHE);
+        // });
+
+        const userCached = await this.authService.cacheUserRegister(userRegCache, body);
 
         // send to mail
         this.mailServie.sendUserConfirmation(userCached);
 
-        return { checkedLolCreds, check: true };
+        return { check: true };
     }
 
     @UseGuards(JwtRegisterAuthGuard, ThrottlerGuard)
-    @Throttle(60)
+    @Throttle(configs.general.AUTH_GENERAL_THROTTLE)
     @UseFilters(RegisterCacheExceptionFilter)
     @Get('/register/confirm/')
     async registerVerify(@Query('id', ParseIntPipe) id: number, @Req() req: Request, @Res() res: Response) {

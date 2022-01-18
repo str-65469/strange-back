@@ -4,8 +4,8 @@ import socket from './addons/socket';
 import tokens from './addons/tokens';
 
 export const configs = {
-  tokens,
-  messages,
-  socket,
-  general,
+    tokens,
+    messages,
+    socket,
+    general,
 };
