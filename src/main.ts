@@ -16,7 +16,6 @@ import { AllExceptionsFilter } from './app/common/exception_filters/all_exceptio
  * ? https://www.npmjs.com/package/ts-mixer
  *
  * @important
- *      | first check if lol_api is working and then remove this message !!!!
  *      | remove CHECKED_SERVER_URL from .env
  *      | yarn remove @nestjs/axios
  *      | add all urls /api (markup,dashboard,development-markup,development-dashboard in digitalocean)

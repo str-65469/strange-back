@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { SummonerAuthRequest } from '../auth/summoner_auth.request';
+import { SummonerAuthRequestStep2 } from '../auth/summoner_auth_step_2.request';
 
-export class UserRegisterDto extends SummonerAuthRequest {
+export class UserRegisterDto extends SummonerAuthRequestStep2 {
     @IsNotEmpty()
     @IsString()
     username: string;

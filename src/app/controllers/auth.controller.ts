@@ -10,9 +10,6 @@ import {
     Req,
     UseFilters,
     HttpStatus as HTTS,
-    Param,
-    ParseUUIDPipe,
-    ParseEnumPipe,
 } from '@nestjs/common';
 import { User } from 'src/database/entity/user.entity';
 import { v4 } from 'uuid';
@@ -43,12 +40,13 @@ import { configs } from 'src/configs/config';
 import { GenericException } from '../common/exceptions/general.exception';
 import { ExceptionMessageCode } from '../common/enum/message_codes/exception_message_code.enum';
 import { ForgotPasswordCache } from 'src/database/entity/forgot_password_cache.entity';
-import { SummonerAuthRequest, SummonerAuthRequestStep1 } from '../schemas/request/auth/summoner_auth.request';
+import { SummonerAuthRequestStep2 } from '../schemas/request/auth/summoner_auth_step_2.request';
 import { LolAuthStatus } from '../common/enum/lol_auth_statuses.enum';
 import { GeneralHelper } from '../utils/general.helper';
 import { FirstStepAuthResponse, SecondStepAuthResponse } from '../modules/auth/response/second_step_auth.response';
 import { SummonerDetailsFailure } from '../common/failures/lol_api/summoner_details.failure.enum';
-import { LolServer } from '../common/enum/lol_server.enum';
+import { SummonerAuthRequestStep1 } from '../schemas/request/auth/summoner_auth_step_1.request';
+import { SummonerAuthCheckParams } from '../schemas/request/auth/summoner_auth_step_2_check.request';
 
 @Controller('/auth')
 export class AuthController {
@@ -118,12 +116,10 @@ export class AuthController {
 
     @UseGuards(ThrottlerGuard)
     @Throttle(configs.general.AUTH_GENERAL_THROTTLE)
-    @Get('/register/step/2/check/:server/:summonerName/:uuid')
-    async registerSecondStepCheck(
-        @Param('server', new ParseEnumPipe(LolServer)) server: LolServer,
-        @Param('summonerName') summonerName: string,
-        @Param('uuid', ParseUUIDPipe) uuid: string,
-    ): Promise<SecondStepAuthResponse> {
+    @Get('/register/step/2/check')
+    async registerSecondStepCheck(@Query() queryData: SummonerAuthCheckParams): Promise<SecondStepAuthResponse> {
+        const { server, summonerName, uuid } = queryData;
+
         const userRegCache = await this.authService.retrieveRegisterCache(server, summonerName, uuid);
 
         if (!userRegCache) return { status: LolAuthStatus.INVALID };
@@ -177,7 +173,7 @@ export class AuthController {
     @UseGuards(ThrottlerGuard)
     @Throttle(configs.general.AUTH_GENERAL_THROTTLE)
     @Post('/register/step/2')
-    async registerSecondStep(@Body() body: SummonerAuthRequest): Promise<SecondStepAuthResponse> {
+    async registerSecondStep(@Body() body: SummonerAuthRequestStep2): Promise<SecondStepAuthResponse> {
         const { server, summonerName, uuid } = body;
 
         const userRegCache = await this.authService.retrieveRegisterCache(server, summonerName, uuid);
