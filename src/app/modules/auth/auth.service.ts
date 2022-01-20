@@ -50,34 +50,6 @@ export class AuthService {
         return user;
     }
 
-    async usernameEmailExists(email: string, username: string, opts?: { inCache: boolean }) {
-        let user = null;
-
-        if (opts?.inCache) {
-            user = await this.userRegisterCacheService.findByEmailOrUsername(email, username);
-        } else {
-            user = await this.userService.findByEmailOrUsername(email, username);
-        }
-
-        if (user) {
-            if (user.email === email) {
-                throw new GenericException(
-                    HttpStatus.BAD_REQUEST,
-                    ExceptionMessageCode.USER_EMAIL_ALREADY_IN_USE,
-                );
-            }
-
-            if (user.username === username) {
-                throw new GenericException(
-                    HttpStatus.BAD_REQUEST,
-                    ExceptionMessageCode.USERNAME_ALREADY_IN_USE,
-                );
-            }
-        }
-
-        return user;
-    }
-
     async emailExists(email: string, opts?: Partial<{ inForgotPasswordCache: boolean }>) {
         if (opts?.inForgotPasswordCache) {
             const user = await this.userForgotPasswordCacheService.findByEmail(email);
@@ -92,17 +64,6 @@ export class AuthService {
         }
 
         return user;
-    }
-
-    async summonerNameAndServerExists(server: LolServer, summonerName: string) {
-        const userDetails = await this.userDetailsService.findBySummonerAndServer(server, summonerName);
-
-        if (userDetails) {
-            throw new GenericException(
-                HttpStatus.BAD_REQUEST,
-                ExceptionMessageCode.SUMMONER_NAME_ALREADY_IN_USE,
-            );
-        }
     }
 
     async renewSummonerNameAndServer(
@@ -122,7 +83,7 @@ export class AuthService {
         );
 
         // create new
-        return this.userRegisterCacheService.createFirstStepCache(server, summonerName, summonerData);
+        return this.userRegisterCacheService.createFirstStepCache(server, summonerName, summonerData.data);
     }
 
     async retrieveRegisterCachedData(id: number) {
@@ -158,7 +119,7 @@ export class AuthService {
 
         return {
             userRegCache,
-            status: userRegCache.is_valid ? LolAuthStatus.IS_VALID : LolAuthStatus.INVALID,
+            status: userRegCache.is_valid ? LolAuthStatus.VALID : LolAuthStatus.INVALID,
         };
     }
 
@@ -171,7 +132,7 @@ export class AuthService {
     }
 
     async cacheUserRegister(userRegCache: UserRegisterCache, body: UserRegisterDto) {
-        const { email, password, username } = body;
+        const { email, password, username: username } = body;
 
         const secret = this.jwtAcessService.jwtService.sign(
             { email, summoner_name: userRegCache.summoner_name, username },
@@ -194,8 +155,4 @@ export class AuthService {
         // fetch updated
         return this.userRegisterCacheService.findOne(userRegCache.id);
     }
-
-    // async cacheUserRegister(body: UserRegisterDto): Promise<UserRegisterCache> {
-
-    // }
 }

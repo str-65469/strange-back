@@ -13,22 +13,22 @@ import { UserForgotPasswordCacheService } from './user/user_forgot_password.serv
 import { EntitiesModule } from './entities.module';
 
 @Module({
-  imports: [
-    EntitiesModule,
-    UsersModule,
-    ThrottlerModule.forRoot({ ttl: 60, limit: 10 }), // 10 request every minute
-    JwtModule.register({ secret: process.env.JWT_SECRET }),
-  ],
-  controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtAcessService,
-    UserDetailsServiceService,
-    UserRegisterCacheService,
-    MatchingSpamService,
-    UserBelongingsService,
-    UserForgotPasswordCacheService,
-  ],
-  exports: [AuthService, JwtAcessService],
+    imports: [
+        EntitiesModule,
+        UsersModule,
+        ThrottlerModule.forRoot({ ttl: 60, limit: 10 }), // 10 request every minute
+        JwtModule.register({ secret: process.env.JWT_SECRET }),
+    ],
+    controllers: [AuthController],
+    providers: [
+        AuthService,
+        JwtAcessService,
+        UserDetailsServiceService,
+        UserRegisterCacheService,
+        MatchingSpamService,
+        UserBelongingsService,
+        UserForgotPasswordCacheService,
+    ],
+    exports: [AuthService, JwtAcessService],
 })
 export class AuthModule {}

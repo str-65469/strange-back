@@ -9,9 +9,11 @@ class DateHelper {
         };
     }
 
-    timeDifferenceMinutes(date1: string | Date, date2: string | Date) {
+    timeDifferenceMinutes(date1: string | Date, date2?: string | Date) {
+        const tempDate2OrNow = date2 ?? new Date();
+
         const tempDate1 = new Date(date1);
-        const tempDate2 = new Date(date2);
+        const tempDate2 = new Date(tempDate2OrNow);
         const diffTime = Math.abs(tempDate2.getTime() - tempDate1.getTime());
 
         const sec = Math.ceil(diffTime / 1000);
@@ -57,5 +59,9 @@ export class GeneralHelper {
 
     public static random(arr: Array<any>) {
         return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    public static isFloatingNumbersEqual(n1, n2) {
+        return Math.abs(n1 - n2) < Number.EPSILON;
     }
 }

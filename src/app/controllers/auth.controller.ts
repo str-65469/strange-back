@@ -9,7 +9,10 @@ import {
     UseGuards,
     Req,
     UseFilters,
-    HttpStatus,
+    HttpStatus as HTTS,
+    Param,
+    ParseUUIDPipe,
+    ParseEnumPipe,
 } from '@nestjs/common';
 import User from 'src/database/entity/user.entity';
 import { v4 } from 'uuid';
@@ -40,11 +43,12 @@ import { configs } from 'src/configs/config';
 import { GenericException } from '../common/exceptions/general.exception';
 import { ExceptionMessageCode } from '../common/enum/message_codes/exception_message_code.enum';
 import { ForgotPasswordCache } from 'src/database/entity/forgot_password_cache.entity';
-import { SummonerAuthRequest } from '../schemas/request/auth/summoner_auth.request';
+import { SummonerAuthRequest, SummonerAuthRequestStep1 } from '../schemas/request/auth/summoner_auth.request';
 import { LolAuthStatus } from '../common/enum/lol_auth_statuses.enum';
-import { NetworkProvider } from '../modules/network/network.provider';
 import { GeneralHelper } from '../utils/general.helper';
-import { SecondStepAuthResponse } from '../modules/auth/response/second_step_auth.response';
+import { FirstStepAuthResponse, SecondStepAuthResponse } from '../modules/auth/response/second_step_auth.response';
+import { SummonerDetailsFailure } from '../common/failures/lol_api/summoner_details.failure.enum';
+import { LolServer } from '../common/enum/lol_server.enum';
 
 @Controller('/auth')
 export class AuthController {
@@ -59,7 +63,6 @@ export class AuthController {
         private readonly userRegisterCacheService: UserRegisterCacheService,
         private readonly matchingSpamService: MatchingSpamService,
         private readonly userBelongingsService: UserBelongingsService,
-        private readonly networkProvider: NetworkProvider,
     ) {}
 
     @UseGuards(ThrottlerGuard)
@@ -80,122 +83,190 @@ export class AuthController {
     @UseGuards(ThrottlerGuard)
     @Throttle(configs.general.AUTH_FIRST_STEP_THROTTLE)
     @Post('/register/step/1')
-    async registerFirstStep(@Body() body: SummonerAuthRequest) {
+    async registerFirstStep(@Body() body: SummonerAuthRequestStep1): Promise<FirstStepAuthResponse> {
         // timestamp check needed
-
         const { server, summonerName } = body;
 
         // check if summoner name and server exists in cache
-        const summoner = await this.authService.retrieveRegisterCache(server, summonerName);
+        const userRegisterCache = await this.authService.retrieveRegisterCache(server, summonerName);
+
+        // if exists and timestamp still in motion then throw exception
+        if (userRegisterCache && userRegisterCache.timestamp_now) {
+            const differenceMin = GeneralHelper.dater.timeDifferenceMinutes(userRegisterCache.timestamp_now);
+
+            if (differenceMin.min < configs.general.REGISTER_TIMESTAMP_DURATION) {
+                return { uuid: userRegisterCache.uuid, timeLeft: differenceMin };
+            }
+        }
 
         // check if server and summoner_name is already in use in user details
-        await this.authService.summonerNameAndServerExists(server, summonerName);
+        const userDetails = await this.userDetailsService.findBySummonerAndServer(server, summonerName);
+
+        if (userDetails) {
+            throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.SUMMONER_NAME_ALREADY_IN_USE);
+        }
 
         // if exists delete and then renew, else create new and then return
-        const userRegisteredCache = await this.authService.renewSummonerNameAndServer(
-            summoner,
+        const userRegisterRenewedCache = await this.authService.renewSummonerNameAndServer(
+            userRegisterCache,
             server,
             summonerName,
         );
 
-        return {
-            uuid: userRegisteredCache.uuid,
-        };
+        return { uuid: userRegisterRenewedCache.uuid };
     }
 
     @UseGuards(ThrottlerGuard)
     @Throttle(configs.general.AUTH_GENERAL_THROTTLE)
+    @Get('/register/step/2/check/:server/:summonerName/:uuid')
+    async registerSecondStepCheck(
+        @Param('server', new ParseEnumPipe(LolServer)) server: LolServer,
+        @Param('summonerName') summonerName: string,
+        @Param('uuid', ParseUUIDPipe) uuid: string,
+    ): Promise<SecondStepAuthResponse> {
+        const userRegCache = await this.authService.retrieveRegisterCache(server, summonerName, uuid);
+
+        if (!userRegCache) return { status: LolAuthStatus.INVALID };
+
+        const differenceMin = GeneralHelper.dater.timeDifferenceMinutes(userRegCache.timestamp_now);
+
+        // if timestamp difference is more than register timestamp duration
+        if (differenceMin.min > configs.general.REGISTER_TIMESTAMP_DURATION) {
+            return { status: LolAuthStatus.INVALID_TIMESTAMP };
+        }
+
+        const summonerOnlyDetailsResponse = await this.userService.summonerNameDetails(server, summonerName);
+
+        return summonerOnlyDetailsResponse.fold<Promise<SecondStepAuthResponse>>(
+            async (l) => {
+                switch (l) {
+                    case SummonerDetailsFailure.UNKNOWN:
+                    case SummonerDetailsFailure.SUMMONER_NAME_NOT_FOUND:
+                        return { status: LolAuthStatus.INVALID };
+                }
+            },
+
+            async (r) => {
+                if (userRegCache.profile_icon_id !== r.profileIconId) {
+                    // change validate to true and return
+                    await this.userRegisterCacheService.updateValidation(userRegCache.id, true);
+
+                    return { status: LolAuthStatus.VALID };
+                }
+
+                return { status: LolAuthStatus.VALID_TIMESTAMP, timeLeft: differenceMin };
+            },
+        );
+    }
+
+    /**
+     * @description Big logic for checking cache
+     *
+     * check if summoner name and server exists in cache
+     *      true -> if exists then check first if is validated
+     *              true -> return validated
+     *
+     *           -> fetch new data and check if profile icon id is changed
+     *              true -> change validated to true
+     *                   -> return validated
+     *
+     *           -> if time stamp is left
+     *              true -> return left time
+     *              false -> return timestamp invalid
+     */
+    @UseGuards(ThrottlerGuard)
+    @Throttle(configs.general.AUTH_GENERAL_THROTTLE)
     @Post('/register/step/2')
-    async registerSecondStep(@Body() body: SummonerAuthRequest) {
+    async registerSecondStep(@Body() body: SummonerAuthRequest): Promise<SecondStepAuthResponse> {
         const { server, summonerName, uuid } = body;
 
-        //! Big logic for checking cache
-        // check if summoner name and server exists in cache
-        //      true -> if exists then check first if is validated
-        //              true -> return validated
-        //
-        //           -> fetch new data and check if profile icon id is changed
-        //              true -> change validated to true
-        //                   -> return validated
-        //
-        //           -> if time stamp is left
-        //              true -> return left time
-        //              false -> return timestamp invalid
+        const userRegCache = await this.authService.retrieveRegisterCache(server, summonerName, uuid);
 
-        const secondStepAuthResponse = new SecondStepAuthResponse();
-
-        const { userRegCache } = await this.authService.checkCacheAndValidation(server, summonerName, uuid);
-
-        // if timestamp difference is more than 10 min
-        const now = new Date();
-        const differenceMin = GeneralHelper.dater.timeDifferenceMinutes(userRegCache.timestamp_now, now);
-
-        if (differenceMin.min > configs.general.REGISTER_TIMESTAMP_DURATION) {
-            secondStepAuthResponse.status = LolAuthStatus.INVALID_TIMESTAMP;
-            return secondStepAuthResponse;
+        // check cache existence
+        if (!userRegCache) {
+            throw new GenericException(HTTS.NOT_FOUND, ExceptionMessageCode.REGISTER_CACHE_NOT_FOUND);
         }
 
-        // fetch new data and check if profile icon id is changed
-        const summonerOnlyDetails = await this.networkProvider.lolRemoteService.summonerNameDetails(
-            server,
-            summonerName,
+        // get date difference between now dan cache timestamp starting point
+        const differenceMin = GeneralHelper.dater.timeDifferenceMinutes(userRegCache.timestamp_now);
+
+        // if timestamp difference is more than for some minutes
+        if (differenceMin.min > configs.general.REGISTER_TIMESTAMP_DURATION) {
+            throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.AUTH_REGISTER_INVALID_TIMESTAMP);
+        }
+
+        // get summoner details from lol api
+        const summonerOnlyDetailsResponse = await this.userService.summonerNameDetails(server, summonerName);
+
+        // check for api exception and return response
+        const summonerDetails = summonerOnlyDetailsResponse.fold(
+            (l) => {
+                switch (l) {
+                    case SummonerDetailsFailure.UNKNOWN:
+                        throw new GenericException(
+                            HTTS.INTERNAL_SERVER_ERROR,
+                            ExceptionMessageCode.INTERNAL_SERVER_ERROR,
+                        );
+
+                    case SummonerDetailsFailure.SUMMONER_NAME_NOT_FOUND:
+                        throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND);
+                }
+            },
+            (r) => r,
         );
 
-        if (userRegCache.profile_icon_id !== summonerOnlyDetails.profileIconId) {
+        // check for profile icon change if change response
+        if (userRegCache.profile_icon_id !== summonerDetails.profileIconId) {
             // change validate to true and return
             await this.userRegisterCacheService.updateValidation(userRegCache.id, true);
-
-            secondStepAuthResponse.status = LolAuthStatus.IS_VALID;
-            return secondStepAuthResponse;
+            return { status: LolAuthStatus.VALID };
         }
 
-        secondStepAuthResponse.timeLeft = differenceMin;
-        return secondStepAuthResponse;
+        // if nothing above just return left time
+        return { status: LolAuthStatus.VALID_TIMESTAMP, timeLeft: differenceMin };
     }
 
     @UseGuards(ThrottlerGuard)
     @Throttle(configs.general.AUTH_GENERAL_THROTTLE)
     @Post('/register/step/3')
-    async register(@Body() body: UserRegisterDto) {
-        const { email, summonerName, server, username, uuid } = body;
+    async register(@Body() body: UserRegisterDto): Promise<void> {
+        const { server, summonerName, uuid } = body;
+        const userRegCache = await this.authService.retrieveRegisterCache(server, summonerName, uuid);
 
-        //! check everything beforehand
+        if (!userRegCache) {
+            throw new GenericException(HTTS.NOT_FOUND, ExceptionMessageCode.REGISTER_CACHE_NOT_FOUND);
+        }
 
-        const secondStepAuthResponse = new SecondStepAuthResponse();
-
-        const { status, userRegCache } = await this.authService.checkCacheAndValidation(
-            server,
-            summonerName,
-            uuid,
-        );
-
-        if (status === LolAuthStatus.INVALID) {
-            secondStepAuthResponse.status = status;
-            return secondStepAuthResponse;
+        if (!userRegCache.is_valid) {
+            throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.SUMMONER_PROFILE_NOT_VALIDATED);
         }
 
         // first checking if email or username already in register cache
-        await this.authService.usernameEmailExists(email, username);
+        const userCache = await this.userRegisterCacheService.findByEmailOrUsername(body.email, body.username);
+
+        if (userCache && userCache.email === body.email) {
+            throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.USER_EMAIL_ALREADY_IN_USE);
+        }
+
+        if (userCache && userCache.username === body.username) {
+            throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.USERNAME_ALREADY_IN_USE);
+        }
 
         // second checking if email and username already in user
-        await this.authService.usernameEmailExists(email, username, { inCache: true });
+        const user = await this.userService.findByEmailOrUsername(body.email, body.username);
 
-        // third checking if lol credentials is valid
-        // const checkedLolCreds = await this.userService.checkLolCredentialsValid(server, summonerName);
+        if (user && user.email === body.email) {
+            throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.USER_EMAIL_ALREADY_IN_USE);
+        }
 
-        // update user register cache
-
-        // cache into database
-        // const userCached = await this.userService.cacheUserRegister(body, checkedLolCreds).catch(() => {
-        //     throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.USER_ALREADY_IN_CACHE);
-        // });
+        if (user && user.username === body.username) {
+            throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.USERNAME_ALREADY_IN_USE);
+        }
 
         const userCached = await this.authService.cacheUserRegister(userRegCache, body);
-
-        // send to mail
         this.mailServie.sendUserConfirmation(userCached);
 
-        return { check: true };
+        return null;
     }
 
     @UseGuards(JwtRegisterAuthGuard, ThrottlerGuard)
@@ -204,8 +275,6 @@ export class AuthController {
     @Get('/register/confirm/')
     async registerVerify(@Query('id', ParseIntPipe) id: number, @Req() req: Request, @Res() res: Response) {
         this.cookieService.clearCookie(res);
-
-        // get data from cache
         const cachedData = await this.authService.retrieveRegisterCachedData(id);
 
         // generate refresh token and new secret
@@ -241,7 +310,7 @@ export class AuthController {
 
     @UseGuards(JwtRefreshTokenAuthGuard)
     @Get('/refresh')
-    public async refreshToken(@Req() req: Request, @Res() res: Response) {
+    async refreshToken(@Req() req: Request, @Res() res: Response) {
         this.cookieService.clearCookie(res);
 
         const cookies = req.cookies;
@@ -262,13 +331,13 @@ export class AuthController {
 
     @UseGuards(JwtAcessTokenAuthGuard)
     @Get('/check')
-    public async checkIfAuth() {
+    async checkIfAuth() {
         return true;
     }
 
     @UseGuards(JwtAcessTokenAuthGuard)
     @Get('/access_token')
-    public async getAccessToken(@Req() request: Request) {
+    async getAccessToken(@Req() request: Request) {
         const cookies = request.cookies;
 
         return cookies?.access_token;
@@ -276,7 +345,7 @@ export class AuthController {
 
     @UseGuards(JwtAcessTokenAuthGuard)
     @Post('/logout')
-    public async logout(@Res() res: Response) {
+    async logout(@Res() res: Response) {
         this.cookieService.clearCookie(res);
 
         return res.send({ message: 'logout successful' });
@@ -284,7 +353,7 @@ export class AuthController {
 
     @UseGuards(ThrottlerGuard)
     @Post('/forgot-password')
-    public async forgotPassword(@Body() body: ForgotPasswordRequestDto) {
+    async forgotPassword(@Body() body: ForgotPasswordRequestDto) {
         const { email, summoner_name } = body;
 
         // first checking if email already in forgot password cache
@@ -298,10 +367,7 @@ export class AuthController {
         if (userCache) {
             // check if summoner name exists
             if (summoner_name !== userCache.summoner_name) {
-                throw new GenericException(
-                    HttpStatus.NOT_FOUND,
-                    ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND,
-                );
+                throw new GenericException(HTTS.NOT_FOUND, ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND);
             }
 
             return {
@@ -316,7 +382,7 @@ export class AuthController {
 
         // check if sommoner name is correct
         if (userWithDetails.details.summoner_name !== summoner_name) {
-            throw new GenericException(HttpStatus.NOT_FOUND, ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND);
+            throw new GenericException(HTTS.NOT_FOUND, ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND);
         }
 
         // first save dto data to database
@@ -347,19 +413,16 @@ export class AuthController {
     }
 
     @UseGuards(ThrottlerGuard, JwtForgotPasswordAuthGuard)
-    @Throttle(5) // minimal throttle for password update in minute
+    @Throttle(5)
     @Post('/forgot-password/confirm')
-    public async forgotPasswordUpdate(
-        @Body() body: ForgotPasswordConfirmRequestDto,
-        @Req() req: ForgotPasswordRequest,
-    ) {
+    async forgotPasswordUpdate(@Body() body: ForgotPasswordConfirmRequestDto, @Req() req: ForgotPasswordRequest) {
         //(!!!) no need for email checkup token checkup and cache checkup happens inside guard, uuid is validate as well from dto
         const { uuid, new_password } = body;
         const forgotPasswordCache = req.forgotPasswordCache;
 
         // validate if uuid is correct
         if (uuid !== forgotPasswordCache.uuid) {
-            throw new GenericException(HttpStatus.BAD_REQUEST, ExceptionMessageCode.INCORRECT_UUID);
+            throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.INCORRECT_UUID);
         }
 
         // delete from cache

@@ -1,5 +1,6 @@
 export enum LolAuthStatus {
-    IS_VALID = 'IS_VALID',
+    VALID = 'VALID',
     INVALID = 'INVALID',
     INVALID_TIMESTAMP = 'INVALID_TIMESTAMP',
+    VALID_TIMESTAMP = 'VALID_TIMESTAMP', // timestamp still in some minutes
 }

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { HTTP, GET, Path, Interceptors } from '@yggdrasilts/axiosfit';
+import { HTTP, GET, Path, Interceptors, AxiosResponse } from '@yggdrasilts/axiosfit';
 import { LolServer } from 'src/app/common/enum/lol_server.enum';
 import { SummonerDetailsResponse } from '../dto/response/summoner_details.response';
 import { SummonerDetailsAndLeagueResponse } from '../dto/response/summoner_details_league.response';
@@ -12,7 +12,7 @@ export class LolRemoteService {
     public summonerNameDetailsAndLeague(
         @Path('server') _server: LolServer,
         @Path('summonerName') _summonerName: string,
-    ): Promise<SummonerDetailsAndLeagueResponse> {
+    ): Promise<AxiosResponse<SummonerDetailsAndLeagueResponse>> {
         return null;
     }
 
@@ -20,7 +20,7 @@ export class LolRemoteService {
     public summonerNameDetails(
         @Path('server') _server: LolServer,
         @Path('summonerName') _summonerName: string,
-    ): Promise<SummonerDetailsResponse> {
+    ): Promise<AxiosResponse<SummonerDetailsResponse>> {
         return null;
     }
 }

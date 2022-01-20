@@ -16,10 +16,14 @@ import { AccessTokenPayload } from 'src/app/common/services/jwt_access.service';
 import { UserProfileUpdateDto } from 'src/app/schemas/request/user/user_update.dto';
 import { UserPasswordUpdateDto } from 'src/app/schemas/request/user/user_update_password.dto';
 import { generateCompressedSprite } from 'src/app/utils/dicebear.helper';
-import { GenericException } from 'src/app/common/exceptions/general.exception';
+import { GenericException, GenericExceptionResponse } from 'src/app/common/exceptions/general.exception';
 import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exception_message_code.enum';
 import { UserRepository } from '../../repositories/user_repository';
 import { NetworkProvider } from '../network/network.provider';
+import { AxiosError } from '@yggdrasilts/axiosfit';
+import { right, left } from 'src/app/common/either';
+import { SummonerDetailsFailure } from 'src/app/common/failures/lol_api/summoner_details.failure.enum';
+import { SummonerDetailsResponse } from '../network/dto/response/summoner_details.response';
 
 @Injectable()
 export class UsersService {
@@ -110,18 +114,6 @@ export class UsersService {
         user.img_path = '/user/profiles/' + path;
 
         return await this.userRepo.save(user);
-    }
-
-    async checkLolCredentialsValid(server: LolServer, summoner_name: string) {
-        return this.networkProvider.lolRemoteService
-            .summonerNameDetailsAndLeague(server, summoner_name)
-            .catch(() => {
-                throw new GenericException(
-                    HttpStatus.BAD_REQUEST,
-                    ExceptionMessageCode.DIVISION_SUMMONER_ERROR,
-                    configs.messages.exceptions.summonerDivisionCheck,
-                );
-            });
     }
 
     async saveUserByCachedData(userCached: UserRegisterCache, secret: string, ip: string): Promise<User> {
@@ -225,39 +217,22 @@ export class UsersService {
             relations: ['user'],
         });
     }
-}
 
-/*
-    async cacheUserRegister(
-        body: UserRegisterDto,
-        details: SummonerDetailsAndLeagueResponse,
-    ): Promise<UserRegisterCache> {
-        const { email, password, server, summonerName, username } = body;
-        const { league, leagueNumber, leaguePoints, summonerLevel, winRatio } = details;
-        const secret = this.jwtService.sign(
-            { email, summoner_name: summonerName, username },
-            { expiresIn: configs.tokens.user_register_token },
-        );
+    public summonerNameDetails(server: LolServer, summonerName: string) {
+        return this.networkProvider.lolRemoteService
+            .summonerNameDetails(server, summonerName)
+            .then((res) => right<SummonerDetailsFailure, SummonerDetailsResponse>(res.data))
+            .catch((e: AxiosError<GenericExceptionResponse>) => {
+                if (e.isAxiosError) {
+                    switch (e.response?.data.messageCode) {
+                        case ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND:
+                            return left<SummonerDetailsFailure, SummonerDetailsResponse>(
+                                SummonerDetailsFailure.SUMMONER_NAME_NOT_FOUND,
+                            );
+                    }
+                }
 
-        const d1 = new Date();
-        const d2 = new Date(d1);
-        d2.setMinutes(d1.getMinutes() + 30);
-
-        const pass = bcrypt.hashSync(password, bcrypt.genSaltSync(12));
-
-        return await this.registerCacheRepo.save({
-            email,
-            server,
-            summoner_name: summonerName,
-            username,
-            league,
-            league_number: leagueNumber,
-            league_points: leaguePoints,
-            level: summonerLevel,
-            win_rate: winRatio,
-            password: pass,
-            secret_token: secret,
-            expiry_date: d2,
-        });
+                return left<SummonerDetailsFailure, SummonerDetailsResponse>(SummonerDetailsFailure.UNKNOWN);
+            });
     }
-*/
+}
