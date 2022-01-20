@@ -1,53 +1,53 @@
 //TODO addUrlParams convert to [addUrlParams,addUrlParam] two method later
 
 namespace UrlBuilder {
-  type Path = Array<string> | string;
+    type Path = Array<string> | string;
 
-  export interface Options {
-    path: Path;
-  }
-
-  export class Builder {
-    private url: string = '';
-
-    constructor(private readonly baseUrl: string) {
-      this.url = this.baseUrl;
+    export interface Options {
+        path: Path;
     }
 
-    addUrlParams(path: Path): this {
-      if (!path) {
-        return this;
-      }
+    export class Builder {
+        private url: string = '';
 
-      if (Array.isArray(path)) {
-        this.url += path
-          .map((el) => {
-            el = el ?? '';
+        constructor(private readonly baseUrl: string) {
+            this.url = this.baseUrl;
+        }
 
-            return el.startsWith('/') ? el : '/' + el;
-          })
-          .join('');
-      } else {
-        this.url += path.startsWith('/') ? path : '/' + path;
-      }
+        addUrlParams(path: Path): this {
+            if (!path) {
+                return this;
+            }
 
-      return this;
+            if (Array.isArray(path)) {
+                this.url += path
+                    .map((el) => {
+                        el = el ?? '';
+
+                        return el.startsWith('/') ? el : '/' + el;
+                    })
+                    .join('');
+            } else {
+                this.url += path.startsWith('/') ? path : '/' + path;
+            }
+
+            return this;
+        }
+
+        get getUrl(): string {
+            return this.url;
+        }
     }
-
-    get getUrl(): string {
-      return this.url;
-    }
-  }
 }
 
 export function createUrl(baseUrl: string, opts: UrlBuilder.Options): string {
-  const builder = new UrlBuilder.Builder(baseUrl);
+    const builder = new UrlBuilder.Builder(baseUrl);
 
-  return builder.addUrlParams(opts.path).getUrl;
+    return builder.addUrlParams(opts.path).getUrl;
 }
 
 export function buildUrl(baseUrl: string) {
-  return new UrlBuilder.Builder(baseUrl);
+    return new UrlBuilder.Builder(baseUrl);
 }
 
 // buildUrl('http://example.com', {

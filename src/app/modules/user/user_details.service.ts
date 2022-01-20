@@ -3,7 +3,7 @@ import { UserRegisterCache } from 'src/database/entity/user_register_cache.entit
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserDetails } from 'src/database/entity/user_details.entity';
-import User from 'src/database/entity/user.entity';
+import { User } from 'src/database/entity/user.entity';
 import { LolServer } from 'src/app/common/enum/lol_server.enum';
 
 @Injectable()
@@ -18,8 +18,7 @@ export class UserDetailsServiceService {
     }
 
     async saveUserDetailsByCachedData(userCached: UserRegisterCache, user: User): Promise<UserDetails> {
-        const { server, summoner_name, league, league_number, league_points, level, win_rate } =
-            userCached;
+        const { server, summoner_name, league, league_number, league_points, level, win_rate } = userCached;
 
         const userDetailed = this.userDetailsRepo.create({
             user,

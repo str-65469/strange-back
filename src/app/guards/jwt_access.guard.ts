@@ -6,42 +6,45 @@ import { ExceptionMessageCode } from 'src/app/common/enum/message_codes/exceptio
 import { Request } from 'express';
 
 export interface JwtRequest extends Request {
-  jwtPayload: AccessTokenPayload;
+    jwtPayload: AccessTokenPayload;
 }
 
 @Injectable()
 export class JwtAcessTokenAuthGuard implements CanActivate {
-  constructor(private readonly jwtAcessService: JwtAcessService, private readonly cookieService: CookieService) {}
+    constructor(
+        private readonly jwtAcessService: JwtAcessService,
+        private readonly cookieService: CookieService,
+    ) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const http = context.switchToHttp();
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        const http = context.switchToHttp();
 
-    // get tokens and response
-    const request = http.getRequest<JwtRequest>();
-    const response = http.getResponse();
-    const cookies = request.cookies;
-    const accessToken = cookies?.access_token;
-    const refreshToken = cookies?.refresh_token;
+        // get tokens and response
+        const request = http.getRequest<JwtRequest>();
+        const response = http.getResponse();
+        const cookies = request.cookies;
+        const accessToken = cookies?.access_token;
+        const refreshToken = cookies?.refresh_token;
 
-    // check both token existence
-    if (!accessToken) {
-      this.cookieService.clearCookie(response);
-      throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.ACCESS_TOKEN_MISSING);
+        // check both token existence
+        if (!accessToken) {
+            this.cookieService.clearCookie(response);
+            throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.ACCESS_TOKEN_MISSING);
+        }
+
+        if (!refreshToken) {
+            this.cookieService.clearCookie(response);
+            throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.REFRESH_TOKEN_MISSING);
+        }
+
+        // validating access token
+        const jwtPayload = await this.jwtAcessService.validateToken({
+            token: accessToken,
+            secret: process.env.JWT_SECRET,
+        });
+
+        request.jwtPayload = jwtPayload;
+
+        return true;
     }
-
-    if (!refreshToken) {
-      this.cookieService.clearCookie(response);
-      throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.REFRESH_TOKEN_MISSING);
-    }
-
-    // validating access token
-    const jwtPayload = await this.jwtAcessService.validateToken({
-      token: accessToken,
-      secret: process.env.JWT_SECRET,
-    });
-
-    request.jwtPayload = jwtPayload;
-
-    return true;
-  }
 }

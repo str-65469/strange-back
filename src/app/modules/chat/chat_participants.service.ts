@@ -7,11 +7,7 @@ import { ChatParticipants } from 'src/database/entity/chat/chat_participants.ent
 export class ChatParticipantsService {
     constructor(private readonly chatParticipantsRepo: ChatParticipantsRepository) {}
 
-    getChatParticipantsByUser(
-        userId: number,
-        partnerId: number,
-        chatHeadId: number,
-    ): Promise<ChatParticipants[]> {
+    getChatParticipantsByUser(userId: number, partnerId: number, chatHeadId: number): Promise<ChatParticipants[]> {
         return this.chatParticipantsRepo.find({
             where: [
                 {

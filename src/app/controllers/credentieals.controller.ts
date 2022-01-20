@@ -7,11 +7,11 @@ import { CredentialsService } from '../modules/non_auth/credentials.service';
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('credentials')
 export class CredentialsController {
-  constructor(private readonly credentialsService: CredentialsService) {}
+    constructor(private readonly credentialsService: CredentialsService) {}
 
-  @Get()
-  @UseInterceptors(UserSafeInterceptor)
-  public credentials(): CredentialsResponse {
-    return this.credentialsService.credentials();
-  }
+    @Get()
+    @UseInterceptors(UserSafeInterceptor)
+    public credentials(): CredentialsResponse {
+        return this.credentialsService.credentials();
+    }
 }

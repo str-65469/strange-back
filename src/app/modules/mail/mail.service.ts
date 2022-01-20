@@ -13,38 +13,38 @@ export const SENDER_ADDRESS = `"${process.env.APP_TITLE} 👻" <${process.env.MA
 
 @Injectable()
 export class MailService {
-  constructor(
-    @Inject('RegisterMailCheck') private readonly registerMailService: RegisterMailCheckService,
-    @Inject('ContactUsMail') private readonly contactUsMailService: ContactUsMailService,
-    @Inject('ForgotPasswordMail') private readonly forgotPasswordMailService: ForgotPasswordMailService,
-  ) {}
+    constructor(
+        @Inject('RegisterMailCheck') private readonly registerMailService: RegisterMailCheckService,
+        @Inject('ContactUsMail') private readonly contactUsMailService: ContactUsMailService,
+        @Inject('ForgotPasswordMail') private readonly forgotPasswordMailService: ForgotPasswordMailService,
+    ) {}
 
-  async sendUserConfirmation(userCached: UserRegisterCache) {
-    const { id, username, secret_token } = userCached;
+    async sendUserConfirmation(userCached: UserRegisterCache) {
+        const { id, username, secret_token } = userCached;
 
-    const url = createUrl(configs.general.routes.APP_URL, {
-      path: `/auth/register/confirm?id=${id}&secret=${secret_token}`,
-    });
+        const url = createUrl(configs.general.routes.APP_URL, {
+            path: `/auth/register/confirm?id=${id}&secret=${secret_token}`,
+        });
 
-    return this.registerMailService.sendConfirmationEmail(userCached, { url, username });
-  }
+        return this.registerMailService.sendConfirmationEmail(userCached, { url, username });
+    }
 
-  async sendForgotPasswordUUID(email: string, uuid: string, username: string) {
-    const properties = {
-      uuid,
-      username,
-    };
+    async sendForgotPasswordUUID(email: string, uuid: string, username: string) {
+        const properties = {
+            uuid,
+            username,
+        };
 
-    return this.forgotPasswordMailService.sendConfirmationEmail(email, properties);
-  }
+        return this.forgotPasswordMailService.sendConfirmationEmail(email, properties);
+    }
 
-  async sendContactEmail(contactUsObj: ContactUs) {
-    const mailTemplateProps: ContactUsMailProps = {
-      email: contactUsObj.email,
-      message_type: contactUsObj.message_type,
-      message: contactUsObj?.message,
-    };
+    async sendContactEmail(contactUsObj: ContactUs) {
+        const mailTemplateProps: ContactUsMailProps = {
+            email: contactUsObj.email,
+            message_type: contactUsObj.message_type,
+            message: contactUsObj?.message,
+        };
 
-    return this.contactUsMailService.sendConfirmationEmail(contactUsObj, mailTemplateProps);
-  }
+        return this.contactUsMailService.sendConfirmationEmail(contactUsObj, mailTemplateProps);
+    }
 }

@@ -6,14 +6,14 @@ import { SuperLikeServiceType } from 'src/app/common/enum/superlike_services';
 
 Injectable();
 export class SuperlikeService {
-  constructor(
-    @InjectRepository(SuperLikeServices)
-    private readonly superlikeServicesRepo: Repository<SuperLikeServices>,
-  ) {}
+    constructor(
+        @InjectRepository(SuperLikeServices)
+        private readonly superlikeServicesRepo: Repository<SuperLikeServices>,
+    ) {}
 
-  findByType(type: SuperLikeServiceType) {
-    return this.superlikeServicesRepo.findOneOrFail({
-      where: { type },
-    });
-  }
+    findByType(type: SuperLikeServiceType) {
+        return this.superlikeServicesRepo.findOneOrFail({
+            where: { type },
+        });
+    }
 }

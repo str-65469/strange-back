@@ -7,24 +7,24 @@ import { SuperLikeServiceType } from 'src/app/common/enum/superlike_services';
 
 Injectable();
 export class SuperlikePaymentService {
-  constructor(
-    @InjectRepository(SuperLikePayment)
-    private readonly superlikePaymentRepo: Repository<SuperLikePayment>,
-  ) {}
+    constructor(
+        @InjectRepository(SuperLikePayment)
+        private readonly superlikePaymentRepo: Repository<SuperLikePayment>,
+    ) {}
 
-  create(
-    amount: number,
-    like_service_type: SuperLikeServiceType,
-    payment_type: PaymentType,
-    userId: number,
-  ): Promise<SuperLikePayment> {
-    const superLikePayment = this.superlikePaymentRepo.create({
-      amount,
-      userId,
-      like_service_type,
-      payment_type,
-    });
+    create(
+        amount: number,
+        like_service_type: SuperLikeServiceType,
+        payment_type: PaymentType,
+        userId: number,
+    ): Promise<SuperLikePayment> {
+        const superLikePayment = this.superlikePaymentRepo.create({
+            amount,
+            userId,
+            like_service_type,
+            payment_type,
+        });
 
-    return this.superlikePaymentRepo.save(superLikePayment);
-  }
+        return this.superlikePaymentRepo.save(superLikePayment);
+    }
 }

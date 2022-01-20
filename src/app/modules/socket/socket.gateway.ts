@@ -100,10 +100,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(configs.socket.duomatchFind)
-    public async handleDuoFind(
-        @MessageBody() data: HandleDuoFindBody,
-        @ConnectedSocket() socket: Socket,
-    ) {
+    public async handleDuoFind(@MessageBody() data: HandleDuoFindBody, @ConnectedSocket() socket: Socket) {
         const payload = this.userService.userSocketPayload(socket);
         const user = await this.userService.userSpamAndDetails(payload.id);
         const prevFound = await this.userService.getUserDetails(data.prevFound.id);
@@ -235,9 +232,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         socket.emit('duo_match_finder', JSON.parse(serialize(foundNewMatch))); // foun new match as well
-        this.wss.sockets
-            .to(prevFound.socket_id)
-            .emit('duo_match_finder', JSON.parse(serialize(foundAnyone))); // send to user
+        this.wss.sockets.to(prevFound.socket_id).emit('duo_match_finder', JSON.parse(serialize(foundAnyone))); // send to user
         // create chat here
         this.chatService.createChatTables(user.id, prevFound.id);
     }

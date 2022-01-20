@@ -7,28 +7,28 @@ import { ContactUsDto } from '../../schemas/request/contact_us.dto';
 
 @Injectable()
 export class ContactUsService {
-  constructor(
-    @InjectRepository(ContactUs)
-    private readonly contactUsRepo: Repository<ContactUs>,
-    private readonly mailService: MailService,
-  ) {}
+    constructor(
+        @InjectRepository(ContactUs)
+        private readonly contactUsRepo: Repository<ContactUs>,
+        private readonly mailService: MailService,
+    ) {}
 
-  async contactUs(body: ContactUsDto): Promise<ContactUs> {
-    const { name, email, message_type } = body;
+    async contactUs(body: ContactUsDto): Promise<ContactUs> {
+        const { name, email, message_type } = body;
 
-    const contactUsObj = new ContactUs();
+        const contactUsObj = new ContactUs();
 
-    contactUsObj.name = name;
-    contactUsObj.email = email;
-    contactUsObj.message_type = message_type;
+        contactUsObj.name = name;
+        contactUsObj.email = email;
+        contactUsObj.message_type = message_type;
 
-    if (body.message) {
-      contactUsObj.message = body.message;
+        if (body.message) {
+            contactUsObj.message = body.message;
+        }
+
+        // send email
+        await this.mailService.sendContactEmail(contactUsObj);
+
+        return await this.contactUsRepo.save(contactUsObj);
     }
-
-    // send email
-    await this.mailService.sendContactEmail(contactUsObj);
-
-    return await this.contactUsRepo.save(contactUsObj);
-  }
 }

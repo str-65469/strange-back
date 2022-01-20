@@ -1,4 +1,4 @@
-import User from '../user.entity';
+import { User } from '../user.entity';
 import { GeneralEntity } from 'src/database/entity_inheritance/general';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { ChatHeads } from './chat_heads.entity';

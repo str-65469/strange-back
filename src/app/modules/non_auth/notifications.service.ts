@@ -2,68 +2,68 @@ import { MatchedDuosNotifications } from 'src/database/entity/matched_duos_notif
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import User from 'src/database/entity/user.entity';
+import { User } from 'src/database/entity/user.entity';
 
 @Injectable()
 export class NotificationsService {
-  constructor(
-    @InjectRepository(MatchedDuosNotifications)
-    private readonly notificationRepo: Repository<MatchedDuosNotifications>,
-  ) {}
+    constructor(
+        @InjectRepository(MatchedDuosNotifications)
+        private readonly notificationRepo: Repository<MatchedDuosNotifications>,
+    ) {}
 
-  async findOne(id: number) {
-    return await this.notificationRepo.findOne({
-      where: { id },
-      relations: ['matchedUser'],
-    });
-  }
-
-  async save(user: User, matchedUser: User) {
-    const existed = await this.notificationRepo.findOne({
-      where: {
-        user,
-        matchedUser,
-      },
-    });
-
-    if (existed) {
-      return;
+    async findOne(id: number) {
+        return await this.notificationRepo.findOne({
+            where: { id },
+            relations: ['matchedUser'],
+        });
     }
 
-    const notification = this.notificationRepo.create({
-      user,
-      matchedUser,
-    });
+    async save(user: User, matchedUser: User) {
+        const existed = await this.notificationRepo.findOne({
+            where: {
+                user,
+                matchedUser,
+            },
+        });
 
-    return this.notificationRepo.save(notification);
-  }
+        if (existed) {
+            return;
+        }
 
-  async delete(id: number): Promise<boolean> {
-    const res = await this.notificationRepo.createQueryBuilder().delete().where('id = :id', { id }).execute();
+        const notification = this.notificationRepo.create({
+            user,
+            matchedUser,
+        });
 
-    return res.affected > 0;
-  }
+        return this.notificationRepo.save(notification);
+    }
 
-  async updateMatchedNotification(id: number): Promise<boolean> {
-    const res = await this.notificationRepo
-      .createQueryBuilder()
-      .update()
-      .set({ is_seen: true })
-      .where('id = :id', { id })
-      .execute();
+    async delete(id: number): Promise<boolean> {
+        const res = await this.notificationRepo.createQueryBuilder().delete().where('id = :id', { id }).execute();
 
-    return res.affected > 0;
-  }
+        return res.affected > 0;
+    }
 
-  updateAllHiddenSeen(userId: number) {
-    return this.notificationRepo.update({ userId }, { is_hidden_seen: true });
-  }
+    async updateMatchedNotification(id: number): Promise<boolean> {
+        const res = await this.notificationRepo
+            .createQueryBuilder()
+            .update()
+            .set({ is_seen: true })
+            .where('id = :id', { id })
+            .execute();
 
-  async all(user: User) {
-    return await this.notificationRepo.find({
-      where: { user },
-      order: { id: 'DESC' },
-      relations: ['matchedUser'],
-    });
-  }
+        return res.affected > 0;
+    }
+
+    updateAllHiddenSeen(userId: number) {
+        return this.notificationRepo.update({ userId }, { is_hidden_seen: true });
+    }
+
+    async all(user: User) {
+        return await this.notificationRepo.find({
+            where: { user },
+            order: { id: 'DESC' },
+            relations: ['matchedUser'],
+        });
+    }
 }

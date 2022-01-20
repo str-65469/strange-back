@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import User from 'src/database/entity/user.entity';
+import { User } from 'src/database/entity/user.entity';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { UserRegisterCache } from '../../../database/entity/user_register_cache.entity';
 import { RandomGenerator } from 'src/app/utils/random_generator.helper';

@@ -2,19 +2,19 @@ import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validat
 import { ContactUseMessageTypes } from 'src/app/common/enum/contact_us_message_type.enum';
 
 export class ContactUsDto {
-  @IsNotEmpty()
-  @IsString()
-  name: string;
+    @IsNotEmpty()
+    @IsString()
+    name: string;
 
-  @IsEmail()
-  @IsString()
-  @IsNotEmpty()
-  email: string;
+    @IsEmail()
+    @IsString()
+    @IsNotEmpty()
+    email: string;
 
-  @IsEnum(ContactUseMessageTypes)
-  message_type: ContactUseMessageTypes;
+    @IsEnum(ContactUseMessageTypes)
+    message_type: ContactUseMessageTypes;
 
-  @IsString()
-  @IsOptional()
-  message?: string;
+    @IsString()
+    @IsOptional()
+    message?: string;
 }

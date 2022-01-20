@@ -15,108 +15,101 @@ import { ExceptionMessageCode } from '../common/enum/message_codes/exception_mes
 @UseGuards(JwtAcessTokenAuthGuard)
 @Controller('superlike')
 export class SuperLikeBillingController {
-  constructor(
-    private readonly userService: UsersService,
-    private readonly superLikeService: SuperlikeService,
-    private readonly superlikePaymentService: SuperlikePaymentService,
-    private readonly paypalPaymentDetailsService: PaypalPaymentDetailsService,
-    private readonly userBelongingsService: UserBelongingsService,
-  ) {}
+    constructor(
+        private readonly userService: UsersService,
+        private readonly superLikeService: SuperlikeService,
+        private readonly superlikePaymentService: SuperlikePaymentService,
+        private readonly paypalPaymentDetailsService: PaypalPaymentDetailsService,
+        private readonly userBelongingsService: UserBelongingsService,
+    ) {}
 
-  @Get('paypal/create-order/:type')
-  public async createOrder(@Param('type', ParseIntPipe) type: SuperLikeServiceType) {
-    const packet = await this.superLikeService.findByType(type);
+    @Get('paypal/create-order/:type')
+    public async createOrder(@Param('type', ParseIntPipe) type: SuperLikeServiceType) {
+        const packet = await this.superLikeService.findByType(type);
 
-    console.log(process.env.NODE_ENV);
-    console.log(process.env.PAYPAL_CLIENT_ID);
-    console.log(process.env.PAYPAL_SECRET_ID);
+        console.log(process.env.NODE_ENV);
+        console.log(process.env.PAYPAL_CLIENT_ID);
+        console.log(process.env.PAYPAL_SECRET_ID);
 
-    const Enviroment =
-      process.env.NODE_ENV === 'production'
-        ? paypal.core.LiveEnvironment
-        : paypal.core.SandboxEnvironment;
+        const Enviroment =
+            process.env.NODE_ENV === 'production' ? paypal.core.LiveEnvironment : paypal.core.SandboxEnvironment;
 
-    const paypalClient = new paypal.core.PayPalHttpClient(
-      new Enviroment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_SECRET_ID),
-    );
+        const paypalClient = new paypal.core.PayPalHttpClient(
+            new Enviroment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_SECRET_ID),
+        );
 
-    const request = new paypal.orders.OrdersCreateRequest();
+        const request = new paypal.orders.OrdersCreateRequest();
 
-    request.prefer('return=representation');
-    request.requestBody({
-      intent: 'CAPTURE',
-      purchase_units: [
-        {
-          amount: {
-            currency_code: 'USD',
-            value: packet.price,
-            breakdown: {
-              item_total: {
-                currency_code: 'USD',
-                value: packet.price,
-              },
-            },
-          },
-        },
-      ],
-    });
+        request.prefer('return=representation');
+        request.requestBody({
+            intent: 'CAPTURE',
+            purchase_units: [
+                {
+                    amount: {
+                        currency_code: 'USD',
+                        value: packet.price,
+                        breakdown: {
+                            item_total: {
+                                currency_code: 'USD',
+                                value: packet.price,
+                            },
+                        },
+                    },
+                },
+            ],
+        });
 
-    try {
-      const order = await paypalClient.execute(request);
+        try {
+            const order = await paypalClient.execute(request);
 
-      console.log('================================= created');
-      console.log(order);
+            console.log('================================= created');
+            console.log(order);
 
-      return {
-        order,
-        id: order.result.id,
-      };
-    } catch (error) {
-      throw new GenericException(HttpStatus.EXPECTATION_FAILED, ExceptionMessageCode.PAYPAL_ORDER_ERROR);
+            return {
+                order,
+                id: order.result.id,
+            };
+        } catch (error) {
+            throw new GenericException(HttpStatus.EXPECTATION_FAILED, ExceptionMessageCode.PAYPAL_ORDER_ERROR);
+        }
     }
-  }
 
-  @Get('paypal/capture-order/:orderId/:type')
-  public async captureOrder(
-    @Param('orderId') orderId: string,
-    @Param('type', ParseIntPipe) type: SuperLikeServiceType,
-    @Req() req: Request,
-  ) {
-    const userId = await this.userService.userID(req);
-    const packet = await this.superLikeService.findByType(type);
+    @Get('paypal/capture-order/:orderId/:type')
+    public async captureOrder(
+        @Param('orderId') orderId: string,
+        @Param('type', ParseIntPipe) type: SuperLikeServiceType,
+        @Req() req: Request,
+    ) {
+        const userId = await this.userService.userID(req);
+        const packet = await this.superLikeService.findByType(type);
 
-    const Enviroment =
-      process.env.NODE_ENV === 'production'
-        ? paypal.core.LiveEnvironment
-        : paypal.core.SandboxEnvironment;
-    const paypalClient = new paypal.core.PayPalHttpClient(
-      new Enviroment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_SECRET_ID),
-    );
+        const Enviroment =
+            process.env.NODE_ENV === 'production' ? paypal.core.LiveEnvironment : paypal.core.SandboxEnvironment;
+        const paypalClient = new paypal.core.PayPalHttpClient(
+            new Enviroment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_SECRET_ID),
+        );
 
-    const request = new paypal.orders.OrdersCaptureRequest(orderId);
-    request.requestBody({});
+        const request = new paypal.orders.OrdersCaptureRequest(orderId);
+        request.requestBody({});
 
-    console.log('starting');
+        console.log('starting');
 
-    try {
-      const capture = await paypalClient.execute(request);
+        try {
+            const capture = await paypalClient.execute(request);
 
-      console.log('================================= captured');
-      console.log(capture);
+            console.log('================================= captured');
+            console.log(capture);
 
-      const captureID = capture?.result?.purchase_units[0]?.payments?.captures[0]?.id;
+            const captureID = capture?.result?.purchase_units[0]?.payments?.captures[0]?.id;
 
-      // save capture id, increase superlike for user, save payment detail
-      await this.paypalPaymentDetailsService.save(userId, captureID, capture);
-      await this.userBelongingsService.update(userId, packet.amount);
-      await this.superlikePaymentService.create(packet.amount, type, PaymentType.PAYPAL, userId);
+            // save capture id, increase superlike for user, save payment detail
+            await this.paypalPaymentDetailsService.save(userId, captureID, capture);
+            await this.userBelongingsService.update(userId, packet.amount);
+            await this.superlikePaymentService.create(packet.amount, type, PaymentType.PAYPAL, userId);
 
-      return { msg: 'successfull payment' };
-    } catch (error) {
-      throw new GenericException(
-        HttpStatus.EXPECTATION_FAILED,
-        ExceptionMessageCode.PAYPAL_PAYMENT_ERROR,
-      );
+            return { msg: 'successfull payment' };
+        } catch (error) {
+            throw new GenericException(HttpStatus.EXPECTATION_FAILED, ExceptionMessageCode.PAYPAL_PAYMENT_ERROR);
+        }
     }
-  }
 }

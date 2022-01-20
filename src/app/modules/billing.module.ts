@@ -8,13 +8,8 @@ import { PaypalPaymentDetailsService } from './billing/paypal_payment_details.se
 import { EntitiesModule } from './entities.module';
 
 @Module({
-  imports: [EntitiesModule, UsersModule],
-  controllers: [SuperLikeBillingController],
-  providers: [
-    SuperlikeService,
-    SuperlikePaymentService,
-    PaypalPaymentDetailsService,
-    UserBelongingsService,
-  ],
+    imports: [EntitiesModule, UsersModule],
+    controllers: [SuperLikeBillingController],
+    providers: [SuperlikeService, SuperlikePaymentService, PaypalPaymentDetailsService, UserBelongingsService],
 })
 export class BillingModule {}

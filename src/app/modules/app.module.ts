@@ -27,43 +27,43 @@ import { ChatModule } from './chat.module';
 import { EntitiesModule } from './entities.module';
 
 @Module({
-  imports: [
-    // defined modules
-    UsersModule,
-    AuthModule,
-    SeederModule,
-    BillingModule,
-    ChatModule,
-    EntitiesModule,
+    imports: [
+        // defined modules
+        UsersModule,
+        AuthModule,
+        SeederModule,
+        BillingModule,
+        ChatModule,
+        EntitiesModule,
 
-    JwtModule.register({}),
-    MulterModule.register({ dest: path.join(__dirname, '../../../../', 'upload') }),
-    ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot(TypeormConfig.instance),
-    RouterModule.register([
-      {
-        path: 'billing',
-        module: BillingModule,
-      },
-    ]),
-  ],
-  controllers: [
-    MatchedDuosController,
-    NotificationsController,
-    AppController,
-    ReportsController,
-    SuperLikeController,
-    CredentialsController,
-  ],
-  providers: [
-    UserBelongingsService,
-    MatchingLobbyService,
-    MatchedDuosService,
-    NotificationsService,
-    ContactUsService,
-    ReportsService,
-    CredentialsService,
-  ],
-  exports: [],
+        JwtModule.register({}),
+        MulterModule.register({ dest: path.join(__dirname, '../../../../', 'upload') }),
+        ConfigModule.forRoot({ isGlobal: true }),
+        TypeOrmModule.forRoot(TypeormConfig.instance),
+        RouterModule.register([
+            {
+                path: 'billing',
+                module: BillingModule,
+            },
+        ]),
+    ],
+    controllers: [
+        MatchedDuosController,
+        NotificationsController,
+        AppController,
+        ReportsController,
+        SuperLikeController,
+        CredentialsController,
+    ],
+    providers: [
+        UserBelongingsService,
+        MatchingLobbyService,
+        MatchedDuosService,
+        NotificationsService,
+        ContactUsService,
+        ReportsService,
+        CredentialsService,
+    ],
+    exports: [],
 })
 export class AppModule {}

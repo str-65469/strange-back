@@ -4,23 +4,23 @@ import { JwtAcessService } from 'src/app/common/services/jwt_access.service';
 
 @Injectable()
 export class SocketAccessGuard implements CanActivate {
-  constructor(private readonly jwtAcessService: JwtAcessService) {}
+    constructor(private readonly jwtAcessService: JwtAcessService) {}
 
-  async canActivate(context: ExecutionContext) {
-    const request = context.switchToWs();
-    const token = request.getClient().handshake?.auth?.token;
+    async canActivate(context: ExecutionContext) {
+        const request = context.switchToWs();
+        const token = request.getClient().handshake?.auth?.token;
 
-    if (!token) {
-      throw new WsException('Token missing');
+        if (!token) {
+            throw new WsException('Token missing');
+        }
+
+        // validate token (it will never come here but still needed !!!)
+        const jwtPayload = await this.jwtAcessService.validateToken({
+            is_socket: true,
+            token,
+            secret: process.env.JWT_SECRET,
+        });
+
+        return true;
     }
-
-    // validate token (it will never come here but still needed !!!)
-    const jwtPayload = await this.jwtAcessService.validateToken({
-      is_socket: true,
-      token,
-      secret: process.env.JWT_SECRET,
-    });
-
-    return true;
-  }
 }

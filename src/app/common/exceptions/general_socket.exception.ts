@@ -3,12 +3,12 @@ import { ExceptionMessageCode } from '../enum/message_codes/exception_message_co
 import { GenericSocketExceptionProps } from '../exception_filters/all_socket_exception.filter';
 
 export class GenericSocketException extends WsException {
-  constructor(messageCode: ExceptionMessageCode, message?: string) {
-    const generalExceptonProps: GenericSocketExceptionProps = {
-      messageCode,
-      message,
-    };
+    constructor(messageCode: ExceptionMessageCode, message?: string) {
+        const generalExceptonProps: GenericSocketExceptionProps = {
+            messageCode,
+            message,
+        };
 
-    super(generalExceptonProps);
-  }
+        super(generalExceptonProps);
+    }
 }

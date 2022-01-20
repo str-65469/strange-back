@@ -7,18 +7,20 @@ import { FileHelper } from 'src/app/utils/file.helper';
 
 @Injectable()
 export class ReportsService {
-  constructor(@InjectRepository(AccountAbuseReport) private readonly reportRepo: Repository<AccountAbuseReport>) {}
+    constructor(
+        @InjectRepository(AccountAbuseReport) private readonly reportRepo: Repository<AccountAbuseReport>,
+    ) {}
 
-  public async save(data: AccountAbuseReportDto, profileImageId: number, email: string) {
-    const { server, summonerName } = data;
+    public async save(data: AccountAbuseReportDto, profileImageId: number, email: string) {
+        const { server, summonerName } = data;
 
-    const report = this.reportRepo.create({
-      server,
-      summoner_name: summonerName,
-      imagePath: FileHelper.profileImagePath(profileImageId),
-      email,
-    });
+        const report = this.reportRepo.create({
+            server,
+            summoner_name: summonerName,
+            imagePath: FileHelper.profileImagePath(profileImageId),
+            email,
+        });
 
-    return await this.reportRepo.save(report);
-  }
+        return await this.reportRepo.save(report);
+    }
 }

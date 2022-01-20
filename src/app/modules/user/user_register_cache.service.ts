@@ -27,11 +27,7 @@ export class UserRegisterCacheService {
         return this.userRegisterCacheRepo.findOne(id);
     }
 
-    createFirstStepCache(
-        server: LolServer,
-        summonerName: string,
-        summonerData: SummonerDetailsAndLeagueResponse,
-    ) {
+    createFirstStepCache(server: LolServer, summonerName: string, summonerData: SummonerDetailsAndLeagueResponse) {
         const { startingTimeStamp, endingTimeStamp } = GeneralHelper.dater.addMinutes(
             configs.general.REGISTER_TIMESTAMP_DURATION,
         );

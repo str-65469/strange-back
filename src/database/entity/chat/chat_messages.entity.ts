@@ -1,4 +1,4 @@
-import User from '../user.entity';
+import { User } from '../user.entity';
 import { MessageType } from 'src/app/common/enum/message_type.enum';
 import { GeneralEntity } from 'src/database/entity_inheritance/general';
 import { Column, Entity, ManyToOne } from 'typeorm';

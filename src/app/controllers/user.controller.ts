@@ -10,26 +10,26 @@ import { UserProfileUpdateDto } from '../schemas/request/user/user_update.dto';
 @UseInterceptors(UserSafeInterceptor)
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UsersService) {}
+    constructor(private readonly userService: UsersService) {}
 
-  @Get()
-  async user(@Req() req: Request) {
-    const id = this.userService.userID(req);
+    @Get()
+    async user(@Req() req: Request) {
+        const id = this.userService.userID(req);
 
-    return await this.userService.getUserDetails(id);
-  }
+        return await this.userService.getUserDetails(id);
+    }
 
-  @Post('/profile/update')
-  async userProfileUpdate(@Req() req: Request, @Body() data: UserProfileUpdateDto) {
-    const id = this.userService.userID(req);
+    @Post('/profile/update')
+    async userProfileUpdate(@Req() req: Request, @Body() data: UserProfileUpdateDto) {
+        const id = this.userService.userID(req);
 
-    return await this.userService.updateUserProfile(id, data);
-  }
+        return await this.userService.updateUserProfile(id, data);
+    }
 
-  @Put('/profile/update-password')
-  async updatePassword(@Req() req: Request, @Body() data: UserPasswordUpdateDto) {
-    const id = this.userService.userID(req);
+    @Put('/profile/update-password')
+    async updatePassword(@Req() req: Request, @Body() data: UserPasswordUpdateDto) {
+        const id = this.userService.userID(req);
 
-    return this.userService.updateUserCredentials(id, data);
-  }
+        return this.userService.updateUserCredentials(id, data);
+    }
 }

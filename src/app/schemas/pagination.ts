@@ -1,10 +1,10 @@
 export interface Pagination {
-  data: any;
-  count: number;
+    data: any;
+    count: number;
 }
 
 export class Pag {
-  data: any;
-  count: number;
-  message: string;
+    data: any;
+    count: number;
+    message: string;
 }

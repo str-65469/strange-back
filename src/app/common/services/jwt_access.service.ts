@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken';
-import User from 'src/database/entity/user.entity';
+import { User } from 'src/database/entity/user.entity';
 import { RandomGenerator } from '../../utils/random_generator.helper';
 import { UserRegisterCache } from 'src/database/entity/user_register_cache.entity';
 import { JwtService } from '@nestjs/jwt';
@@ -73,72 +73,57 @@ export class JwtAcessService {
 
         let decodedToken: AccessTokenPayload;
 
-        await jwt.verify(
-            params.token,
-            params.secret,
-            async (err: jwt.VerifyErrors, decoded: jwt.JwtPayload) => {
-                if (!err) {
-                    decodedToken = decoded as AccessTokenPayload;
-                    return null;
-                }
+        await jwt.verify(params.token, params.secret, async (err: jwt.VerifyErrors, decoded: jwt.JwtPayload) => {
+            if (!err) {
+                decodedToken = decoded as AccessTokenPayload;
+                return null;
+            }
 
-                // expired
-                if (err instanceof jwt.TokenExpiredError) {
-                    if ('expired_clbck' in params) await params.expired_clbck();
-
-                    if (params?.is_socket) {
-                        throw new GenericSocketException(
-                            ExceptionMessageCode.TOKEN_EXPIRED_ERROR,
-                            err.message,
-                        );
-                    }
-
-                    throw new GenericException(
-                        HttpStatus.UNAUTHORIZED,
-                        ExceptionMessageCode.TOKEN_EXPIRED_ERROR,
-                        err.message,
-                    );
-                }
-
-                if ('clbck' in params) await params.clbck();
+            // expired
+            if (err instanceof jwt.TokenExpiredError) {
+                if ('expired_clbck' in params) await params.expired_clbck();
 
                 if (params?.is_socket) {
-                    throw new GenericSocketException(ExceptionMessageCode.TOKEN_ERROR, err.message);
+                    throw new GenericSocketException(ExceptionMessageCode.TOKEN_EXPIRED_ERROR, err.message);
                 }
 
-                // general
-                if (err instanceof jwt.JsonWebTokenError) {
-                    throw new GenericException(
-                        HttpStatus.UNAUTHORIZED,
-                        ExceptionMessageCode.TOKEN_ERROR,
-                        err.message,
-                    );
-                }
-            },
-        );
+                throw new GenericException(
+                    HttpStatus.UNAUTHORIZED,
+                    ExceptionMessageCode.TOKEN_EXPIRED_ERROR,
+                    err.message,
+                );
+            }
+
+            if ('clbck' in params) await params.clbck();
+
+            if (params?.is_socket) {
+                throw new GenericSocketException(ExceptionMessageCode.TOKEN_ERROR, err.message);
+            }
+
+            // general
+            if (err instanceof jwt.JsonWebTokenError) {
+                throw new GenericException(HttpStatus.UNAUTHORIZED, ExceptionMessageCode.TOKEN_ERROR, err.message);
+            }
+        });
 
         return decodedToken;
     }
 
     public decodeAccessToken(token: string) {
         return new Promise((resolve: (value: AccessTokenPayload) => void) => {
-            jwt.verify(
-                token,
-                process.env.JWT_SECRET,
-                (err: jwt.VerifyErrors, decoded: jwt.JwtPayload) => {
-                    // we don't care about token expiration only valid
-                    if (!err || err instanceof jwt.TokenExpiredError) {
-                        const decoded = jwt.decode(token) as AccessTokenPayload;
-                        resolve(decoded);
-                    }
+            jwt.verify(token, process.env.JWT_SECRET, (err: jwt.VerifyErrors, decoded: jwt.JwtPayload) => {
+                // we don't care about token expiration only valid
+                if (!err || err instanceof jwt.TokenExpiredError) {
+                    const decoded = jwt.decode(token) as AccessTokenPayload;
+                    resolve(decoded);
+                }
 
-                    throw new GenericException(
-                        HttpStatus.UNAUTHORIZED,
-                        ExceptionMessageCode.GENERAL_ERROR,
-                        'token must be validated before',
-                    );
-                },
-            );
+                throw new GenericException(
+                    HttpStatus.UNAUTHORIZED,
+                    ExceptionMessageCode.GENERAL_ERROR,
+                    'token must be validated before',
+                );
+            });
         });
     }
 

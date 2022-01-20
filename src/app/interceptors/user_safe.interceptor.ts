@@ -5,11 +5,11 @@ import { map } from 'rxjs/operators';
 
 @Injectable()
 export class UserSafeInterceptor implements NestInterceptor {
-  intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
-    return next.handle().pipe(
-      map((data) => {
-        return classToPlain(data);
-      }),
-    );
-  }
+    intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
+        return next.handle().pipe(
+            map((data) => {
+                return classToPlain(data);
+            }),
+        );
+    }
 }

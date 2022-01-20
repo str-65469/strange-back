@@ -14,7 +14,7 @@ import {
     ParseUUIDPipe,
     ParseEnumPipe,
 } from '@nestjs/common';
-import User from 'src/database/entity/user.entity';
+import { User } from 'src/database/entity/user.entity';
 import { v4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';

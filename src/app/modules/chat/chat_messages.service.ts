@@ -21,12 +21,7 @@ export class ChatMessagesService {
         return this.chatMessagesRepo.save(chatMessage);
     }
 
-    async fetchMessages(
-        userId: number,
-        chatHeadId: number,
-        take: number,
-        lastId?: number,
-    ): Promise<Pagination> {
+    async fetchMessages(userId: number, chatHeadId: number, take: number, lastId?: number): Promise<Pagination> {
         let chatWhere: FindConditions<ChatMessages> = {
             chatHeadId,
         };

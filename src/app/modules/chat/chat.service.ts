@@ -92,19 +92,14 @@ export class ChatService {
         const chatHeads = await this.chatHeadService.getChatHeads(chatHeadIds);
 
         if (fetchLastMessage) {
-            const lastMessage = await this.chatMessagesService.getLastChatMessages(
-                userChatParticipants,
-                userId,
-            );
+            const lastMessage = await this.chatMessagesService.getLastChatMessages(userChatParticipants, userId);
 
             return chatHeads
                 .map((el) => {
                     const chatParticipant = el.chatParticipants.find((p) => p.userId !== userId);
                     const userParticipant = el.chatParticipants.find((p) => p.userId == userId);
                     const lastChatMessage = lastMessage.find((e) => {
-                        return (
-                            e.userId === chatParticipant.userId && e.chatHeadId === chatParticipant.chatHeadId
-                        );
+                        return e.userId === chatParticipant.userId && e.chatHeadId === chatParticipant.chatHeadId;
                     });
 
                     el.chatParticipant = chatParticipant;

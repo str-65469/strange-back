@@ -5,18 +5,18 @@ import { PaypalPaymentDetails } from 'src/database/entity/paypal_payment_details
 
 Injectable();
 export class PaypalPaymentDetailsService {
-  constructor(
-    @InjectRepository(PaypalPaymentDetails)
-    private readonly paypalPaymentDetailsRepo: Repository<PaypalPaymentDetails>,
-  ) {}
+    constructor(
+        @InjectRepository(PaypalPaymentDetails)
+        private readonly paypalPaymentDetailsRepo: Repository<PaypalPaymentDetails>,
+    ) {}
 
-  save(userId: number, captureId: string, paymentJson: string): Promise<PaypalPaymentDetails> {
-    const paypalPaymentDetail = this.paypalPaymentDetailsRepo.create({
-      captureId,
-      userId,
-      paymentJson,
-    });
+    save(userId: number, captureId: string, paymentJson: string): Promise<PaypalPaymentDetails> {
+        const paypalPaymentDetail = this.paypalPaymentDetailsRepo.create({
+            captureId,
+            userId,
+            paymentJson,
+        });
 
-    return this.paypalPaymentDetailsRepo.save(paypalPaymentDetail);
-  }
+        return this.paypalPaymentDetailsRepo.save(paypalPaymentDetail);
+    }
 }

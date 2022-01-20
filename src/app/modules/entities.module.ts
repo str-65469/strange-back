@@ -1,4 +1,4 @@
-import User from 'src/database/entity/user.entity';
+import { User } from 'src/database/entity/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { AccountAbuseReport } from 'src/database/entity/account_abuse_reports.entity';
@@ -17,41 +17,41 @@ import { UserRegisterCache } from 'src/database/entity/user_register_cache.entit
 import { ChatHeadRepository } from '../repositories/chat_head.repository';
 import { ChatMessagesRepository } from '../repositories/chat_messages.repository';
 import { ChatParticipantsRepository } from '../repositories/chat_participant.repositry';
-import {UserRepository} from "../repositories/user_repository";
+import { UserRepository } from '../repositories/user_repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      // user
-      User, //TODO replace all soon !!!
-      UserRepository,
-      UserDetails,
-      UserBelongings,
-      UserRegisterCache,
+    imports: [
+        TypeOrmModule.forFeature([
+            // user
+            User, //TODO replace all soon !!!
+            UserRepository,
+            UserDetails,
+            UserBelongings,
+            UserRegisterCache,
 
-      // duo finder
-      MatchedDuos,
-      MatchingLobby,
-      MatchedDuosNotifications,
-      MatchingSpams,
+            // duo finder
+            MatchedDuos,
+            MatchingLobby,
+            MatchedDuosNotifications,
+            MatchingSpams,
 
-      // chat
-      ChatParticipantsRepository,
-      ChatMessagesRepository,
-      ChatHeadRepository,
+            // chat
+            ChatParticipantsRepository,
+            ChatMessagesRepository,
+            ChatHeadRepository,
 
-      // billing
-      SuperLikeServices,
-      SuperLikePayment,
-      PaypalPaymentDetails,
+            // billing
+            SuperLikeServices,
+            SuperLikePayment,
+            PaypalPaymentDetails,
 
-      // other
-      ContactUs,
-      AccountAbuseReport,
-      ForgotPasswordCache,
-    ]),
-  ],
-  providers: [],
-  exports: [TypeOrmModule],
+            // other
+            ContactUs,
+            AccountAbuseReport,
+            ForgotPasswordCache,
+        ]),
+    ],
+    providers: [],
+    exports: [TypeOrmModule],
 })
 export class EntitiesModule {}

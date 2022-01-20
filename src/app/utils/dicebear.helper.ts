@@ -6,38 +6,38 @@ import { configs } from 'src/configs/config';
 type DiceBearOptions = BottsStyle.Options | GridyStyle.Options;
 
 function generateSprite(options: StyleOptions<DiceBearOptions>): string {
-  const AvatarStyle = Math.round(Math.random()) % 2 === 0 ? GridyStyle : BottsStyle;
-  const svg = createAvatar(AvatarStyle, options);
+    const AvatarStyle = Math.round(Math.random()) % 2 === 0 ? GridyStyle : BottsStyle;
+    const svg = createAvatar(AvatarStyle, options);
 
-  // final
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    // final
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
 function generateRandomSprite(): string {
-  return generateSprite({
-    seed: Math.random() + 'random sprite svg',
-    size: configs.general.DICEBEAR_MAX_SIZE,
-  });
+    return generateSprite({
+        seed: Math.random() + 'random sprite svg',
+        size: configs.general.DICEBEAR_MAX_SIZE,
+    });
 }
 
 export function generateCompressedSprite(benchmark: boolean = false): string | number {
-  let sprite = generateRandomSprite();
-  let buffer = Buffer.from(sprite);
-  let tried = 0;
-  let size = buffer.length;
+    let sprite = generateRandomSprite();
+    let buffer = Buffer.from(sprite);
+    let tried = 0;
+    let size = buffer.length;
 
-  while (!(size > configs.general.DICEBEAR_MIN_SIZE && size < configs.general.DICEBEAR_MAX_SIZE)) {
-    sprite = generateRandomSprite();
-    buffer = Buffer.from(sprite);
-    size = buffer.length;
-    tried++;
-  }
+    while (!(size > configs.general.DICEBEAR_MIN_SIZE && size < configs.general.DICEBEAR_MAX_SIZE)) {
+        sprite = generateRandomSprite();
+        buffer = Buffer.from(sprite);
+        size = buffer.length;
+        tried++;
+    }
 
-  if (benchmark) {
-    return tried;
-  }
+    if (benchmark) {
+        return tried;
+    }
 
-  return sprite;
+    return sprite;
 }
 
 // if needed you can try benchmark

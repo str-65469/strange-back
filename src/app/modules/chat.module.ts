@@ -16,24 +16,24 @@ import { EntitiesModule } from './entities.module';
 import { UsersModule } from './users.module';
 
 @Module({
-  imports: [UsersModule, EntitiesModule],
-  controllers: [ChatController],
-  providers: [
-    ChatService,
-    ChatParticipantsService,
-    ChatMessagesService,
-    ChatHeadService,
+    imports: [UsersModule, EntitiesModule],
+    controllers: [ChatController],
+    providers: [
+        ChatService,
+        ChatParticipantsService,
+        ChatMessagesService,
+        ChatHeadService,
 
-    // must be replace in future !
-    SocketService,
-    SocketGateway,
-    DuoFinderService,
-    MatchedDuosService,
-    MatchingLobbyService,
-    NotificationsService,
-    MatchingSpamService,
-    UserBelongingsService,
-  ],
-  exports: [],
+        // must be replace in future !
+        SocketService,
+        SocketGateway,
+        DuoFinderService,
+        MatchedDuosService,
+        MatchingLobbyService,
+        NotificationsService,
+        MatchingSpamService,
+        UserBelongingsService,
+    ],
+    exports: [],
 })
 export class ChatModule {}
