@@ -24,6 +24,8 @@ import { AxiosError } from '@yggdrasilts/axiosfit';
 import { right, left } from 'src/app/common/either';
 import { SummonerDetailsFailure } from 'src/app/common/failures/lol_api/summoner_details.failure.enum';
 import { SummonerDetailsResponse } from '../network/dto/response/summoner_details.response';
+import { SummonerDetailsAndLeagueFailure } from 'src/app/common/failures/lol_api/summoner_details_league.failure.enum';
+import { SummonerDetailsAndLeagueResponse } from '../network/dto/response/summoner_details_league.response';
 
 @Injectable()
 export class UsersService {
@@ -233,6 +235,31 @@ export class UsersService {
                 }
 
                 return left<SummonerDetailsFailure, SummonerDetailsResponse>(SummonerDetailsFailure.UNKNOWN);
+            });
+    }
+
+    public summonerNameDetailsAndLeague(server: LolServer, summonerName: string) {
+        return this.networkProvider.lolRemoteService
+            .summonerNameDetailsAndLeague(server, summonerName)
+            .then((res) => right<SummonerDetailsAndLeagueFailure, SummonerDetailsAndLeagueResponse>(res.data))
+            .catch((e: AxiosError<GenericExceptionResponse>) => {
+                if (e.isAxiosError) {
+                    switch (e.response?.data.messageCode) {
+                        case ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND:
+                            return left<SummonerDetailsAndLeagueFailure, SummonerDetailsAndLeagueResponse>(
+                                SummonerDetailsAndLeagueFailure.SUMMONER_NAME_NOT_FOUND,
+                            );
+
+                        case ExceptionMessageCode.SUMMONER_DIVISION_ERROR:
+                            return left<SummonerDetailsAndLeagueFailure, SummonerDetailsAndLeagueResponse>(
+                                SummonerDetailsAndLeagueFailure.SUMMONER_DIVISION_ERROR,
+                            );
+                    }
+                }
+
+                return left<SummonerDetailsAndLeagueFailure, SummonerDetailsAndLeagueResponse>(
+                    SummonerDetailsAndLeagueFailure.UNKNOWN,
+                );
             });
     }
 }

@@ -5,7 +5,7 @@ import { SummonerDetailsResponse } from '../dto/response/summoner_details.respon
 import { SummonerDetailsAndLeagueResponse } from '../dto/response/summoner_details_league.response';
 import { LolApiInterceptor } from '../interceptor/lol_api.interceptor';
 
-@HTTP('api/proxy', { usePromises: true, enableAxiosLogger: true })
+@HTTP('/api/proxy', { usePromises: true, enableAxiosLogger: process.env.NODE_ENV === 'development' })
 @Interceptors(LolApiInterceptor)
 export class LolRemoteService {
     @GET('/summoner/details-and-league/:server/:summonerName')

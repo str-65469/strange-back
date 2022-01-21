@@ -10,6 +10,7 @@ import {
     Req,
     UseFilters,
     HttpStatus as HTTS,
+    HttpStatus,
 } from '@nestjs/common';
 import { User } from 'src/database/entity/user.entity';
 import { v4 } from 'uuid';
@@ -29,7 +30,7 @@ import { UserDetailsServiceService } from '../modules/user/user_details.service'
 import { UserRegisterCacheService } from '../modules/user/user_register_cache.service';
 import { UserRegisterDto } from '../schemas/request/user/user_register.dto';
 import { RegisterCacheExceptionFilter } from '../common/exception_filters/register_cache.excpetion.filter';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle, ThrottlerException, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtRefreshTokenAuthGuard } from '../guards/jwt_refresh.guard';
 import { ForgotPasswordRequest, JwtForgotPasswordAuthGuard } from '../guards/jwt_forgot_password.guard';
 import { ForgotPasswordRequestDto } from '../schemas/request/forgot_password/forgot_password.dto';
@@ -47,6 +48,8 @@ import { FirstStepAuthResponse, SecondStepAuthResponse } from '../modules/auth/r
 import { SummonerDetailsFailure } from '../common/failures/lol_api/summoner_details.failure.enum';
 import { SummonerAuthRequestStep1 } from '../schemas/request/auth/summoner_auth_step_1.request';
 import { SummonerAuthCheckParams } from '../schemas/request/auth/summoner_auth_step_2_check.request';
+import { NetworkProvider } from '../modules/network/network.provider';
+import { SummonerDetailsAndLeagueFailure } from '../common/failures/lol_api/summoner_details_league.failure.enum';
 
 @Controller('/auth')
 export class AuthController {
@@ -61,6 +64,7 @@ export class AuthController {
         private readonly userRegisterCacheService: UserRegisterCacheService,
         private readonly matchingSpamService: MatchingSpamService,
         private readonly userBelongingsService: UserBelongingsService,
+        private readonly networkProvider: NetworkProvider,
     ) {}
 
     @UseGuards(ThrottlerGuard)
@@ -104,12 +108,58 @@ export class AuthController {
             throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.SUMMONER_NAME_ALREADY_IN_USE);
         }
 
+        // const userRegisterRenewedCache = await this.authService.renewSummonerNameAndServer(
+        //     userRegisterCache,
+        //     server,
+        //     summonerName,
+        // );
+
         // if exists delete and then renew, else create new and then return
-        const userRegisterRenewedCache = await this.authService.renewSummonerNameAndServer(
-            userRegisterCache,
-            server,
-            summonerName,
+        if (userRegisterCache) {
+            await this.userRegisterCacheService.delete(userRegisterCache.id);
+        }
+
+        const summonerDetailsAndLeague = await this.userService.summonerNameDetailsAndLeague(server, summonerName);
+
+        const userRegisterRenewedCache = await summonerDetailsAndLeague.fold(
+            async (l) => {
+                switch (l) {
+                    case SummonerDetailsAndLeagueFailure.UNKNOWN:
+                        throw new GenericException(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            ExceptionMessageCode.INTERNAL_SERVER_ERROR,
+                            ';dddd',
+                        );
+                    case SummonerDetailsAndLeagueFailure.SUMMONER_NAME_NOT_FOUND:
+                        throw new GenericException(
+                            HttpStatus.NOT_FOUND,
+                            ExceptionMessageCode.SUMMONER_NAME_NOT_FOUND,
+                        );
+                    case SummonerDetailsAndLeagueFailure.SUMMONER_DIVISION_ERROR:
+                        throw new GenericException(
+                            HttpStatus.BAD_REQUEST,
+                            ExceptionMessageCode.SUMMONER_DIVISION_ERROR,
+                        );
+                }
+            },
+
+            async (r) => {
+                // create new
+                const userRegisterRenewedCache = await this.userRegisterCacheService.createFirstStepCache(
+                    server,
+                    summonerName,
+                    r,
+                );
+
+                return userRegisterRenewedCache;
+            },
         );
+
+        // fetch data from lol
+        // const summonerData = await this.networkProvider.lolRemoteService.summonerNameDetailsAndLeague(
+        //     server,
+        //     summonerName,
+        // );
 
         return { uuid: userRegisterRenewedCache.uuid };
     }

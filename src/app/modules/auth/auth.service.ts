@@ -66,26 +66,6 @@ export class AuthService {
         return user;
     }
 
-    async renewSummonerNameAndServer(
-        oldSummonerCache: UserRegisterCache | null,
-        server: LolServer,
-        summonerName: string,
-    ) {
-        // if exists delete and then renew,then create new and then return
-        if (oldSummonerCache) {
-            await this.userRegisterCacheService.delete(oldSummonerCache.id);
-        }
-
-        // fetch data from lol
-        const summonerData = await this.networkProvider.lolRemoteService.summonerNameDetailsAndLeague(
-            server,
-            summonerName,
-        );
-
-        // create new
-        return this.userRegisterCacheService.createFirstStepCache(server, summonerName, summonerData.data);
-    }
-
     async retrieveRegisterCachedData(id: number) {
         const cachedData = await this.userRegisterCacheService.findOne(id);
 

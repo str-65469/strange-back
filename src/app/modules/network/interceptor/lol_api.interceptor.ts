@@ -6,4 +6,8 @@ export class LolApiInterceptor implements AxiosfitRequestInterceptor {
         config.timeout = 10000; // 10 sec
         return config;
     }
+
+    // onError(error: any) {
+    //     console.log(error);
+    // }
 }
