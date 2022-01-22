@@ -264,7 +264,10 @@ export class AuthController {
         }
 
         // if nothing above just return left time
-        return { status: LolAuthStatus.VALID_TIMESTAMP, timeLeft: differenceMin };
+        return {
+            status: LolAuthStatus.VALID_TIMESTAMP,
+            timeLeft: GeneralHelper.dater.timeLeft(differenceMin, configs.general.REGISTER_TIMESTAMP_DURATION),
+        };
     }
 
     @UseGuards(ThrottlerGuard)
