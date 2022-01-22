@@ -1,36 +1,4 @@
-class DateHelper {
-    addMinutes(minutesToAdd: number = 1) {
-        var startingTimeStamp = new Date();
-        var endingTimeStamp = new Date(startingTimeStamp.getTime() + minutesToAdd * 60 * 1000);
-
-        return {
-            startingTimeStamp,
-            endingTimeStamp,
-        };
-    }
-
-    timeDifferenceMinutes(date1: string | Date, date2?: string | Date) {
-        const tempDate2OrNow = date2 ?? new Date();
-
-        const tempDate1 = new Date(date1);
-        const tempDate2 = new Date(tempDate2OrNow);
-        const diffTime = Math.abs(tempDate2.getTime() - tempDate1.getTime());
-
-        const sec = Math.ceil(diffTime / 1000);
-        const min = sec / 60;
-        const hour = min / 60;
-        const day = hour / 24;
-
-        return {
-            sec: Math.trunc(sec),
-            min: Math.trunc(min),
-            hour: Math.trunc(hour),
-            day: Math.trunc(day),
-        };
-
-        // return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // day
-    }
-}
+import { DateHelper } from './general/dater.helper';
 
 export class GeneralHelper {
     public static readonly dater = new DateHelper();

@@ -48,7 +48,6 @@ import { FirstStepAuthResponse, SecondStepAuthResponse } from '../modules/auth/r
 import { SummonerDetailsFailure } from '../common/failures/lol_api/summoner_details.failure.enum';
 import { SummonerAuthRequestStep1 } from '../schemas/request/auth/summoner_auth_step_1.request';
 import { SummonerAuthCheckParams } from '../schemas/request/auth/summoner_auth_step_2_check.request';
-import { NetworkProvider } from '../modules/network/network.provider';
 import { SummonerDetailsAndLeagueFailure } from '../common/failures/lol_api/summoner_details_league.failure.enum';
 
 @Controller('/auth')
@@ -64,7 +63,6 @@ export class AuthController {
         private readonly userRegisterCacheService: UserRegisterCacheService,
         private readonly matchingSpamService: MatchingSpamService,
         private readonly userBelongingsService: UserBelongingsService,
-        private readonly networkProvider: NetworkProvider,
     ) {}
 
     @UseGuards(ThrottlerGuard)
@@ -93,11 +91,17 @@ export class AuthController {
         const userRegisterCache = await this.authService.retrieveRegisterCache(server, summonerName);
 
         // if exists and timestamp still in motion then throw exception
-        if (userRegisterCache && userRegisterCache.timestamp_now) {
-            const differenceMin = GeneralHelper.dater.timeDifferenceMinutes(userRegisterCache.timestamp_now);
+        if (userRegisterCache && userRegisterCache.timestamp_started) {
+            const differenceMin = GeneralHelper.dater.timeDifference(userRegisterCache.timestamp_started);
 
-            if (differenceMin.min < configs.general.REGISTER_TIMESTAMP_DURATION) {
-                return { uuid: userRegisterCache.uuid, timeLeft: differenceMin };
+            if (differenceMin && differenceMin.sec < configs.general.REGISTER_TIMESTAMP_DURATION) {
+                return {
+                    uuid: userRegisterCache.uuid,
+                    timeLeft: GeneralHelper.dater.timeLeft(
+                        differenceMin,
+                        configs.general.REGISTER_TIMESTAMP_DURATION,
+                    ),
+                };
             }
         }
 
@@ -108,19 +112,12 @@ export class AuthController {
             throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.SUMMONER_NAME_ALREADY_IN_USE);
         }
 
-        // const userRegisterRenewedCache = await this.authService.renewSummonerNameAndServer(
-        //     userRegisterCache,
-        //     server,
-        //     summonerName,
-        // );
-
         // if exists delete and then renew, else create new and then return
         if (userRegisterCache) {
             await this.userRegisterCacheService.delete(userRegisterCache.id);
         }
 
         const summonerDetailsAndLeague = await this.userService.summonerNameDetailsAndLeague(server, summonerName);
-
         const userRegisterRenewedCache = await summonerDetailsAndLeague.fold(
             async (l) => {
                 switch (l) {
@@ -128,7 +125,7 @@ export class AuthController {
                         throw new GenericException(
                             HttpStatus.INTERNAL_SERVER_ERROR,
                             ExceptionMessageCode.INTERNAL_SERVER_ERROR,
-                            ';dddd',
+                            'something went wrong with api',
                         );
                     case SummonerDetailsAndLeagueFailure.SUMMONER_NAME_NOT_FOUND:
                         throw new GenericException(
@@ -155,12 +152,6 @@ export class AuthController {
             },
         );
 
-        // fetch data from lol
-        // const summonerData = await this.networkProvider.lolRemoteService.summonerNameDetailsAndLeague(
-        //     server,
-        //     summonerName,
-        // );
-
         return { uuid: userRegisterRenewedCache.uuid };
     }
 
@@ -174,15 +165,14 @@ export class AuthController {
 
         if (!userRegCache) return { status: LolAuthStatus.INVALID };
 
-        const differenceMin = GeneralHelper.dater.timeDifferenceMinutes(userRegCache.timestamp_now);
+        const differenceMin = GeneralHelper.dater.timeDifference(userRegCache.timestamp_started);
 
         // if timestamp difference is more than register timestamp duration
-        if (differenceMin.min > configs.general.REGISTER_TIMESTAMP_DURATION) {
+        if (differenceMin.sec > configs.general.REGISTER_TIMESTAMP_DURATION) {
             return { status: LolAuthStatus.INVALID_TIMESTAMP };
         }
 
         const summonerOnlyDetailsResponse = await this.userService.summonerNameDetails(server, summonerName);
-
         return summonerOnlyDetailsResponse.fold<Promise<SecondStepAuthResponse>>(
             async (l) => {
                 switch (l) {
@@ -200,7 +190,13 @@ export class AuthController {
                     return { status: LolAuthStatus.VALID };
                 }
 
-                return { status: LolAuthStatus.VALID_TIMESTAMP, timeLeft: differenceMin };
+                return {
+                    status: LolAuthStatus.VALID_TIMESTAMP,
+                    timeLeft: GeneralHelper.dater.timeLeft(
+                        differenceMin,
+                        configs.general.REGISTER_TIMESTAMP_DURATION,
+                    ),
+                };
             },
         );
     }
@@ -234,17 +230,15 @@ export class AuthController {
         }
 
         // get date difference between now dan cache timestamp starting point
-        const differenceMin = GeneralHelper.dater.timeDifferenceMinutes(userRegCache.timestamp_now);
+        const differenceMin = GeneralHelper.dater.timeDifference(userRegCache.timestamp_started);
 
         // if timestamp difference is more than for some minutes
-        if (differenceMin.min > configs.general.REGISTER_TIMESTAMP_DURATION) {
+        if (differenceMin.sec > configs.general.REGISTER_TIMESTAMP_DURATION) {
             throw new GenericException(HTTS.BAD_REQUEST, ExceptionMessageCode.AUTH_REGISTER_INVALID_TIMESTAMP);
         }
 
-        // get summoner details from lol api
+        // get summoner details from lol api and check for api exception and return response
         const summonerOnlyDetailsResponse = await this.userService.summonerNameDetails(server, summonerName);
-
-        // check for api exception and return response
         const summonerDetails = summonerOnlyDetailsResponse.fold(
             (l) => {
                 switch (l) {
@@ -265,6 +259,7 @@ export class AuthController {
         if (userRegCache.profile_icon_id !== summonerDetails.profileIconId) {
             // change validate to true and return
             await this.userRegisterCacheService.updateValidation(userRegCache.id, true);
+
             return { status: LolAuthStatus.VALID };
         }
 

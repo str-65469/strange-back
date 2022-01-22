@@ -15,8 +15,7 @@ export class UserRegisterCache extends GeneralEntity {
 
     // for more validation
     @Column({ nullable: false, type: 'int' }) profile_icon_id: number;
-    @Column({ nullable: false, type: 'timestamptz' }) timestamp_now: Date;
-    @Column({ nullable: false, type: 'timestamptz' }) timestamp_end: Date;
+    @Column({ nullable: false, type: 'timestamptz' }) timestamp_started: Date;
     @Column({ nullable: false }) is_valid: boolean;
     @Column({ nullable: false }) @Generated('uuid') uuid: string;
 

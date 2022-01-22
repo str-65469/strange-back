@@ -19,7 +19,8 @@ export default Object.freeze({
     },
 
     // throttling, rate limitins
-    REGISTER_TIMESTAMP_DURATION: 10, // 10 min
+    REGISTER_TIMESTAMP_DURATION: 1 * 60, //
+    // REGISTER_TIMESTAMP_DURATION_MINUTES: 10 * 60, // 10 min
 
     AUTH_FIRST_STEP_THROTTLE: 15, // first step retrieves api
     AUTH_GENERAL_THROTTLE: 200, // 120 req in min from single ip

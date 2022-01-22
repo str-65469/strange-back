@@ -1,6 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { Request } from 'express';
+import e, { Request } from 'express';
 import { IncomingHttpHeaders } from 'http';
 import { configs } from 'src/configs/config';
 import { ExceptionMessageCode } from '../enum/message_codes/exception_message_code.enum';
@@ -31,10 +31,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const request = ctx.getRequest() as Request;
         let responseBody: GenericExceptionProps | null = null;
 
+        // can be removed or saved in some file
+        this.logInternalServerErrors(exception);
+
         // http exceptions
         if (exception instanceof GenericException) {
             const exceptionResponse = exception.getResponse() as GenericExceptionProps;
             const statusCode = exception.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
+
             responseBody = {
                 message: exceptionResponse?.message ?? configs.messages.exceptions.generalMessage,
                 messageCode: exceptionResponse?.messageCode ?? ExceptionMessageCode.INTERNAL_SERVER_ERROR,
@@ -86,5 +90,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
         };
 
         return process.env.NODE_ENV === 'development' ? additionalParams : undefined;
+    }
+
+    private logInternalServerErrors(exception: any) {
+        if (exception && exception.hasOwnProperty('getStatus') && exception.getStatus() === 500) {
+            console.log(exception);
+        }
     }
 }

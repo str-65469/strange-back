@@ -28,14 +28,9 @@ export class UserRegisterCacheService {
     }
 
     createFirstStepCache(server: LolServer, summonerName: string, summonerData: SummonerDetailsAndLeagueResponse) {
-        const { startingTimeStamp, endingTimeStamp } = GeneralHelper.dater.addMinutes(
-            configs.general.REGISTER_TIMESTAMP_DURATION,
-        );
-
         const generatedUUID: string = uuid();
         const userRegisterCache = this.userRegisterCacheRepo.create({
-            timestamp_now: startingTimeStamp,
-            timestamp_end: endingTimeStamp,
+            timestamp_started: new Date(),
             profile_icon_id: summonerData.profileIconId,
             is_valid: false,
             uuid: generatedUUID,
